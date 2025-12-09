@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import SkillMatches from "@/components/SkillMatches";
 import SkillSelect from "@/components/SkillSelect";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { 
@@ -285,13 +284,30 @@ const Dashboard = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Skill Matches - Only show if profile is complete */}
+            {/* Link to Matching Page - Only show if profile is complete */}
             {user && fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && (
-              <SkillMatches 
-                userSkillsOffered={skillsOffered}
-                userSkillsWanted={skillsWanted}
-                userId={user.id}
-              />
+              <Card className="shadow-elevated bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+                <CardContent className="py-8">
+                  <div className="text-center space-y-4">
+                    <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                      <Heart className="w-8 h-8 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-2xl font-bold mb-2">Find Your Skill Match</h3>
+                      <p className="text-muted-foreground">
+                        Swipe through potential matches and connect with people who can teach you or learn from you!
+                      </p>
+                    </div>
+                    <Button variant="hero" size="lg" asChild className="px-8">
+                      <Link to="/matching">
+                        <Heart className="w-5 h-5 mr-2" />
+                        Start Matching
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Profile Card */}

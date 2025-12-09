@@ -8,6 +8,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Matching from "./pages/Matching";
 import Messages from "./pages/Messages";
 import Browse from "./pages/Browse";
 import NotFound from "./pages/NotFound";
@@ -33,6 +34,14 @@ const App = () => (
               } 
             />
             <Route 
+              path="/matching" 
+              element={
+                <ProtectedRoute>
+                  <Matching />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/messages" 
               element={
                 <ProtectedRoute>
