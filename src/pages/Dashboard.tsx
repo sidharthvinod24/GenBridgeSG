@@ -4,11 +4,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import SkillMatches from "@/components/SkillMatches";
+import SkillSelect from "@/components/SkillSelect";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { 
   Heart, 
@@ -16,8 +17,7 @@ import {
   MapPin, 
   Edit3, 
   Save, 
-  X, 
-  Plus,
+  X,
   Sparkles,
   Users,
   ArrowRight,
@@ -366,18 +366,13 @@ const Dashboard = () => {
                     )}
                   </div>
                   {editing && (
-                    <div className="flex gap-2">
-                      <Input
-                        value={skillOffered}
-                        onChange={(e) => setSkillOffered(e.target.value)}
-                        placeholder="e.g., Cooking, Piano, Web Design"
-                        onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSkillOffered())}
-                        className="h-12"
-                      />
-                      <Button type="button" variant="outline" onClick={addSkillOffered}>
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
+                    <SkillSelect
+                      value={skillOffered}
+                      onChange={setSkillOffered}
+                      onAdd={addSkillOffered}
+                      placeholder="Search skills you can teach..."
+                      existingSkills={skillsOffered}
+                    />
                   )}
                 </div>
 
@@ -410,18 +405,13 @@ const Dashboard = () => {
                     )}
                   </div>
                   {editing && (
-                    <div className="flex gap-2">
-                      <Input
-                        value={skillWanted}
-                        onChange={(e) => setSkillWanted(e.target.value)}
-                        placeholder="e.g., Photography, Guitar, Languages"
-                        onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSkillWanted())}
-                        className="h-12"
-                      />
-                      <Button type="button" variant="outline" onClick={addSkillWanted}>
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
+                    <SkillSelect
+                      value={skillWanted}
+                      onChange={setSkillWanted}
+                      onAdd={addSkillWanted}
+                      placeholder="Search skills you want to learn..."
+                      existingSkills={skillsWanted}
+                    />
                   )}
                 </div>
               </CardContent>
