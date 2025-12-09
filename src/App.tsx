@@ -8,6 +8,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Messages from "./pages/Messages";
+import Browse from "./pages/Browse";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,15 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/messages" 
+              element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              } 
+            />
+            <Route path="/browse" element={<Browse />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
