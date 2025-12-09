@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import SkillCategories from "@/components/SkillCategories";
+import WhyUseUs from "@/components/WhyUseUs";
 import HowItWorks from "@/components/HowItWorks";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
@@ -11,7 +11,7 @@ const Index = () => {
       <Navbar />
       <main>
         <Hero />
-        <SkillCategories />
+        <WhyUseUs />
         <HowItWorks />
         <CTASection />
       </main>
