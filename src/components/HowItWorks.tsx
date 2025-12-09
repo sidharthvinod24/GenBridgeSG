@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { UserPlus, Search, MessageCircle, Handshake } from "lucide-react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const steps = [
   {
@@ -29,10 +30,18 @@ const steps = [
 ];
 
 const HowItWorks = () => {
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation(0.1);
+  const { ref: stepsRef, isVisible: stepsVisible } = useScrollAnimation(0.1);
+
   return (
     <section id="how-it-works" className="py-20 bg-gradient-to-b from-background to-primary-light/30">
       <div className="container">
-        <div className="text-center mb-16">
+        <div 
+          ref={headerRef}
+          className={`text-center mb-16 transition-all duration-700 ${
+            headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
             How GenBridgeSG Works
           </h2>
@@ -41,7 +50,12 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        <div 
+          ref={stepsRef}
+          className={`grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 transition-all duration-700 delay-200 ${
+            stepsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
           {steps.map((step, index) => (
             <div key={step.step} className="relative">
               {/* Connector line (hidden on mobile and last item) */}

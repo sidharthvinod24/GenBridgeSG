@@ -5,6 +5,7 @@ import {
   Shield, 
   Sparkles
 } from "lucide-react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const benefits = [
   {
@@ -34,10 +35,18 @@ const benefits = [
 ];
 
 const WhyUseUs = () => {
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation(0.1);
+  const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation(0.1);
+
   return (
     <section id="why-use" className="py-20 bg-muted/30">
       <div className="container">
-        <div className="text-center mb-12">
+        <div 
+          ref={headerRef}
+          className={`text-center mb-12 transition-all duration-700 ${
+            headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
             Why Use GenBridgeSG?
           </h2>
@@ -47,7 +56,12 @@ const WhyUseUs = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div 
+          ref={cardsRef}
+          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 transition-all duration-700 delay-200 ${
+            cardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
           {benefits.map((benefit) => (
             <Card 
               key={benefit.title} 
