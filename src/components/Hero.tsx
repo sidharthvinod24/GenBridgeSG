@@ -36,7 +36,7 @@ const Hero = () => {
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Button variant="hero" size="xl" className="w-full sm:w-auto pulse-soft" asChild>
+            <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
               <Link to="/auth">
                 Start Matching
                 <Sparkles className="ml-2" />
