@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import SkillMatches from "@/components/SkillMatches";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { 
   Heart, 
   LogOut, 
@@ -39,6 +40,7 @@ interface Profile {
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { unreadCount } = useUnreadMessages();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -441,10 +443,15 @@ const Dashboard = () => {
                     <ArrowRight className="w-4 h-4 ml-auto" />
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start" asChild>
+                <Button variant="outline" className="w-full justify-start relative" asChild>
                   <Link to="/messages">
                     <MessageCircle className="w-5 h-5 mr-3" />
                     Messages
+                    {unreadCount > 0 && (
+                      <span className="absolute right-12 bg-destructive text-destructive-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
                     <ArrowRight className="w-4 h-4 ml-auto" />
                   </Link>
                 </Button>
