@@ -6,25 +6,25 @@ const steps = [
     icon: UserPlus,
     step: "1",
     title: "Create Your Profile",
-    description: "Sign up and tell us about the skills you can teach and what you'd like to learn.",
+    description: "Share your skills and what you want to learn.",
   },
   {
     icon: Search,
     step: "2",
     title: "Find Your Match",
-    description: "Browse available skills or let us match you with compatible neighbours nearby.",
+    description: "Get matched with compatible community members.",
   },
   {
     icon: MessageCircle,
     step: "3",
     title: "Connect & Arrange",
-    description: "Send a message to introduce yourself and agree on time, place, and duration.",
+    description: "Chat and set up a time to meet.",
   },
   {
     icon: Handshake,
     step: "4",
     title: "Swap & Grow",
-    description: "Meet up, exchange skills, and build lasting connections in your community.",
+    description: "Exchange skills and build connections.",
   },
 ];
 
@@ -34,11 +34,10 @@ const HowItWorks = () => {
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            How SkillSwap Works
+            How GenBridgeSG Works
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Exchange skills in four simple steps — it's free, it's easy, 
-            and it brings our community closer together.
+            Four simple steps to start exchanging skills with your community.
           </p>
         </div>
 
