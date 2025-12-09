@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Heart, ArrowLeft, Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { validateMessage } from "@/lib/validation";
+import ReportUser from "@/components/ReportUser";
 
 interface Conversation {
   id: string;
@@ -261,6 +262,14 @@ const Messages = () => {
               </span>
             </Link>
           </div>
+          
+          {/* Report Button */}
+          <ReportUser 
+            chatPartners={conversations.map(c => ({
+              user_id: c.otherUser?.user_id || "",
+              full_name: c.otherUser?.full_name || null
+            })).filter(p => p.user_id)}
+          />
         </div>
       </header>
 

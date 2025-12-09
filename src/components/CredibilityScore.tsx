@@ -1,5 +1,5 @@
 import { Progress } from "@/components/ui/progress";
-import { Award, Shield, TrendingUp, Star } from "lucide-react";
+import { Shield, Star } from "lucide-react";
 
 interface CredibilityScoreProps {
   score: number;
@@ -7,11 +7,11 @@ interface CredibilityScoreProps {
 }
 
 const getScoreLevel = (score: number) => {
-  if (score >= 80) return { label: "Excellent", color: "text-green-600", bg: "bg-green-100" };
-  if (score >= 60) return { label: "Good", color: "text-blue-600", bg: "bg-blue-100" };
-  if (score >= 40) return { label: "Building", color: "text-amber-600", bg: "bg-amber-100" };
-  if (score >= 20) return { label: "Getting Started", color: "text-orange-600", bg: "bg-orange-100" };
-  return { label: "New", color: "text-slate-600", bg: "bg-slate-100" };
+  if (score >= 90) return { label: "Excellent", color: "text-green-600", bg: "bg-green-100" };
+  if (score >= 70) return { label: "Good", color: "text-blue-600", bg: "bg-blue-100" };
+  if (score >= 50) return { label: "Average", color: "text-amber-600", bg: "bg-amber-100" };
+  if (score >= 30) return { label: "Below Average", color: "text-orange-600", bg: "bg-orange-100" };
+  return { label: "Needs Improvement", color: "text-red-600", bg: "bg-red-100" };
 };
 
 const CredibilityScore = ({ score, compact = false }: CredibilityScoreProps) => {
@@ -46,12 +46,11 @@ const CredibilityScore = ({ score, compact = false }: CredibilityScoreProps) => 
       <Progress value={score} className="h-2" />
 
       <div className="text-xs text-muted-foreground space-y-1">
-        <p className="font-medium">How to improve your score:</p>
-        <ul className="space-y-0.5 ml-4 list-disc">
-          <li>Add more skills you can teach</li>
-          <li>Set higher proficiency levels for your skills</li>
-          <li>Complete the personality questionnaire</li>
-        </ul>
+        <div className="flex items-center gap-1">
+          <Star className="w-3 h-3" />
+          <p className="font-medium">Score based on reviews from skill exchanges</p>
+        </div>
+        <p className="ml-4">Connect with others and get reviews to build your credibility!</p>
       </div>
     </div>
   );
