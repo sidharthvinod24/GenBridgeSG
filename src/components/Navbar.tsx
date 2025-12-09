@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Heart } from "lucide-react";
 import { useState } from "react";
 
 const Navbar = () => {
@@ -11,8 +11,8 @@ const Navbar = () => {
       <nav className="container flex items-center justify-between h-18 py-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-            <span className="text-primary-foreground font-display font-bold text-lg">S</span>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
+            <Heart className="w-5 h-5 text-primary-foreground" />
           </div>
           <span className="font-display font-bold text-xl text-foreground">
             Skill<span className="text-primary">Swap</span>
@@ -43,11 +43,11 @@ const Navbar = () => {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="default">
-            Sign In
+          <Button variant="ghost" size="default" asChild>
+            <Link to="/auth">Sign In</Link>
           </Button>
-          <Button variant="hero" size="default">
-            Get Started
+          <Button variant="hero" size="default" asChild>
+            <Link to="/auth">Get Started</Link>
           </Button>
         </div>
 
@@ -87,11 +87,11 @@ const Navbar = () => {
               Community
             </Link>
             <div className="flex flex-col gap-3 pt-4">
-              <Button variant="outline" size="lg" className="w-full">
-                Sign In
+              <Button variant="outline" size="lg" className="w-full" asChild>
+                <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
               </Button>
-              <Button variant="hero" size="lg" className="w-full">
-                Get Started
+              <Button variant="hero" size="lg" className="w-full" asChild>
+                <Link to="/auth" onClick={() => setIsOpen(false)}>Get Started</Link>
               </Button>
             </div>
           </div>

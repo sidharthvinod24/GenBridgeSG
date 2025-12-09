@@ -1,14 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CTASection = () => {
   return (
     <section className="py-20">
       <div className="container">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-primary-dark p-8 md:p-16">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-secondary p-8 md:p-16">
           {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/20 rounded-full blur-2xl" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary-foreground/10 rounded-full blur-2xl" />
+          
+          {/* Floating hearts */}
+          <div className="absolute top-10 left-10 opacity-20">
+            <Heart className="w-12 h-12 text-primary-foreground float" />
+          </div>
+          <div className="absolute bottom-10 right-10 opacity-20">
+            <Heart className="w-8 h-8 text-primary-foreground float" style={{ animationDelay: '1s' }} />
+          </div>
           
           <div className="relative z-10 max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 border border-primary-foreground/20 mb-6">
@@ -19,7 +28,7 @@ const CTASection = () => {
             </div>
 
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-6 leading-tight">
-              Ready to Share Your Skills?
+              Ready to Find Your Perfect Match?
             </h2>
             
             <p className="text-lg md:text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
@@ -32,9 +41,12 @@ const CTASection = () => {
                 variant="accent" 
                 size="xl" 
                 className="w-full sm:w-auto"
+                asChild
               >
-                Create Free Account
-                <ArrowRight className="ml-2" />
+                <Link to="/auth">
+                  Create Free Account
+                  <ArrowRight className="ml-2" />
+                </Link>
               </Button>
               <Button 
                 variant="ghost" 
