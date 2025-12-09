@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MapPin, Sparkles, Heart, ArrowLeftRight, MessageCircle, X, RotateCcw } from "lucide-react";
 import { useStartConversation } from "@/hooks/useStartConversation";
 import { toast } from "sonner";
+import MatchCelebration from "./MatchCelebration";
 
 interface MatchedProfile {
   id: string;
@@ -36,6 +37,8 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
   const [currentIndex, setCurrentIndex] = useState(0);
   const [skippedMatches, setSkippedMatches] = useState<MatchedProfile[]>([]);
   const [connecting, setConnecting] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationMatch, setCelebrationMatch] = useState<MatchedProfile | null>(null);
   
   // Swipe state
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -146,15 +149,23 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
     if (currentIndex >= matches.length) return;
 
     setIsExiting(direction);
+    const match = matches[currentIndex];
+    const isPerfect = match.matchingSkillsICanTeach.length > 0 && match.matchingSkillsTheyCanTeach.length > 0;
 
     setTimeout(async () => {
       if (direction === "right") {
-        const match = matches[currentIndex];
         setConnecting(true);
         const conversationId = await startConversation(userId, match.user_id);
         setConnecting(false);
+        
         if (conversationId) {
-          toast.success(`Connected with ${match.full_name || "user"}! 💬`);
+          if (isPerfect) {
+            // Show celebration for perfect matches
+            setCelebrationMatch(match);
+            setShowCelebration(true);
+          } else {
+            toast.success(`Connected with ${match.full_name || "user"}! 💬`);
+          }
         }
       } else {
         setSkippedMatches(prev => [...prev, matches[currentIndex]]);
@@ -164,6 +175,12 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
       setIsExiting(null);
       setDragOffset({ x: 0, y: 0 });
     }, 300);
+  };
+
+  const handleCelebrationComplete = () => {
+    setShowCelebration(false);
+    setCelebrationMatch(null);
+    toast.success(`Connected with ${celebrationMatch?.full_name || "user"}! 💬`);
   };
 
   const handleUndo = () => {
@@ -335,7 +352,16 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
   }
 
   return (
-    <Card className="shadow-elevated overflow-hidden">
+    <>
+      {/* Match Celebration Overlay */}
+      {showCelebration && celebrationMatch && (
+        <MatchCelebration 
+          matchName={celebrationMatch.full_name || "your match"}
+          onComplete={handleCelebrationComplete}
+        />
+      )}
+
+      <Card className="shadow-elevated overflow-hidden">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="font-display text-xl flex items-center gap-2">
@@ -501,6 +527,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
         </p>
       </CardContent>
     </Card>
+    </>
   );
 };
 
