@@ -90,6 +90,17 @@ const Dashboard = () => {
     if (!user) return;
     setSaving(true);
 
+    // Auto-add any skills that are typed but not yet added
+    const finalSkillsOffered = [...skillsOffered];
+    const finalSkillsWanted = [...skillsWanted];
+    
+    if (skillOffered.trim() && !finalSkillsOffered.includes(skillOffered.trim())) {
+      finalSkillsOffered.push(skillOffered.trim());
+    }
+    if (skillWanted.trim() && !finalSkillsWanted.includes(skillWanted.trim())) {
+      finalSkillsWanted.push(skillWanted.trim());
+    }
+
     try {
       const { error } = await supabase
         .from("profiles")
@@ -98,13 +109,19 @@ const Dashboard = () => {
           bio,
           location,
           age_group: ageGroup,
-          skills_offered: skillsOffered,
-          skills_wanted: skillsWanted,
+          skills_offered: finalSkillsOffered,
+          skills_wanted: finalSkillsWanted,
         })
         .eq("user_id", user.id);
 
       if (error) throw error;
 
+      // Update local state with the final values
+      setSkillsOffered(finalSkillsOffered);
+      setSkillsWanted(finalSkillsWanted);
+      setSkillOffered("");
+      setSkillWanted("");
+      
       toast.success("Profile updated!");
       setEditing(false);
       fetchProfile();
