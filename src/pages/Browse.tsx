@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import CredibilityScore, { getScoreLevel } from "@/components/CredibilityScore";
 import { 
   Heart, 
   ArrowLeft, 
@@ -16,7 +17,8 @@ import {
   X,
   Sparkles,
   MessageCircle,
-  Users
+  Users,
+  Shield
 } from "lucide-react";
 import {
   Select,
@@ -37,6 +39,7 @@ interface Profile {
   skills_offered: string[];
   skills_wanted: string[];
   age_group: string | null;
+  credibility_score: number | null;
 }
 
 // Skill categories for filtering
@@ -396,9 +399,18 @@ const Browse = () => {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-display font-bold text-lg truncate">
-                        {profile.full_name || "Anonymous"}
-                      </h3>
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-display font-bold text-lg truncate">
+                          {profile.full_name || "Anonymous"}
+                        </h3>
+                        {/* Credibility Score Badge */}
+                        {(profile.credibility_score ?? 0) > 0 && (
+                          <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${getScoreLevel(profile.credibility_score || 0).bg} ${getScoreLevel(profile.credibility_score || 0).color}`}>
+                            <Shield className="w-3 h-3" />
+                            {profile.credibility_score}
+                          </div>
+                        )}
+                      </div>
                       {profile.location && (
                         <p className="text-sm text-muted-foreground flex items-center gap-1">
                           <MapPin className="w-3 h-3" />

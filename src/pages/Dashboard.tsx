@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import SkillSelect from "@/components/SkillSelect";
+import SkillProficiencySelector, { ProficiencyLevel } from "@/components/SkillProficiencySelector";
+import CredibilityScore from "@/components/CredibilityScore";
 import ProfileQuestionnaire from "@/components/ProfileQuestionnaire";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { validateProfile } from "@/lib/validation";
@@ -26,7 +28,8 @@ import {
   MessageCircle,
   AlertCircle,
   CheckCircle2,
-  ClipboardList
+  ClipboardList,
+  Shield
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -43,6 +46,8 @@ interface Profile {
   q_skill_or_hobby: string | null;
   q_learning_style: string | null;
   q_joining_reason: string | null;
+  skills_proficiency: Record<string, ProficiencyLevel> | null;
+  credibility_score: number | null;
 }
 
 interface QuestionnaireAnswers {
@@ -70,6 +75,8 @@ const Dashboard = () => {
   const [skillWanted, setSkillWanted] = useState("");
   const [skillsOffered, setSkillsOffered] = useState<string[]>([]);
   const [skillsWanted, setSkillsWanted] = useState<string[]>([]);
+  const [skillsProficiency, setSkillsProficiency] = useState<Record<string, ProficiencyLevel>>({});
+  const [credibilityScore, setCredibilityScore] = useState(0);
   
   // Questionnaire answers
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
@@ -107,13 +114,28 @@ const Dashboard = () => {
       }
 
       if (data) {
-        setProfile(data);
+        // Cast skills_proficiency properly from JSON
+        const proficiency = (typeof data.skills_proficiency === 'object' && data.skills_proficiency !== null)
+          ? data.skills_proficiency as Record<string, ProficiencyLevel>
+          : {};
+        
+        const profileData: Profile = {
+          ...data,
+          skills_offered: data.skills_offered || [],
+          skills_wanted: data.skills_wanted || [],
+          skills_proficiency: proficiency,
+          credibility_score: data.credibility_score || 0,
+        };
+        
+        setProfile(profileData);
         setFullName(data.full_name || "");
         setBio(data.bio || "");
         setLocation(data.location || "");
         setAgeGroup(data.age_group || "");
         setSkillsOffered(data.skills_offered || []);
         setSkillsWanted(data.skills_wanted || []);
+        setSkillsProficiency(proficiency);
+        setCredibilityScore(data.credibility_score || 0);
         setQuestionnaireAnswers({
           q_skill_or_hobby: data.q_skill_or_hobby || "",
           q_learning_style: data.q_learning_style || "",
@@ -142,6 +164,20 @@ const Dashboard = () => {
       finalSkillsWanted.push(skillWanted.trim());
     }
 
+    // Update proficiency for any new skills (default to beginner)
+    const updatedProficiency = { ...skillsProficiency };
+    finalSkillsOffered.forEach(skill => {
+      if (!updatedProficiency[skill]) {
+        updatedProficiency[skill] = "beginner";
+      }
+    });
+    // Remove proficiency for skills that were removed
+    Object.keys(updatedProficiency).forEach(skill => {
+      if (!finalSkillsOffered.includes(skill)) {
+        delete updatedProficiency[skill];
+      }
+    });
+
     // Validate profile data before saving
     const profileData = {
       full_name: fullName,
@@ -150,6 +186,7 @@ const Dashboard = () => {
       age_group: ageGroup,
       skills_offered: finalSkillsOffered,
       skills_wanted: finalSkillsWanted,
+      skills_proficiency: updatedProficiency,
     };
     
     const validation = validateProfile(profileData);
@@ -213,7 +250,10 @@ const Dashboard = () => {
 
   const addSkillOffered = () => {
     if (skillOffered.trim() && !skillsOffered.includes(skillOffered.trim())) {
-      setSkillsOffered([...skillsOffered, skillOffered.trim()]);
+      const newSkill = skillOffered.trim();
+      setSkillsOffered([...skillsOffered, newSkill]);
+      // Default new skills to beginner proficiency
+      setSkillsProficiency(prev => ({ ...prev, [newSkill]: "beginner" }));
       setSkillOffered("");
     }
   };
@@ -227,6 +267,16 @@ const Dashboard = () => {
 
   const removeSkillOffered = (skill: string) => {
     setSkillsOffered(skillsOffered.filter(s => s !== skill));
+    // Also remove from proficiency map
+    setSkillsProficiency(prev => {
+      const updated = { ...prev };
+      delete updated[skill];
+      return updated;
+    });
+  };
+
+  const handleProficiencyChange = (skill: string, level: ProficiencyLevel) => {
+    setSkillsProficiency(prev => ({ ...prev, [skill]: level }));
   };
 
   const removeSkillWanted = (skill: string) => {
@@ -539,34 +589,24 @@ const Dashboard = () => {
                   )}
                 </div>
 
-                {/* Skills Offered */}
+                {/* Skills Offered with Proficiency */}
                 <div className="space-y-3">
                   <Label className="text-base font-medium flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-primary" />
                     Skills You Can Teach
+                    <span className="text-xs text-muted-foreground font-normal ml-2">
+                      (with proficiency level)
+                    </span>
                   </Label>
-                  <div className="flex flex-wrap gap-2">
-                    {skillsOffered.map((skill) => (
-                      <Badge 
-                        key={skill} 
-                        variant="secondary"
-                        className="px-3 py-1.5 text-sm bg-primary-light text-primary border-primary/20"
-                      >
-                        {skill}
-                        {editing && (
-                          <button 
-                            onClick={() => removeSkillOffered(skill)}
-                            className="ml-2 hover:text-destructive"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        )}
-                      </Badge>
-                    ))}
-                    {skillsOffered.length === 0 && !editing && (
-                      <span className="text-muted-foreground">No skills added yet</span>
-                    )}
-                  </div>
+                  
+                  <SkillProficiencySelector
+                    skills={skillsOffered}
+                    proficiencies={skillsProficiency}
+                    onProficiencyChange={handleProficiencyChange}
+                    onRemoveSkill={removeSkillOffered}
+                    editing={editing}
+                  />
+                  
                   {editing && (
                     <SkillSelect
                       value={skillOffered}
@@ -663,6 +703,19 @@ const Dashboard = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Credibility Score Card */}
+            <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="font-display text-xl flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-primary" />
+                  Credibility Score
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CredibilityScore score={credibilityScore} />
+              </CardContent>
+            </Card>
+
             {/* Quick Actions */}
             <Card>
               <CardHeader>
