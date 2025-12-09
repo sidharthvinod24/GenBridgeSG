@@ -16,8 +16,8 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         // Custom variants for SkillSwap
-        hero: "bg-gradient-to-r from-primary to-primary-dark text-primary-foreground shadow-elevated hover:shadow-glow hover:scale-[1.02] active:scale-[0.98]",
-        warm: "bg-secondary text-secondary-foreground shadow-card hover:shadow-elevated hover:scale-[1.02] active:scale-[0.98]",
+        hero: "bg-gradient-to-r from-primary to-primary-dark text-primary-foreground shadow-elevated hover:shadow-glow hover:brightness-105 active:brightness-95",
+        warm: "bg-secondary text-secondary-foreground shadow-card hover:shadow-elevated hover:brightness-105 active:brightness-95",
         accent: "bg-accent text-accent-foreground shadow-card hover:shadow-elevated font-bold",
         soft: "bg-primary-light text-primary hover:bg-primary hover:text-primary-foreground border border-primary/20",
       },
