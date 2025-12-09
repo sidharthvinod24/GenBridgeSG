@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import SkillMatches from "@/components/SkillMatches";
 import { 
   Heart, 
   LogOut, 
-  User, 
   MapPin, 
   Edit3, 
   Save, 
@@ -190,8 +190,18 @@ const Dashboard = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Profile Card */}
-          <div className="lg:col-span-2">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Skill Matches */}
+            {user && (
+              <SkillMatches 
+                userSkillsOffered={skillsOffered}
+                userSkillsWanted={skillsWanted}
+                userId={user.id}
+              />
+            )}
+
+            {/* Profile Card */}
             <Card className="shadow-elevated">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
@@ -409,14 +419,9 @@ const Dashboard = () => {
                 <Button variant="hero" className="w-full justify-start" asChild>
                   <Link to="/">
                     <Users className="w-5 h-5 mr-3" />
-                    Browse Skills
+                    Browse All Skills
                     <ArrowRight className="w-4 h-4 ml-auto" />
                   </Link>
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Heart className="w-5 h-5 mr-3" />
-                  View Matches
-                  <Badge variant="secondary" className="ml-auto">Soon</Badge>
                 </Button>
               </CardContent>
             </Card>
@@ -452,6 +457,13 @@ const Dashboard = () => {
                       Skills to learn
                     </span>
                   </div>
+                </div>
+
+                {/* Tip */}
+                <div className="mt-6 p-4 rounded-lg bg-accent/10 border border-accent/20">
+                  <p className="text-sm text-muted-foreground">
+                    💡 <strong>Tip:</strong> Complete your profile and add skills to find your perfect skill swap matches!
+                  </p>
                 </div>
               </CardContent>
             </Card>
