@@ -68,7 +68,7 @@ const Browse = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [locationFilter, setLocationFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("all");
   const [ageFilter, setAgeFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -144,7 +144,7 @@ const Browse = () => {
       }
 
       // Location filter
-      if (locationFilter && profile.location !== locationFilter) {
+      if (locationFilter !== "all" && profile.location !== locationFilter) {
         return false;
       }
 
@@ -165,11 +165,11 @@ const Browse = () => {
   const clearFilters = () => {
     setSearchQuery("");
     setCategoryFilter("all");
-    setLocationFilter("");
+    setLocationFilter("all");
     setAgeFilter("all");
   };
 
-  const hasActiveFilters = searchQuery || categoryFilter !== "all" || locationFilter || ageFilter !== "all";
+  const hasActiveFilters = searchQuery || categoryFilter !== "all" || locationFilter !== "all" || ageFilter !== "all";
 
   const handleStartChat = async (profileUserId: string) => {
     if (!user) {
@@ -317,7 +317,7 @@ const Browse = () => {
                         <SelectValue placeholder="All Locations" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Locations</SelectItem>
+                        <SelectItem value="all">All Locations</SelectItem>
                         {locations.map((loc) => (
                           <SelectItem key={loc} value={loc}>
                             {loc}
