@@ -64,13 +64,25 @@ const Dashboard = () => {
     if (!user) return;
     
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("user_id", user.id)
         .maybeSingle();
 
       if (error) throw error;
+
+      // If no profile exists, create one
+      if (!data) {
+        const { data: newProfile, error: insertError } = await supabase
+          .from("profiles")
+          .insert({ user_id: user.id, full_name: user.user_metadata?.full_name || "" })
+          .select()
+          .single();
+        
+        if (insertError) throw insertError;
+        data = newProfile;
+      }
 
       if (data) {
         setProfile(data);
