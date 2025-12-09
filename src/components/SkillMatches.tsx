@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,12 +34,20 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
   const [matches, setMatches] = useState<MatchedProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [skippedMatches, setSkippedMatches] = useState<MatchedProfile[]>([]);
   const [connecting, setConnecting] = useState(false);
+  
+  // Swipe state
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [isExiting, setIsExiting] = useState<"left" | "right" | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  
   const navigate = useNavigate();
   const { startConversation } = useStartConversation();
+
+  const SWIPE_THRESHOLD = 100;
 
   useEffect(() => {
     fetchMatches();
@@ -108,15 +116,39 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
       .slice(0, 2);
   };
 
-  const handleSwipe = async (direction: "left" | "right") => {
-    if (isAnimating || currentIndex >= matches.length) return;
+  // Touch/Mouse handlers for swiping
+  const handleDragStart = (clientX: number, clientY: number) => {
+    setDragStart({ x: clientX, y: clientY });
+    setIsDragging(true);
+  };
 
-    setSwipeDirection(direction);
-    setIsAnimating(true);
+  const handleDragMove = (clientX: number, clientY: number) => {
+    if (!isDragging) return;
+    const deltaX = clientX - dragStart.x;
+    const deltaY = clientY - dragStart.y;
+    setDragOffset({ x: deltaX, y: deltaY * 0.3 }); // Less vertical movement
+  };
+
+  const handleDragEnd = async () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+
+    if (Math.abs(dragOffset.x) > SWIPE_THRESHOLD) {
+      const direction = dragOffset.x > 0 ? "right" : "left";
+      await handleSwipe(direction);
+    } else {
+      // Snap back
+      setDragOffset({ x: 0, y: 0 });
+    }
+  };
+
+  const handleSwipe = async (direction: "left" | "right") => {
+    if (currentIndex >= matches.length) return;
+
+    setIsExiting(direction);
 
     setTimeout(async () => {
       if (direction === "right") {
-        // Like - start conversation
         const match = matches[currentIndex];
         setConnecting(true);
         const conversationId = await startConversation(userId, match.user_id);
@@ -125,27 +157,81 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
           toast.success(`Connected with ${match.full_name || "user"}! 💬`);
         }
       } else {
-        // Pass - add to skipped
         setSkippedMatches(prev => [...prev, matches[currentIndex]]);
       }
 
       setCurrentIndex(prev => prev + 1);
-      setSwipeDirection(null);
-      setIsAnimating(false);
+      setIsExiting(null);
+      setDragOffset({ x: 0, y: 0 });
     }, 300);
   };
 
   const handleUndo = () => {
     if (skippedMatches.length === 0 || currentIndex === 0) return;
-    
-    const lastSkipped = skippedMatches[skippedMatches.length - 1];
     setSkippedMatches(prev => prev.slice(0, -1));
     setCurrentIndex(prev => prev - 1);
+  };
+
+  // Mouse event handlers
+  const onMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleDragStart(e.clientX, e.clientY);
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    handleDragMove(e.clientX, e.clientY);
+  };
+
+  const onMouseUp = () => {
+    handleDragEnd();
+  };
+
+  const onMouseLeave = () => {
+    if (isDragging) {
+      handleDragEnd();
+    }
+  };
+
+  // Touch event handlers
+  const onTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    handleDragStart(touch.clientX, touch.clientY);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    handleDragMove(touch.clientX, touch.clientY);
+  };
+
+  const onTouchEnd = () => {
+    handleDragEnd();
   };
 
   const currentMatch = matches[currentIndex];
   const isPerfectMatch = currentMatch?.matchingSkillsICanTeach.length > 0 && 
                          currentMatch?.matchingSkillsTheyCanTeach.length > 0;
+
+  // Calculate card transform
+  const getCardStyle = () => {
+    if (isExiting === "left") {
+      return { transform: "translateX(-150%) rotate(-30deg)", opacity: 0, transition: "all 0.3s ease-out" };
+    }
+    if (isExiting === "right") {
+      return { transform: "translateX(150%) rotate(30deg)", opacity: 0, transition: "all 0.3s ease-out" };
+    }
+    if (isDragging || dragOffset.x !== 0) {
+      const rotation = dragOffset.x * 0.1;
+      return { 
+        transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
+        transition: isDragging ? "none" : "all 0.3s ease-out"
+      };
+    }
+    return { transform: "translateX(0) rotate(0)", transition: "all 0.3s ease-out" };
+  };
+
+  // Swipe indicator opacity
+  const likeOpacity = Math.min(Math.max(dragOffset.x / SWIPE_THRESHOLD, 0), 1);
+  const passOpacity = Math.min(Math.max(-dragOffset.x / SWIPE_THRESHOLD, 0), 1);
 
   if (loading) {
     return (
@@ -263,7 +349,12 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
       </CardHeader>
       <CardContent className="pt-2">
         {/* Card Stack */}
-        <div className="relative h-[400px] w-full">
+        <div 
+          className="relative h-[420px] w-full select-none"
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseLeave}
+        >
           {/* Background cards for stack effect */}
           {matches.slice(currentIndex + 1, currentIndex + 3).map((_, i) => (
             <div
@@ -279,13 +370,29 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
 
           {/* Current Card */}
           <div
-            className={`absolute inset-0 bg-gradient-to-b from-card to-card/95 rounded-2xl border-2 
-              ${isPerfectMatch ? "border-primary shadow-[0_0_30px_rgba(var(--primary)/0.3)]" : "border-border"} 
-              transition-all duration-300 ease-out overflow-hidden
-              ${swipeDirection === "left" ? "translate-x-[-120%] rotate-[-20deg] opacity-0" : ""}
-              ${swipeDirection === "right" ? "translate-x-[120%] rotate-[20deg] opacity-0" : ""}
-            `}
+            ref={cardRef}
+            className={`absolute inset-0 bg-gradient-to-b from-card to-card/95 rounded-2xl border-2 cursor-grab active:cursor-grabbing overflow-hidden
+              ${isPerfectMatch ? "border-primary shadow-[0_0_30px_rgba(var(--primary)/0.3)]" : "border-border"}`}
+            style={getCardStyle()}
+            onMouseDown={onMouseDown}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
           >
+            {/* Swipe Indicators */}
+            <div 
+              className="absolute top-8 left-8 z-20 px-4 py-2 rounded-lg border-4 border-green-500 text-green-500 font-bold text-2xl rotate-[-20deg]"
+              style={{ opacity: likeOpacity }}
+            >
+              LIKE
+            </div>
+            <div 
+              className="absolute top-8 right-8 z-20 px-4 py-2 rounded-lg border-4 border-red-500 text-red-500 font-bold text-2xl rotate-[20deg]"
+              style={{ opacity: passOpacity }}
+            >
+              NOPE
+            </div>
+
             {/* Perfect Match Banner */}
             {isPerfectMatch && (
               <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
@@ -296,7 +403,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             )}
 
             {/* Avatar Section */}
-            <div className="h-[45%] bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 flex items-center justify-center relative">
+            <div className="h-[45%] bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 flex items-center justify-center relative pointer-events-none">
               <Avatar className="w-28 h-28 border-4 border-white shadow-xl">
                 <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-3xl font-bold">
                   {getInitials(currentMatch.full_name)}
@@ -305,7 +412,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             </div>
 
             {/* Info Section */}
-            <div className="p-5 space-y-4">
+            <div className="p-5 space-y-4 pointer-events-none">
               <div className="text-center">
                 <h3 className="font-display text-2xl font-bold text-foreground">
                   {currentMatch.full_name || "Anonymous"}
@@ -364,7 +471,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             size="icon"
             className="w-12 h-12 rounded-full border-2 text-muted-foreground hover:border-muted-foreground hover:bg-muted/50 disabled:opacity-50"
             onClick={handleUndo}
-            disabled={skippedMatches.length === 0 || isAnimating}
+            disabled={skippedMatches.length === 0}
           >
             <RotateCcw className="w-5 h-5" />
           </Button>
@@ -374,7 +481,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             size="icon"
             className="w-16 h-16 rounded-full border-2 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground transition-all"
             onClick={() => handleSwipe("left")}
-            disabled={isAnimating}
+            disabled={!!isExiting}
           >
             <X className="w-8 h-8" />
           </Button>
@@ -383,14 +490,14 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             size="icon"
             className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white shadow-lg transition-all"
             onClick={() => handleSwipe("right")}
-            disabled={isAnimating || connecting}
+            disabled={!!isExiting || connecting}
           >
             <Heart className="w-8 h-8" fill="currentColor" />
           </Button>
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-4">
-          Swipe right to connect, left to pass
+          Drag to swipe or use the buttons
         </p>
       </CardContent>
     </Card>

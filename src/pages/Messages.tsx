@@ -55,6 +55,7 @@ const Messages = () => {
   useEffect(() => {
     if (selectedConversation) {
       fetchMessages(selectedConversation.id);
+      markMessagesAsRead(selectedConversation.id);
       
       // Subscribe to new messages
       const channel = supabase
@@ -70,6 +71,10 @@ const Messages = () => {
           (payload) => {
             const newMsg = payload.new as Message;
             setMessages(prev => [...prev, newMsg]);
+            // Mark as read if from other user
+            if (newMsg.sender_id !== user?.id) {
+              markMessagesAsRead(selectedConversation.id);
+            }
           }
         )
         .subscribe();
@@ -79,6 +84,20 @@ const Messages = () => {
       };
     }
   }, [selectedConversation]);
+
+  const markMessagesAsRead = async (conversationId: string) => {
+    if (!user) return;
+    try {
+      await supabase
+        .from("messages")
+        .update({ read_at: new Date().toISOString() })
+        .eq("conversation_id", conversationId)
+        .neq("sender_id", user.id)
+        .is("read_at", null);
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+    }
+  };
 
   useEffect(() => {
     scrollToBottom();
