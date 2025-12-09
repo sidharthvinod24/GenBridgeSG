@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Heart, ArrowLeft, Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import { validateMessage } from "@/lib/validation";
 
 interface Conversation {
   id: string;
@@ -182,12 +183,20 @@ const Messages = () => {
     e.preventDefault();
     if (!user || !selectedConversation || !newMessage.trim()) return;
 
+    // Validate message content before sending
+    const validation = validateMessage(newMessage.trim());
+    if (!validation.success) {
+      const errorMessage = validation.error.errors[0]?.message || "Invalid message";
+      toast.error(errorMessage);
+      return;
+    }
+
     setSending(true);
     try {
       const { error } = await supabase.from("messages").insert({
         conversation_id: selectedConversation.id,
         sender_id: user.id,
-        content: newMessage.trim(),
+        content: validation.data.content,
       });
 
       if (error) throw error;

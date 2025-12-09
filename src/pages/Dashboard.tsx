@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import SkillSelect from "@/components/SkillSelect";
 import ProfileQuestionnaire from "@/components/ProfileQuestionnaire";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { validateProfile } from "@/lib/validation";
 import { 
   Heart, 
   LogOut, 
@@ -141,17 +142,28 @@ const Dashboard = () => {
       finalSkillsWanted.push(skillWanted.trim());
     }
 
+    // Validate profile data before saving
+    const profileData = {
+      full_name: fullName,
+      bio,
+      location,
+      age_group: ageGroup,
+      skills_offered: finalSkillsOffered,
+      skills_wanted: finalSkillsWanted,
+    };
+    
+    const validation = validateProfile(profileData);
+    if (!validation.success) {
+      const errorMessage = validation.error.errors[0]?.message || "Invalid profile data";
+      toast.error(errorMessage);
+      setSaving(false);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({
-          full_name: fullName,
-          bio,
-          location,
-          age_group: ageGroup,
-          skills_offered: finalSkillsOffered,
-          skills_wanted: finalSkillsWanted,
-        })
+        .update(profileData)
         .eq("user_id", user.id);
 
       if (error) throw error;
