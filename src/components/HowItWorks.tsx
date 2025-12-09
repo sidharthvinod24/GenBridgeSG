@@ -30,7 +30,7 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-20 bg-gradient-to-b from-background to-primary-light/30">
+    <section id="how-it-works" className="py-20 bg-gradient-to-b from-background to-primary-light/30">
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
