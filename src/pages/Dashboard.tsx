@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import SkillMatches from "@/components/SkillMatches";
 import SkillSelect from "@/components/SkillSelect";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
@@ -21,7 +22,9 @@ import {
   Sparkles,
   Users,
   ArrowRight,
-  MessageCircle
+  MessageCircle,
+  AlertCircle,
+  CheckCircle2
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -221,11 +224,69 @@ const Dashboard = () => {
           </p>
         </div>
 
+        {/* Profile Completion Check */}
+        {(() => {
+          const isProfileComplete = fullName && skillsOffered.length > 0 && skillsWanted.length > 0;
+          const completionSteps = [
+            { label: "Add your name", done: !!fullName },
+            { label: "Add skills you can teach", done: skillsOffered.length > 0 },
+            { label: "Add skills you want to learn", done: skillsWanted.length > 0 },
+          ];
+          const completedCount = completionSteps.filter(s => s.done).length;
+          const progressPercent = (completedCount / completionSteps.length) * 100;
+
+          if (!isProfileComplete) {
+            return (
+              <Card className="border-primary/50 bg-gradient-to-br from-primary-light/50 to-secondary-light/30 mb-8">
+                <CardHeader>
+                  <CardTitle className="font-display text-2xl flex items-center gap-2">
+                    <AlertCircle className="w-6 h-6 text-primary" />
+                    Complete Your Profile to Start Matching
+                  </CardTitle>
+                  <CardDescription className="text-base">
+                    You need to complete your profile before you can discover skill matches.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-medium">Profile completion</span>
+                      <span className="text-muted-foreground">{completedCount}/{completionSteps.length} steps</span>
+                    </div>
+                    <Progress value={progressPercent} className="h-2" />
+                  </div>
+                  <div className="space-y-2">
+                    {completionSteps.map((step, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm">
+                        {step.done ? (
+                          <CheckCircle2 className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <div className="w-4 h-4 rounded-full border-2 border-muted-foreground" />
+                        )}
+                        <span className={step.done ? "text-muted-foreground line-through" : "font-medium"}>
+                          {step.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  {!editing && (
+                    <Button variant="hero" onClick={() => setEditing(true)} className="w-full mt-4">
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Complete Your Profile
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          }
+          return null;
+        })()}
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Skill Matches */}
-            {user && (
+            {/* Skill Matches - Only show if profile is complete */}
+            {user && fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && (
               <SkillMatches 
                 userSkillsOffered={skillsOffered}
                 userSkillsWanted={skillsWanted}
