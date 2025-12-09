@@ -82,6 +82,16 @@ export type Database = {
           full_name: string | null
           id: string
           location: string | null
+          q_conversation_preference: string | null
+          q_explaining_patience: string | null
+          q_frustrating_task: string | null
+          q_hands_or_screens: string | null
+          q_joining_reason: string | null
+          q_learning_style: string | null
+          q_other_generation: string | null
+          q_proud_story: string | null
+          q_skill_or_hobby: string | null
+          q_talk_topic: string | null
           skills_offered: string[] | null
           skills_wanted: string[] | null
           updated_at: string
@@ -95,6 +105,16 @@ export type Database = {
           full_name?: string | null
           id?: string
           location?: string | null
+          q_conversation_preference?: string | null
+          q_explaining_patience?: string | null
+          q_frustrating_task?: string | null
+          q_hands_or_screens?: string | null
+          q_joining_reason?: string | null
+          q_learning_style?: string | null
+          q_other_generation?: string | null
+          q_proud_story?: string | null
+          q_skill_or_hobby?: string | null
+          q_talk_topic?: string | null
           skills_offered?: string[] | null
           skills_wanted?: string[] | null
           updated_at?: string
@@ -108,6 +128,16 @@ export type Database = {
           full_name?: string | null
           id?: string
           location?: string | null
+          q_conversation_preference?: string | null
+          q_explaining_patience?: string | null
+          q_frustrating_task?: string | null
+          q_hands_or_screens?: string | null
+          q_joining_reason?: string | null
+          q_learning_style?: string | null
+          q_other_generation?: string | null
+          q_proud_story?: string | null
+          q_skill_or_hobby?: string | null
+          q_talk_topic?: string | null
           skills_offered?: string[] | null
           skills_wanted?: string[] | null
           updated_at?: string
