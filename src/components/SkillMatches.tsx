@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MapPin, Sparkles, Heart, ArrowLeftRight, MessageCircle } from "lucide-react";
+import { useStartConversation } from "@/hooks/useStartConversation";
+import { toast } from "sonner";
 
 interface MatchedProfile {
   id: string;
@@ -30,6 +33,9 @@ interface SkillMatchesProps {
 const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatchesProps) => {
   const [matches, setMatches] = useState<MatchedProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [connecting, setConnecting] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { startConversation } = useStartConversation();
 
   useEffect(() => {
     fetchMatches();
@@ -104,6 +110,15 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
       .join("")
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleConnect = async (matchUserId: string) => {
+    setConnecting(matchUserId);
+    const conversationId = await startConversation(userId, matchUserId);
+    if (conversationId) {
+      navigate("/messages");
+    }
+    setConnecting(null);
   };
 
   if (loading) {
@@ -263,9 +278,15 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
                 </div>
 
                 {/* Action */}
-                <Button variant="soft" size="sm" className="shrink-0">
+                <Button 
+                  variant="soft" 
+                  size="sm" 
+                  className="shrink-0"
+                  onClick={() => handleConnect(match.user_id)}
+                  disabled={connecting === match.user_id}
+                >
                   <MessageCircle className="w-4 h-4 mr-1" />
-                  Connect
+                  {connecting === match.user_id ? "..." : "Connect"}
                 </Button>
               </div>
             </div>

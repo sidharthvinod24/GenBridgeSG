@@ -19,7 +19,8 @@ import {
   Plus,
   Sparkles,
   Users,
-  ArrowRight
+  ArrowRight,
+  MessageCircle
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -417,9 +418,16 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button variant="hero" className="w-full justify-start" asChild>
-                  <Link to="/">
+                  <Link to="/browse">
                     <Users className="w-5 h-5 mr-3" />
                     Browse All Skills
+                    <ArrowRight className="w-4 h-4 ml-auto" />
+                  </Link>
+                </Button>
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <Link to="/messages">
+                    <MessageCircle className="w-5 h-5 mr-3" />
+                    Messages
                     <ArrowRight className="w-4 h-4 ml-auto" />
                   </Link>
                 </Button>
