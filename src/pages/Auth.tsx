@@ -82,7 +82,7 @@ const Auth = () => {
               <Heart className="w-8 h-8 text-primary-foreground heartbeat" />
             </div>
             <h1 className="font-display text-3xl font-bold text-foreground mb-2">
-              Skill<span className="text-gradient-hero">Swap</span>
+              Gen<span className="text-gradient-hero">Bridge</span>SG
             </h1>
             <p className="text-muted-foreground">
               Connect. Share. Grow together.
