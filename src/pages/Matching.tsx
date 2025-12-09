@@ -81,7 +81,7 @@ const Matching = () => {
                 <Heart className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-display font-bold text-xl text-foreground">
-                Find Matches
+                Gen<span className="text-primary">Bridge</span>SG
               </span>
             </div>
           </div>
