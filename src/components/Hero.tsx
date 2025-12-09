@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Users, Heart, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Hero = () => {
@@ -16,9 +16,9 @@ const Hero = () => {
         <div className="max-w-4xl mx-auto text-center stagger-children">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-light border border-primary/20 mb-8">
-            <Heart className="w-4 h-4 text-primary heartbeat" />
+            <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-primary">
-              Singapore's Skill Exchange Community
+              Skill Exchange Community
             </span>
           </div>
 
@@ -35,47 +35,18 @@ const Hero = () => {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
               <Link to="/auth">
                 Start Matching
                 <Sparkles className="ml-2" />
               </Link>
             </Button>
-            <Button variant="outline" size="xl" className="w-full sm:w-auto">
-              Browse Skills
-              <ArrowRight className="ml-2" />
+            <Button variant="outline" size="xl" className="w-full sm:w-auto" asChild>
+              <Link to="/browse">
+                Browse Skills
+              </Link>
             </Button>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-12 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Users className="w-6 h-6 text-primary" />
-                <span className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                  2,500+
-                </span>
-              </div>
-              <p className="text-muted-foreground text-sm md:text-base">Active Members</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                  150+
-                </span>
-              </div>
-              <p className="text-muted-foreground text-sm md:text-base">Skills Available</p>
-            </div>
-            <div className="text-center col-span-2 md:col-span-1">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Heart className="w-6 h-6 text-secondary" />
-                <span className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                  5,000+
-                </span>
-              </div>
-              <p className="text-muted-foreground text-sm md:text-base">Successful Matches</p>
-            </div>
           </div>
         </div>
       </div>
