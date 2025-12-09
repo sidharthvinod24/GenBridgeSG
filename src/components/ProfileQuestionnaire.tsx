@@ -9,14 +9,7 @@ import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
 
 interface QuestionnaireAnswers {
   q_skill_or_hobby: string;
-  q_frustrating_task: string;
-  q_talk_topic: string;
   q_learning_style: string;
-  q_proud_story: string;
-  q_hands_or_screens: string;
-  q_explaining_patience: string;
-  q_other_generation: string;
-  q_conversation_preference: string;
   q_joining_reason: string;
 }
 
@@ -35,18 +28,6 @@ const questions = [
     placeholder: "e.g., Cooking traditional dishes, fixing electronics, gardening tips...",
   },
   {
-    id: "q_frustrating_task",
-    question: "What is a task in your daily life (modern or traditional) that you find frustrating or confusing?",
-    type: "text",
-    placeholder: "e.g., Using smartphone apps, traditional sewing techniques, online banking...",
-  },
-  {
-    id: "q_talk_topic",
-    question: "If you had to give a 30-minute talk right now with no preparation, what topic would you choose?",
-    type: "text",
-    placeholder: "e.g., My experience in teaching, history of our neighbourhood, mobile photography...",
-  },
-  {
     id: "q_learning_style",
     question: "When learning something new, do you prefer step-by-step instructions or hearing the story behind it?",
     type: "radio",
@@ -54,48 +35,6 @@ const questions = [
       { value: "step-by-step", label: "Step-by-step instructions" },
       { value: "story", label: "Hearing the story behind it" },
       { value: "both", label: "A mix of both" },
-    ],
-  },
-  {
-    id: "q_proud_story",
-    question: "Share a brief story about a problem you solved that made you proud.",
-    type: "text",
-    placeholder: "Tell us about a time you helped someone or figured something out...",
-  },
-  {
-    id: "q_hands_or_screens",
-    question: "Do you feel more comfortable working with your hands or with screens and ideas?",
-    type: "radio",
-    options: [
-      { value: "hands", label: "Working with hands (crafts, repairs, cooking)" },
-      { value: "screens", label: "Working with screens and ideas (tech, strategy)" },
-      { value: "both", label: "Comfortable with both" },
-    ],
-  },
-  {
-    id: "q_explaining_patience",
-    question: "How do you react when someone does not understand what you are explaining the first time?",
-    type: "radio",
-    options: [
-      { value: "patient", label: "I stay patient and try a different approach" },
-      { value: "show", label: "I prefer to show them by doing it together" },
-      { value: "resources", label: "I point them to other resources" },
-    ],
-  },
-  {
-    id: "q_other_generation",
-    question: "What is something from the other generation (younger or older) that genuinely confuses or intrigues you?",
-    type: "text",
-    placeholder: "e.g., Why young people use so many apps, how elders remember so many recipes...",
-  },
-  {
-    id: "q_conversation_preference",
-    question: "Do you prefer deep 1-on-1 conversations or lively group activities?",
-    type: "radio",
-    options: [
-      { value: "one-on-one", label: "Deep 1-on-1 conversations" },
-      { value: "group", label: "Lively group activities" },
-      { value: "both", label: "I enjoy both equally" },
     ],
   },
   {
@@ -111,6 +50,41 @@ const questions = [
   },
 ];
 
+const countWords = (text: string): number => {
+  return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+};
+
+const extractKeywords = (text: string): string => {
+  // Remove common stop words and keep meaningful keywords
+  const stopWords = new Set([
+    'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours',
+    'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself',
+    'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which',
+    'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be',
+    'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an',
+    'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by',
+    'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before',
+    'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over',
+    'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why',
+    'how', 'all', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not',
+    'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just',
+    'don', 'should', 'now', 'also', 'like', 'really', 'always', 'often', 'sometimes',
+    'usually', 'never', 'ever', 'always', 'help', 'ask', 'friends', 'years', 'spent',
+    'something', 'one', 'thing', 'things', 'way', 'people', 'make', 'made', 'good', 'well'
+  ]);
+
+  const words = text.toLowerCase()
+    .replace(/[^\w\s]/g, '') // Remove punctuation
+    .split(/\s+/)
+    .filter(word => word.length > 2 && !stopWords.has(word));
+
+  // Get unique keywords
+  const uniqueKeywords = [...new Set(words)];
+  
+  // Return top keywords (max 10)
+  return uniqueKeywords.slice(0, 10).join(', ');
+};
+
 const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: ProfileQuestionnaireProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<QuestionnaireAnswers>(initialAnswers);
@@ -119,17 +93,46 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
   const progress = ((currentStep + 1) / questions.length) * 100;
 
   const handleAnswer = (value: string) => {
-    setAnswers(prev => ({
-      ...prev,
-      [currentQuestion.id]: value,
-    }));
+    // For text inputs, extract keywords before saving
+    if (currentQuestion.type === "text") {
+      const keywords = extractKeywords(value);
+      setAnswers(prev => ({
+        ...prev,
+        [currentQuestion.id]: keywords || value, // Keep original if no keywords extracted
+      }));
+    } else {
+      setAnswers(prev => ({
+        ...prev,
+        [currentQuestion.id]: value,
+      }));
+    }
+  };
+
+  const handleTextChange = (value: string) => {
+    const wordCount = countWords(value);
+    if (wordCount <= 200) {
+      setAnswers(prev => ({
+        ...prev,
+        [currentQuestion.id]: value,
+      }));
+    }
   };
 
   const currentAnswer = answers[currentQuestion.id as keyof QuestionnaireAnswers] || "";
+  const wordCount = currentQuestion.type === "text" ? countWords(currentAnswer) : 0;
 
   const canProceed = currentAnswer.trim().length > 0;
 
   const handleNext = () => {
+    // Extract keywords before moving to next question for text answers
+    if (currentQuestion.type === "text" && currentAnswer) {
+      const keywords = extractKeywords(currentAnswer);
+      setAnswers(prev => ({
+        ...prev,
+        [currentQuestion.id]: keywords || currentAnswer,
+      }));
+    }
+    
     if (currentStep < questions.length - 1) {
       setCurrentStep(prev => prev + 1);
     }
@@ -142,7 +145,13 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
   };
 
   const handleSubmit = async () => {
-    await onSave(answers);
+    // Extract keywords for the last text answer if needed
+    const finalAnswers = { ...answers };
+    if (currentQuestion.type === "text" && currentAnswer) {
+      const keywords = extractKeywords(currentAnswer);
+      finalAnswers[currentQuestion.id as keyof QuestionnaireAnswers] = keywords || currentAnswer;
+    }
+    await onSave(finalAnswers);
   };
 
   const isLastStep = currentStep === questions.length - 1;
@@ -167,12 +176,17 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
 
       <CardContent className="space-y-6">
         {currentQuestion.type === "text" ? (
-          <Textarea
-            value={currentAnswer}
-            onChange={(e) => handleAnswer(e.target.value)}
-            placeholder={currentQuestion.placeholder}
-            className="min-h-[120px] text-base"
-          />
+          <div className="space-y-2">
+            <Textarea
+              value={currentAnswer}
+              onChange={(e) => handleTextChange(e.target.value)}
+              placeholder={currentQuestion.placeholder}
+              className="min-h-[120px] text-base"
+            />
+            <p className={`text-sm text-right ${wordCount > 180 ? "text-amber-600" : "text-muted-foreground"}`}>
+              {wordCount}/200 words
+            </p>
+          </div>
         ) : (
           <RadioGroup
             value={currentAnswer}

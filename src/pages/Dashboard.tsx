@@ -40,27 +40,13 @@ interface Profile {
   skills_wanted: string[];
   age_group: string | null;
   q_skill_or_hobby: string | null;
-  q_frustrating_task: string | null;
-  q_talk_topic: string | null;
   q_learning_style: string | null;
-  q_proud_story: string | null;
-  q_hands_or_screens: string | null;
-  q_explaining_patience: string | null;
-  q_other_generation: string | null;
-  q_conversation_preference: string | null;
   q_joining_reason: string | null;
 }
 
 interface QuestionnaireAnswers {
   q_skill_or_hobby: string;
-  q_frustrating_task: string;
-  q_talk_topic: string;
   q_learning_style: string;
-  q_proud_story: string;
-  q_hands_or_screens: string;
-  q_explaining_patience: string;
-  q_other_generation: string;
-  q_conversation_preference: string;
   q_joining_reason: string;
 }
 
@@ -87,14 +73,7 @@ const Dashboard = () => {
   // Questionnaire answers
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
     q_skill_or_hobby: "",
-    q_frustrating_task: "",
-    q_talk_topic: "",
     q_learning_style: "",
-    q_proud_story: "",
-    q_hands_or_screens: "",
-    q_explaining_patience: "",
-    q_other_generation: "",
-    q_conversation_preference: "",
     q_joining_reason: "",
   });
 
@@ -136,14 +115,7 @@ const Dashboard = () => {
         setSkillsWanted(data.skills_wanted || []);
         setQuestionnaireAnswers({
           q_skill_or_hobby: data.q_skill_or_hobby || "",
-          q_frustrating_task: data.q_frustrating_task || "",
-          q_talk_topic: data.q_talk_topic || "",
           q_learning_style: data.q_learning_style || "",
-          q_proud_story: data.q_proud_story || "",
-          q_hands_or_screens: data.q_hands_or_screens || "",
-          q_explaining_patience: data.q_explaining_patience || "",
-          q_other_generation: data.q_other_generation || "",
-          q_conversation_preference: data.q_conversation_preference || "",
           q_joining_reason: data.q_joining_reason || "",
         });
       }
@@ -209,14 +181,7 @@ const Dashboard = () => {
         .from("profiles")
         .update({
           q_skill_or_hobby: answers.q_skill_or_hobby,
-          q_frustrating_task: answers.q_frustrating_task,
-          q_talk_topic: answers.q_talk_topic,
           q_learning_style: answers.q_learning_style,
-          q_proud_story: answers.q_proud_story,
-          q_hands_or_screens: answers.q_hands_or_screens,
-          q_explaining_patience: answers.q_explaining_patience,
-          q_other_generation: answers.q_other_generation,
-          q_conversation_preference: answers.q_conversation_preference,
           q_joining_reason: answers.q_joining_reason,
         })
         .eq("user_id", user.id);

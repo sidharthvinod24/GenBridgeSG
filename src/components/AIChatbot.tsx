@@ -26,7 +26,7 @@ const predefinedAnswers: PredefinedAnswer[] = [
   },
   {
     keywords: ["profile", "setup", "create", "complete"],
-    response: "To complete your profile:\n\n1. **Add your name** - so others know who you are\n2. **List skills you can teach** - what are you good at?\n3. **List skills you want to learn** - what interests you?\n4. **Add your location** - to find nearby matches\n5. **Write a bio** - tell others about yourself!\n\nThe more complete your profile, the better your matches! 🎯",
+    response: "To complete your profile:\n\n1. **Add your name** - so others know who you are\n2. **List skills you can teach** - what are you good at?\n3. **List skills you want to learn** - what interests you?\n4. **Complete the questionnaire** - help us match you better!\n\nThe more complete your profile, the better your matches! 🎯",
   },
   {
     keywords: ["start", "conversation", "message", "chat", "contact"],
@@ -46,15 +46,19 @@ const predefinedAnswers: PredefinedAnswer[] = [
   },
   {
     keywords: ["free", "cost", "pay", "price", "money"],
-    response: "SkillSwap is a **free** skill exchange platform! 🎉\n\nThe concept is simple: you teach something you know, and learn something new in return. No money changes hands - just knowledge and skills!\n\nIt's a win-win for everyone in the community.",
+    response: "GenBridgeSG is a **free** skill exchange platform! 🎉\n\nThe concept is simple: you teach something you know, and learn something new in return. No money changes hands - just knowledge and skills!\n\nIt's a win-win for everyone in the community.",
   },
   {
     keywords: ["singapore", "location", "where", "area"],
-    response: "SkillSwap is designed for the **Singapore community**! 🇸🇬\n\nYou can add your location (like Tampines, Jurong, etc.) to find matches nearby. This makes it easier to meet up for skill exchange sessions!",
+    response: "GenBridgeSG is designed for the **Singapore community**! 🇸🇬\n\nYou can add your location (like Tampines, Jurong, etc.) to find matches nearby. This makes it easier to meet up for skill exchange sessions!",
+  },
+  {
+    keywords: ["generation", "elderly", "senior", "young", "bridge"],
+    response: "GenBridgeSG bridges generations! 🌉\n\nWe connect **young adults** with **seniors** to exchange skills and wisdom. Seniors can share traditional knowledge and life experience, while younger members can help with technology and modern skills.\n\nIt's about building meaningful connections across age groups!",
   },
   {
     keywords: ["hello", "hi", "hey", "good morning", "good afternoon", "good evening"],
-    response: "Hello! 👋 Welcome to SkillSwap! I'm here to help you find skill matches and answer your questions. What would you like to know about?",
+    response: "Hello! 👋 Welcome to GenBridgeSG! I'm here to help you find skill matches and answer your questions. What would you like to know about?",
   },
   {
     keywords: ["thank", "thanks", "appreciate"],
@@ -93,7 +97,7 @@ const findPredefinedAnswer = (input: string): string | null => {
 const fallbackResponses = [
   "I'm not sure I understand that question. Could you try asking about:\n\n• How matching works\n• Setting up your profile\n• Starting conversations\n• Finding skills to learn\n\nOr click one of the quick reply buttons below! 💡",
   "Hmm, I don't have an answer for that specific question. Try asking about skill matching, profiles, or how to connect with others! 🤔",
-  "I'm a simple assistant focused on SkillSwap basics. Ask me about matching, profiles, or messaging and I'll be happy to help! 😊",
+  "I'm a simple assistant focused on GenBridgeSG basics. Ask me about matching, profiles, or messaging and I'll be happy to help! 😊",
 ];
 
 const AIChatbot = () => {
@@ -101,7 +105,7 @@ const AIChatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! I'm SkillSwap Assistant 👋 I can help you understand how skill matching works and guide you through the platform. What would you like to know?",
+      content: "Hi! I'm the GenBridgeSG Assistant 👋 I can help you understand how skill matching works and guide you through the platform. What would you like to know?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -169,7 +173,7 @@ const AIChatbot = () => {
                 <Bot className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-display font-semibold">SkillSwap Assistant</h3>
+                <h3 className="font-display font-semibold">GenBridgeSG Assistant</h3>
                 <p className="text-xs opacity-80">Quick answers & help</p>
               </div>
             </div>
