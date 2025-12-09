@@ -9,10 +9,10 @@ const Footer = () => {
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-display font-bold text-lg">S</span>
+                <span className="text-primary-foreground font-display font-bold text-lg">G</span>
               </div>
               <span className="font-display font-bold text-xl">
-                Skill<span className="text-primary">Swap</span>
+                Gen<span className="text-primary">Bridge</span>SG
               </span>
             </Link>
             <p className="text-background/70 mb-6">
@@ -106,7 +106,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-background/50 text-sm">
-            © 2024 SkillSwap SG. Made with ❤️ in Singapore
+            © 2024 GenBridgeSG. Made with ❤️ in Singapore
           </p>
           <div className="flex items-center gap-6">
             <span className="text-background/50 text-sm">
