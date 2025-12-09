@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Hero = () => {
+  const { ref, isVisible } = useScrollAnimation(0.1);
+
   return (
     <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
       {/* Background decoration */}
@@ -13,25 +16,30 @@ const Hero = () => {
       </div>
 
       <div className="container">
-        <div className="max-w-4xl mx-auto text-center stagger-children">
+        <div 
+          ref={ref}
+          className={`max-w-4xl mx-auto text-center transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-light border border-primary/20 mb-8">
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-primary">
-              Skill Exchange Community
+              Bridging Generations Through Skills
             </span>
           </div>
 
           {/* Headline */}
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight mb-6">
-            Share Your Skills,{" "}
-            <span className="text-gradient-hero">Find Your Match</span>
+            Bridge Generations,{" "}
+            <span className="text-gradient-hero">Share Skills</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            Connect with neighbours across generations. Teach what you know, 
-            learn what you love — build meaningful connections in your community.
+            GenBridgeSG connects young adults and seniors to exchange skills, 
+            wisdom, and build meaningful relationships across generations.
           </p>
 
           {/* CTAs */}
