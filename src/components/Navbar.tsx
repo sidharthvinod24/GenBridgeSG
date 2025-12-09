@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Heart } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
@@ -43,12 +45,20 @@ const Navbar = () => {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="default" asChild>
-            <Link to="/auth">Sign In</Link>
-          </Button>
-          <Button variant="hero" size="default" asChild>
-            <Link to="/auth">Get Started</Link>
-          </Button>
+          {user ? (
+            <Button variant="hero" size="default" asChild>
+              <Link to="/dashboard">My Dashboard</Link>
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" size="default" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+              <Button variant="hero" size="default" asChild>
+                <Link to="/auth">Get Started</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -87,12 +97,20 @@ const Navbar = () => {
               Community
             </Link>
             <div className="flex flex-col gap-3 pt-4">
-              <Button variant="outline" size="lg" className="w-full" asChild>
-                <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
-              </Button>
-              <Button variant="hero" size="lg" className="w-full" asChild>
-                <Link to="/auth" onClick={() => setIsOpen(false)}>Get Started</Link>
-              </Button>
+              {user ? (
+                <Button variant="hero" size="lg" className="w-full" asChild>
+                  <Link to="/dashboard" onClick={() => setIsOpen(false)}>My Dashboard</Link>
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" size="lg" className="w-full" asChild>
+                    <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
+                  </Button>
+                  <Button variant="hero" size="lg" className="w-full" asChild>
+                    <Link to="/auth" onClick={() => setIsOpen(false)}>Get Started</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
