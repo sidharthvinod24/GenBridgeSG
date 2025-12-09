@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import SkillSelect from "@/components/SkillSelect";
+import ProfileQuestionnaire from "@/components/ProfileQuestionnaire";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { 
   Heart, 
@@ -23,7 +24,8 @@ import {
   ArrowRight,
   MessageCircle,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  ClipboardList
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -37,6 +39,29 @@ interface Profile {
   skills_offered: string[];
   skills_wanted: string[];
   age_group: string | null;
+  q_skill_or_hobby: string | null;
+  q_frustrating_task: string | null;
+  q_talk_topic: string | null;
+  q_learning_style: string | null;
+  q_proud_story: string | null;
+  q_hands_or_screens: string | null;
+  q_explaining_patience: string | null;
+  q_other_generation: string | null;
+  q_conversation_preference: string | null;
+  q_joining_reason: string | null;
+}
+
+interface QuestionnaireAnswers {
+  q_skill_or_hobby: string;
+  q_frustrating_task: string;
+  q_talk_topic: string;
+  q_learning_style: string;
+  q_proud_story: string;
+  q_hands_or_screens: string;
+  q_explaining_patience: string;
+  q_other_generation: string;
+  q_conversation_preference: string;
+  q_joining_reason: string;
 }
 
 const Dashboard = () => {
@@ -47,6 +72,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
   
   // Form state
   const [fullName, setFullName] = useState("");
@@ -57,6 +83,20 @@ const Dashboard = () => {
   const [skillWanted, setSkillWanted] = useState("");
   const [skillsOffered, setSkillsOffered] = useState<string[]>([]);
   const [skillsWanted, setSkillsWanted] = useState<string[]>([]);
+  
+  // Questionnaire answers
+  const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
+    q_skill_or_hobby: "",
+    q_frustrating_task: "",
+    q_talk_topic: "",
+    q_learning_style: "",
+    q_proud_story: "",
+    q_hands_or_screens: "",
+    q_explaining_patience: "",
+    q_other_generation: "",
+    q_conversation_preference: "",
+    q_joining_reason: "",
+  });
 
   useEffect(() => {
     fetchProfile();
@@ -94,6 +134,18 @@ const Dashboard = () => {
         setAgeGroup(data.age_group || "");
         setSkillsOffered(data.skills_offered || []);
         setSkillsWanted(data.skills_wanted || []);
+        setQuestionnaireAnswers({
+          q_skill_or_hobby: data.q_skill_or_hobby || "",
+          q_frustrating_task: data.q_frustrating_task || "",
+          q_talk_topic: data.q_talk_topic || "",
+          q_learning_style: data.q_learning_style || "",
+          q_proud_story: data.q_proud_story || "",
+          q_hands_or_screens: data.q_hands_or_screens || "",
+          q_explaining_patience: data.q_explaining_patience || "",
+          q_other_generation: data.q_other_generation || "",
+          q_conversation_preference: data.q_conversation_preference || "",
+          q_joining_reason: data.q_joining_reason || "",
+        });
       }
     } catch (error: any) {
       toast.error("Failed to load profile");
@@ -148,6 +200,40 @@ const Dashboard = () => {
     }
   };
 
+  const handleSaveQuestionnaire = async (answers: QuestionnaireAnswers) => {
+    if (!user) return;
+    setSaving(true);
+
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          q_skill_or_hobby: answers.q_skill_or_hobby,
+          q_frustrating_task: answers.q_frustrating_task,
+          q_talk_topic: answers.q_talk_topic,
+          q_learning_style: answers.q_learning_style,
+          q_proud_story: answers.q_proud_story,
+          q_hands_or_screens: answers.q_hands_or_screens,
+          q_explaining_patience: answers.q_explaining_patience,
+          q_other_generation: answers.q_other_generation,
+          q_conversation_preference: answers.q_conversation_preference,
+          q_joining_reason: answers.q_joining_reason,
+        })
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      setQuestionnaireAnswers(answers);
+      toast.success("Questionnaire completed!");
+      setShowQuestionnaire(false);
+      fetchProfile();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to save questionnaire");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const addSkillOffered = () => {
     if (skillOffered.trim() && !skillsOffered.includes(skillOffered.trim())) {
       setSkillsOffered([...skillsOffered, skillOffered.trim()]);
@@ -175,6 +261,8 @@ const Dashboard = () => {
     navigate("/");
   };
 
+  const isQuestionnaireComplete = questionnaireAnswers.q_joining_reason !== "";
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -182,6 +270,45 @@ const Dashboard = () => {
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           <p className="text-muted-foreground">Loading your profile...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Show questionnaire view
+  if (showQuestionnaire) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-primary-light/30 via-background to-secondary-light/20">
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+          <div className="container flex items-center justify-between h-18 py-4">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
+                <Heart className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <span className="font-display font-bold text-xl text-foreground">
+                Gen<span className="text-primary">Bridge</span>SG
+              </span>
+            </Link>
+          </div>
+        </header>
+
+        <main className="container py-8 md:py-12">
+          <div className="mb-8 text-center">
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
+              Tell Us About Yourself
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Answer these questions to help us find your perfect skill matches.
+            </p>
+          </div>
+
+          <ProfileQuestionnaire
+            initialAnswers={questionnaireAnswers}
+            onSave={handleSaveQuestionnaire}
+            onCancel={() => setShowQuestionnaire(false)}
+            saving={saving}
+          />
+        </main>
       </div>
     );
   }
@@ -225,11 +352,12 @@ const Dashboard = () => {
 
         {/* Profile Completion Check */}
         {(() => {
-          const isProfileComplete = fullName && skillsOffered.length > 0 && skillsWanted.length > 0;
+          const isProfileComplete = fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && isQuestionnaireComplete;
           const completionSteps = [
             { label: "Add your name", done: !!fullName },
             { label: "Add skills you can teach", done: skillsOffered.length > 0 },
             { label: "Add skills you want to learn", done: skillsWanted.length > 0 },
+            { label: "Complete the questionnaire", done: isQuestionnaireComplete },
           ];
           const completedCount = completionSteps.filter(s => s.done).length;
           const progressPercent = (completedCount / completionSteps.length) * 100;
@@ -268,12 +396,20 @@ const Dashboard = () => {
                       </div>
                     ))}
                   </div>
-                  {!editing && (
-                    <Button variant="hero" onClick={() => setEditing(true)} className="w-full mt-4">
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      Complete Your Profile
-                    </Button>
-                  )}
+                  <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                    {!editing && (fullName === "" || skillsOffered.length === 0 || skillsWanted.length === 0) && (
+                      <Button variant="hero" onClick={() => setEditing(true)} className="flex-1">
+                        <Edit3 className="w-4 h-4 mr-2" />
+                        Edit Profile
+                      </Button>
+                    )}
+                    {!isQuestionnaireComplete && (
+                      <Button variant="warm" onClick={() => setShowQuestionnaire(true)} className="flex-1">
+                        <ClipboardList className="w-4 h-4 mr-2" />
+                        Complete Questionnaire
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             );
@@ -285,7 +421,7 @@ const Dashboard = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Link to Matching Page - Only show if profile is complete */}
-            {user && fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && (
+            {user && fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && isQuestionnaireComplete && (
               <Card className="shadow-elevated bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
                 <CardContent className="py-8">
                   <div className="text-center space-y-4">
@@ -505,6 +641,47 @@ const Dashboard = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Questionnaire Card */}
+            <Card className="shadow-elevated">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="font-display text-2xl flex items-center gap-2">
+                    <ClipboardList className="w-6 h-6 text-primary" />
+                    Your Questionnaire
+                  </CardTitle>
+                  <CardDescription>
+                    {isQuestionnaireComplete 
+                      ? "Your answers help us find better matches" 
+                      : "Complete the questionnaire to improve your matches"}
+                  </CardDescription>
+                </div>
+                <Button 
+                  variant={isQuestionnaireComplete ? "outline" : "hero"}
+                  onClick={() => setShowQuestionnaire(true)}
+                >
+                  {isQuestionnaireComplete ? (
+                    <>
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Edit
+                    </>
+                  ) : (
+                    <>
+                      <ArrowRight className="w-4 h-4 mr-2" />
+                      Complete
+                    </>
+                  )}
+                </Button>
+              </CardHeader>
+              {isQuestionnaireComplete && (
+                <CardContent>
+                  <div className="flex items-center gap-2 text-green-600">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="font-medium">Questionnaire completed</span>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
           </div>
 
           {/* Sidebar */}
@@ -568,12 +745,18 @@ const Dashboard = () => {
                       Skills to learn
                     </span>
                   </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${isQuestionnaireComplete ? "bg-green-500" : "bg-muted"}`} />
+                    <span className={isQuestionnaireComplete ? "text-foreground" : "text-muted-foreground"}>
+                      Questionnaire done
+                    </span>
+                  </div>
                 </div>
 
                 {/* Tip */}
                 <div className="mt-6 p-4 rounded-lg bg-accent/10 border border-accent/20">
                   <p className="text-sm text-muted-foreground">
-                    💡 <strong>Tip:</strong> Complete your profile and add skills to find your perfect skill swap matches!
+                    💡 <strong>Tip:</strong> Complete your profile and questionnaire to find your perfect skill swap matches!
                   </p>
                 </div>
               </CardContent>
