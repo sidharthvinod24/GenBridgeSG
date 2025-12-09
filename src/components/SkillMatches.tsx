@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MapPin, Sparkles, Heart, ArrowLeftRight, MessageCircle } from "lucide-react";
+import { MapPin, Sparkles, Heart, ArrowLeftRight, MessageCircle, X, RotateCcw } from "lucide-react";
 import { useStartConversation } from "@/hooks/useStartConversation";
 import { toast } from "sonner";
 
@@ -33,7 +33,11 @@ interface SkillMatchesProps {
 const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatchesProps) => {
   const [matches, setMatches] = useState<MatchedProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [connecting, setConnecting] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [skippedMatches, setSkippedMatches] = useState<MatchedProfile[]>([]);
+  const [connecting, setConnecting] = useState(false);
   const navigate = useNavigate();
   const { startConversation } = useStartConversation();
 
@@ -48,7 +52,6 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
     }
 
     try {
-      // Fetch all profiles except the current user
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select("*")
@@ -56,18 +59,15 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
 
       if (error) throw error;
 
-      // Calculate matches
       const matchedProfiles: MatchedProfile[] = [];
 
       profiles?.forEach((profile) => {
-        // Skills I can teach them (my offered matches their wanted)
         const skillsICanTeach = userSkillsOffered.filter((skill) =>
           profile.skills_wanted?.some(
             (wanted: string) => wanted.toLowerCase() === skill.toLowerCase()
           )
         );
 
-        // Skills they can teach me (their offered matches my wanted)
         const skillsTheyCanTeach = (profile.skills_offered || []).filter(
           (skill: string) =>
             userSkillsWanted.some(
@@ -75,9 +75,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             )
         );
 
-        // Only include if there's at least one match
         if (skillsICanTeach.length > 0 || skillsTheyCanTeach.length > 0) {
-          // Calculate match score - higher if bidirectional match
           const matchScore =
             skillsICanTeach.length + skillsTheyCanTeach.length +
             (skillsICanTeach.length > 0 && skillsTheyCanTeach.length > 0 ? 5 : 0);
@@ -91,9 +89,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
         }
       });
 
-      // Sort by match score (best matches first)
       matchedProfiles.sort((a, b) => b.matchScore - a.matchScore);
-
       setMatches(matchedProfiles);
     } catch (error) {
       console.error("Error fetching matches:", error);
@@ -112,14 +108,44 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
       .slice(0, 2);
   };
 
-  const handleConnect = async (matchUserId: string) => {
-    setConnecting(matchUserId);
-    const conversationId = await startConversation(userId, matchUserId);
-    if (conversationId) {
-      navigate("/messages");
-    }
-    setConnecting(null);
+  const handleSwipe = async (direction: "left" | "right") => {
+    if (isAnimating || currentIndex >= matches.length) return;
+
+    setSwipeDirection(direction);
+    setIsAnimating(true);
+
+    setTimeout(async () => {
+      if (direction === "right") {
+        // Like - start conversation
+        const match = matches[currentIndex];
+        setConnecting(true);
+        const conversationId = await startConversation(userId, match.user_id);
+        setConnecting(false);
+        if (conversationId) {
+          toast.success(`Connected with ${match.full_name || "user"}! 💬`);
+        }
+      } else {
+        // Pass - add to skipped
+        setSkippedMatches(prev => [...prev, matches[currentIndex]]);
+      }
+
+      setCurrentIndex(prev => prev + 1);
+      setSwipeDirection(null);
+      setIsAnimating(false);
+    }, 300);
   };
+
+  const handleUndo = () => {
+    if (skippedMatches.length === 0 || currentIndex === 0) return;
+    
+    const lastSkipped = skippedMatches[skippedMatches.length - 1];
+    setSkippedMatches(prev => prev.slice(0, -1));
+    setCurrentIndex(prev => prev - 1);
+  };
+
+  const currentMatch = matches[currentIndex];
+  const isPerfectMatch = currentMatch?.matchingSkillsICanTeach.length > 0 && 
+                         currentMatch?.matchingSkillsTheyCanTeach.length > 0;
 
   if (loading) {
     return (
@@ -175,13 +201,12 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary-light flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
               <Heart className="w-8 h-8 text-primary" />
             </div>
             <h3 className="font-semibold text-lg mb-2">No Matches Yet</h3>
             <p className="text-muted-foreground">
-              We're looking for people with matching skills. Check back soon as more
-              people join the community!
+              We're looking for people with matching skills. Check back soon!
             </p>
           </div>
         </CardContent>
@@ -189,117 +214,184 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
     );
   }
 
-  return (
-    <Card className="shadow-elevated">
-      <CardHeader>
-        <CardTitle className="font-display text-xl flex items-center gap-2">
-          <Heart className="w-5 h-5 text-primary heartbeat" />
-          Your Skill Matches
-          <Badge variant="secondary" className="ml-2 bg-primary-light text-primary">
-            {matches.length} found
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {matches.slice(0, 5).map((match) => (
-            <div
-              key={match.id}
-              className="p-4 rounded-xl border border-border bg-card hover:shadow-card transition-all duration-300"
-            >
-              <div className="flex items-start gap-4">
-                {/* Avatar */}
-                <Avatar className="w-14 h-14 border-2 border-primary/20">
-                  <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-primary-foreground font-bold">
-                    {getInitials(match.full_name)}
-                  </AvatarFallback>
-                </Avatar>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-display font-bold text-lg text-foreground truncate">
-                      {match.full_name || "Anonymous"}
-                    </h4>
-                    {match.matchingSkillsICanTeach.length > 0 &&
-                      match.matchingSkillsTheyCanTeach.length > 0 && (
-                        <Badge className="bg-accent text-accent-foreground text-xs">
-                          Perfect Match!
-                        </Badge>
-                      )}
-                  </div>
-
-                  {match.location && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-1 mb-3">
-                      <MapPin className="w-3 h-3" />
-                      {match.location}
-                      {match.age_group && ` • ${match.age_group}`}
-                    </p>
-                  )}
-
-                  {/* Matching Skills */}
-                  <div className="space-y-2">
-                    {match.matchingSkillsTheyCanTeach.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                          <Sparkles className="w-3 h-3 text-primary" />
-                          Can teach you:
-                        </span>
-                        {match.matchingSkillsTheyCanTeach.map((skill) => (
-                          <Badge
-                            key={skill}
-                            variant="secondary"
-                            className="bg-primary-light text-primary text-xs"
-                          >
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-
-                    {match.matchingSkillsICanTeach.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                          <Heart className="w-3 h-3 text-secondary" />
-                          Wants to learn:
-                        </span>
-                        {match.matchingSkillsICanTeach.map((skill) => (
-                          <Badge
-                            key={skill}
-                            variant="secondary"
-                            className="bg-secondary-light text-secondary text-xs"
-                          >
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Action */}
-                <Button 
-                  variant="soft" 
-                  size="sm" 
-                  className="shrink-0"
-                  onClick={() => handleConnect(match.user_id)}
-                  disabled={connecting === match.user_id}
-                >
-                  <MessageCircle className="w-4 h-4 mr-1" />
-                  {connecting === match.user_id ? "..." : "Connect"}
-                </Button>
-              </div>
+  if (currentIndex >= matches.length) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-display text-xl flex items-center gap-2">
+            <Heart className="w-5 h-5 text-primary" />
+            Skill Matches
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-10 h-10 text-primary" />
             </div>
-          ))}
-
-          {matches.length > 5 && (
-            <div className="text-center pt-2">
-              <Button variant="outline">
-                View All {matches.length} Matches
+            <h3 className="font-semibold text-xl mb-2">You've seen all matches!</h3>
+            <p className="text-muted-foreground mb-6">
+              Check your messages to connect with people you liked.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Button variant="outline" onClick={() => navigate("/messages")}>
+                <MessageCircle className="w-4 h-4 mr-2" />
+                View Messages
+              </Button>
+              <Button onClick={() => { setCurrentIndex(0); setSkippedMatches([]); }}>
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Start Over
               </Button>
             </div>
-          )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="shadow-elevated overflow-hidden">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-display text-xl flex items-center gap-2">
+            <Heart className="w-5 h-5 text-primary heartbeat" />
+            Find Your Match
+          </CardTitle>
+          <Badge variant="secondary" className="bg-primary/10 text-primary">
+            {currentIndex + 1} / {matches.length}
+          </Badge>
         </div>
+      </CardHeader>
+      <CardContent className="pt-2">
+        {/* Card Stack */}
+        <div className="relative h-[400px] w-full">
+          {/* Background cards for stack effect */}
+          {matches.slice(currentIndex + 1, currentIndex + 3).map((_, i) => (
+            <div
+              key={i}
+              className="absolute inset-x-0 top-0 h-full bg-card rounded-2xl border border-border"
+              style={{
+                transform: `scale(${1 - (i + 1) * 0.05}) translateY(${(i + 1) * 8}px)`,
+                zIndex: -i - 1,
+                opacity: 1 - (i + 1) * 0.3,
+              }}
+            />
+          ))}
+
+          {/* Current Card */}
+          <div
+            className={`absolute inset-0 bg-gradient-to-b from-card to-card/95 rounded-2xl border-2 
+              ${isPerfectMatch ? "border-primary shadow-[0_0_30px_rgba(var(--primary)/0.3)]" : "border-border"} 
+              transition-all duration-300 ease-out overflow-hidden
+              ${swipeDirection === "left" ? "translate-x-[-120%] rotate-[-20deg] opacity-0" : ""}
+              ${swipeDirection === "right" ? "translate-x-[120%] rotate-[20deg] opacity-0" : ""}
+            `}
+          >
+            {/* Perfect Match Banner */}
+            {isPerfectMatch && (
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
+                <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-1 text-sm animate-pulse">
+                  ✨ Perfect Match!
+                </Badge>
+              </div>
+            )}
+
+            {/* Avatar Section */}
+            <div className="h-[45%] bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 flex items-center justify-center relative">
+              <Avatar className="w-28 h-28 border-4 border-white shadow-xl">
+                <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-3xl font-bold">
+                  {getInitials(currentMatch.full_name)}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+
+            {/* Info Section */}
+            <div className="p-5 space-y-4">
+              <div className="text-center">
+                <h3 className="font-display text-2xl font-bold text-foreground">
+                  {currentMatch.full_name || "Anonymous"}
+                </h3>
+                {(currentMatch.location || currentMatch.age_group) && (
+                  <p className="text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                    <MapPin className="w-4 h-4" />
+                    {currentMatch.location}
+                    {currentMatch.age_group && ` • ${currentMatch.age_group}`}
+                  </p>
+                )}
+              </div>
+
+              {/* Skills Exchange */}
+              <div className="space-y-3">
+                {currentMatch.matchingSkillsTheyCanTeach.length > 0 && (
+                  <div className="bg-primary/5 rounded-xl p-3">
+                    <p className="text-xs font-semibold text-primary mb-2 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      Can teach you
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {currentMatch.matchingSkillsTheyCanTeach.map((skill) => (
+                        <Badge key={skill} className="bg-primary/20 text-primary border-0">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {currentMatch.matchingSkillsICanTeach.length > 0 && (
+                  <div className="bg-secondary/5 rounded-xl p-3">
+                    <p className="text-xs font-semibold text-secondary mb-2 flex items-center gap-1">
+                      <Heart className="w-3 h-3" />
+                      Wants to learn from you
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {currentMatch.matchingSkillsICanTeach.map((skill) => (
+                        <Badge key={skill} className="bg-secondary/20 text-secondary border-0">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-center gap-4 mt-6">
+          <Button
+            variant="outline"
+            size="icon"
+            className="w-12 h-12 rounded-full border-2 text-muted-foreground hover:border-muted-foreground hover:bg-muted/50 disabled:opacity-50"
+            onClick={handleUndo}
+            disabled={skippedMatches.length === 0 || isAnimating}
+          >
+            <RotateCcw className="w-5 h-5" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="w-16 h-16 rounded-full border-2 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground transition-all"
+            onClick={() => handleSwipe("left")}
+            disabled={isAnimating}
+          >
+            <X className="w-8 h-8" />
+          </Button>
+
+          <Button
+            size="icon"
+            className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white shadow-lg transition-all"
+            onClick={() => handleSwipe("right")}
+            disabled={isAnimating || connecting}
+          >
+            <Heart className="w-8 h-8" fill="currentColor" />
+          </Button>
+        </div>
+
+        <p className="text-center text-xs text-muted-foreground mt-4">
+          Swipe right to connect, left to pass
+        </p>
       </CardContent>
     </Card>
   );
