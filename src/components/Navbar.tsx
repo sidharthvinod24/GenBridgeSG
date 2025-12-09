@@ -8,6 +8,14 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    setIsOpen(false);
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
       <nav className="container flex items-center justify-between h-18 py-4">
@@ -24,23 +32,17 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
           <Link 
-            to="/" 
+            to="/browse" 
             className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Browse Skills
           </Link>
-          <Link 
-            to="/" 
+          <button 
+            onClick={() => scrollToSection("how-it-works")}
             className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             How It Works
-          </Link>
-          <Link 
-            to="/" 
-            className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Community
-          </Link>
+          </button>
         </div>
 
         {/* Desktop CTA */}
@@ -76,26 +78,18 @@ const Navbar = () => {
         <div className="md:hidden bg-background border-b border-border animate-slide-down">
           <div className="container py-6 flex flex-col gap-4">
             <Link 
-              to="/" 
+              to="/browse" 
               className="text-lg font-medium text-foreground py-3 border-b border-border"
               onClick={() => setIsOpen(false)}
             >
               Browse Skills
             </Link>
-            <Link 
-              to="/" 
-              className="text-lg font-medium text-foreground py-3 border-b border-border"
-              onClick={() => setIsOpen(false)}
+            <button 
+              onClick={() => scrollToSection("how-it-works")}
+              className="text-lg font-medium text-foreground py-3 border-b border-border text-left"
             >
               How It Works
-            </Link>
-            <Link 
-              to="/" 
-              className="text-lg font-medium text-foreground py-3 border-b border-border"
-              onClick={() => setIsOpen(false)}
-            >
-              Community
-            </Link>
+            </button>
             <div className="flex flex-col gap-3 pt-4">
               {user ? (
                 <Button variant="hero" size="lg" className="w-full" asChild>
