@@ -23,17 +23,17 @@ const CTASection = () => {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 border border-primary-foreground/20 mb-6">
               <Sparkles className="w-4 h-4 text-accent" />
               <span className="text-sm font-medium text-primary-foreground">
-                Join 2,500+ Singaporeans
+                Join GenBridgeSG Today
               </span>
             </div>
 
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-6 leading-tight">
-              Ready to Find Your Perfect Match?
+              Ready to Bridge Generations?
             </h2>
             
             <p className="text-lg md:text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
-              Whether you're a retiree with decades of wisdom or a young professional 
-              with fresh ideas — your skills matter. Start connecting today.
+              Whether you're a senior with wisdom to share or a young adult eager to learn — 
+              your skills matter. Start connecting today with GenBridgeSG.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
