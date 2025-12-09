@@ -79,6 +79,7 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          credibility_score: number | null
           full_name: string | null
           id: string
           location: string | null
@@ -93,6 +94,7 @@ export type Database = {
           q_skill_or_hobby: string | null
           q_talk_topic: string | null
           skills_offered: string[] | null
+          skills_proficiency: Json | null
           skills_wanted: string[] | null
           updated_at: string
           user_id: string
@@ -102,6 +104,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          credibility_score?: number | null
           full_name?: string | null
           id?: string
           location?: string | null
@@ -116,6 +119,7 @@ export type Database = {
           q_skill_or_hobby?: string | null
           q_talk_topic?: string | null
           skills_offered?: string[] | null
+          skills_proficiency?: Json | null
           skills_wanted?: string[] | null
           updated_at?: string
           user_id: string
@@ -125,6 +129,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          credibility_score?: number | null
           full_name?: string | null
           id?: string
           location?: string | null
@@ -139,6 +144,7 @@ export type Database = {
           q_skill_or_hobby?: string | null
           q_talk_topic?: string | null
           skills_offered?: string[] | null
+          skills_proficiency?: Json | null
           skills_wanted?: string[] | null
           updated_at?: string
           user_id?: string
