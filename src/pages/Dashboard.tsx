@@ -762,6 +762,7 @@ const Dashboard = () => {
                   <Label className="text-base font-medium flex items-center gap-2">
                     <Clock className="w-4 h-4 text-accent" />
                     Preferred Session Duration
+                    <span className="text-sm font-normal text-muted-foreground">(30 mins = 1 credit)</span>
                   </Label>
                   {editing ? (
                     <Select value={skillExchangeDuration} onValueChange={setSkillExchangeDuration}>
