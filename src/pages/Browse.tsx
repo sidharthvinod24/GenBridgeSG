@@ -28,12 +28,14 @@ interface Profile {
 }
 
 const DURATION_LABELS: Record<string, string> = {
-  "30min": "30 min",
-  "1hr": "1 hour",
-  "2hr": "2 hours",
-  "half-day": "Half day",
-  "full-day": "Full day",
-  "flexible": "Flexible",
+  "30": "30 min",
+  "60": "1 hr",
+  "90": "1.5 hrs",
+  "120": "2 hrs",
+  "150": "2.5 hrs",
+  "180": "3 hrs",
+  "210": "3.5 hrs",
+  "240": "4 hrs",
 };
 
 // Skill categories for filtering
