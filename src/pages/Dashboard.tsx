@@ -110,6 +110,7 @@ const Dashboard = () => {
     q_digital_teaching_skills: [],
     q_teaching_comfort: 3,
     q_open_to_verification: false,
+    q_skill_proficiency: "",
   });
   useEffect(() => {
     fetchProfile();
@@ -182,6 +183,7 @@ const Dashboard = () => {
           q_digital_teaching_skills: data.q_digital_teaching_skills || [],
           q_teaching_comfort: data.q_teaching_comfort || 3,
           q_open_to_verification: data.q_open_to_verification || false,
+          q_skill_proficiency: (data as any).q_skill_proficiency || "",
         });
       }
     } catch (error: any) {
