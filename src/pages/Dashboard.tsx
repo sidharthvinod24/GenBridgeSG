@@ -276,10 +276,11 @@ const Dashboard = () => {
         .from("profiles")
         .update({
           age: answers.age,
-          q_skills_to_share: isElderly ? answers.q_skills_to_share : null,
+          // For elderly: q_skills_to_share stores what they want to share
+          // For youth: q_skills_to_share stores what they can teach (q_skill_to_teach)
+          q_skills_to_share: isElderly ? answers.q_skills_to_share : answers.q_skill_to_teach,
           q_digital_help_needed: isElderly ? answers.q_digital_help_needed : null,
           q_languages_dialects: isElderly ? answers.q_languages_dialects : null,
-          q_skill_to_teach: !isElderly ? answers.q_skill_to_teach : null,
           q_cultural_interests: !isElderly ? answers.q_cultural_interests : null,
           q_digital_teaching_skills: !isElderly ? answers.q_digital_teaching_skills : null,
           q_teaching_comfort: !isElderly ? answers.q_teaching_comfort : null,
