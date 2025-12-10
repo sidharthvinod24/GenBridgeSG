@@ -14,6 +14,7 @@ import SkillProficiencySelector, { ProficiencyLevel } from "@/components/SkillPr
 import CredibilityScore from "@/components/CredibilityScore";
 import ProfileQuestionnaire from "@/components/ProfileQuestionnaire";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { useAdminRole } from "@/hooks/useAdminRole";
 import { validateProfile } from "@/lib/validation";
 import { 
   Heart, 
@@ -60,6 +61,7 @@ const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { unreadCount } = useUnreadMessages();
+  const { isAdmin } = useAdminRole();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -355,6 +357,14 @@ const Dashboard = () => {
           </Link>
 
           <div className="flex items-center gap-3">
+            {isAdmin && (
+              <Button variant="outline" size="sm" asChild className="text-destructive border-destructive/30 hover:bg-destructive/10">
+                <Link to="/admin">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Admin
+                </Link>
+              </Button>
+            )}
             <span className="text-sm text-muted-foreground hidden sm:block">
               {user?.email}
             </span>

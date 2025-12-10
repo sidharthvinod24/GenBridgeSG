@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Matching from "./pages/Matching";
 import Messages from "./pages/Messages";
 import Browse from "./pages/Browse";
+import AdminModeration from "./pages/AdminModeration";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,14 @@ const App = () => (
               } 
             />
             <Route path="/browse" element={<Browse />} />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute>
+                  <AdminModeration />
+                </ProtectedRoute>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
