@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MapPin, Sparkles, Heart, ArrowLeftRight, MessageCircle, X, RotateCcw } from "lucide-react";
+import { MapPin, Sparkles, Heart, ArrowLeftRight, MessageCircle, X, RotateCcw, Clock } from "lucide-react";
 import { useStartConversation } from "@/hooks/useStartConversation";
 import { toast } from "sonner";
 import MatchCelebration from "./MatchCelebration";
@@ -20,10 +20,20 @@ interface MatchedProfile {
   skills_offered: string[];
   skills_wanted: string[];
   age_group: string | null;
+  skill_exchange_duration: string | null;
   matchingSkillsICanTeach: string[];
   matchingSkillsTheyCanTeach: string[];
   matchScore: number;
 }
+
+const DURATION_LABELS: Record<string, string> = {
+  "30min": "30 min",
+  "1hr": "1 hour",
+  "2hr": "2 hours",
+  "half-day": "Half day",
+  "full-day": "Full day",
+  "flexible": "Flexible",
+};
 
 interface SkillMatchesProps {
   userSkillsOffered: string[];
@@ -481,6 +491,12 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
                     <MapPin className="w-4 h-4" />
                     {currentMatch.location}
                     {currentMatch.age_group && ` • ${currentMatch.age_group}`}
+                  </p>
+                )}
+                {currentMatch.skill_exchange_duration && (
+                  <p className="text-muted-foreground flex items-center justify-center gap-1 mt-1 text-sm">
+                    <Clock className="w-3 h-3" />
+                    {DURATION_LABELS[currentMatch.skill_exchange_duration] || currentMatch.skill_exchange_duration}
                   </p>
                 )}
               </div>

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SkillSelect from "@/components/SkillSelect";
 import SkillProficiencySelector, { ProficiencyLevel } from "@/components/SkillProficiencySelector";
 import CredibilityScore, { calculateCredibilityScore } from "@/components/CredibilityScore";
@@ -32,6 +33,7 @@ import {
   ClipboardList,
   Shield,
   Coins,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -49,6 +51,7 @@ interface Profile {
   skills_proficiency: Record<string, ProficiencyLevel> | null;
   credibility_score: number | null;
   credits: number;
+  skill_exchange_duration: string | null;
   // New questionnaire fields
   q_skills_to_share: string | null;
   q_digital_help_needed: string[] | null;
@@ -61,6 +64,15 @@ interface Profile {
   q_allow_archive: boolean | null;
   q_open_to_verification: boolean | null;
 }
+
+const DURATION_OPTIONS = [
+  { value: "30min", label: "30 minutes" },
+  { value: "1hr", label: "1 hour" },
+  { value: "2hr", label: "2 hours" },
+  { value: "half-day", label: "Half day" },
+  { value: "full-day", label: "Full day" },
+  { value: "flexible", label: "Flexible" },
+];
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -84,6 +96,7 @@ const Dashboard = () => {
   const [skillsProficiency, setSkillsProficiency] = useState<Record<string, ProficiencyLevel>>({});
   const [credibilityScore, setCredibilityScore] = useState(0);
   const [credits, setCredits] = useState(0);
+  const [skillExchangeDuration, setSkillExchangeDuration] = useState("");
 
   // Questionnaire answers
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
@@ -145,6 +158,7 @@ const Dashboard = () => {
           skills_proficiency: proficiency,
           credibility_score: data.credibility_score || 0,
           credits: data.credits || 0,
+          skill_exchange_duration: data.skill_exchange_duration || null,
         };
         setProfile(profileData);
         setFullName(data.full_name || "");
@@ -156,6 +170,7 @@ const Dashboard = () => {
         setSkillsProficiency(proficiency);
         setCredibilityScore(data.credibility_score || 0);
         setCredits(data.credits || 0);
+        setSkillExchangeDuration(data.skill_exchange_duration || "");
         setQuestionnaireAnswers({
           age: data.age || null,
           q_skills_to_share: data.q_skills_to_share || "",
@@ -216,6 +231,7 @@ const Dashboard = () => {
       skills_offered: finalSkillsOffered,
       skills_wanted: finalSkillsWanted,
       skills_proficiency: updatedProficiency,
+      skill_exchange_duration: skillExchangeDuration || null,
     };
 
     // Calculate credibility score based on profile completeness
@@ -740,6 +756,32 @@ const Dashboard = () => {
                       placeholder="Search skills you want to learn..."
                       existingSkills={skillsWanted}
                     />
+                  )}
+                </div>
+
+                {/* Skill Exchange Duration */}
+                <div className="space-y-3">
+                  <Label className="text-base font-medium flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-accent" />
+                    Preferred Session Duration
+                  </Label>
+                  {editing ? (
+                    <Select value={skillExchangeDuration} onValueChange={setSkillExchangeDuration}>
+                      <SelectTrigger className="h-12 w-full sm:w-[250px]">
+                        <SelectValue placeholder="Select duration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DURATION_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <p className="text-lg text-foreground py-3">
+                      {DURATION_OPTIONS.find(o => o.value === skillExchangeDuration)?.label || "Not set"}
+                    </p>
                   )}
                 </div>
               </CardContent>
