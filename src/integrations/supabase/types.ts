@@ -249,7 +249,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_reports: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          reported_user_id: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          reported_user_id?: string | null
+          status?: never
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          reported_user_id?: string | null
+          status?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_public_profile: {
