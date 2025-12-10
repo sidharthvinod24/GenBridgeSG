@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
+import logo from "@/assets/logo.png";
 
 type SignupStep = "details" | "otp";
 type AuthMode = "login" | "signup" | "forgot";
@@ -199,7 +200,7 @@ const Auth = () => {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <img src="/src/assets/logo.png" alt="GenBridgeSG Logo" className="h-20 w-auto object-contain mx-auto mb-4" />
+            <img src={logo} alt="GenBridgeSG Logo" className="h-20 w-auto object-contain mx-auto mb-4" />
             <h1 className="font-display text-3xl font-bold text-foreground mb-2">
               Gen<span className="text-gradient-hero">Bridge</span>SG
             </h1>
