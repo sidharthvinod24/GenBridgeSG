@@ -100,6 +100,7 @@ const Dashboard = () => {
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
     age: null,
     q_skills_to_share: "",
+    q_skill_proficiency: "",
     q_digital_help_needed: [],
     q_languages_dialects: [],
     q_communication_preference: "",
@@ -110,7 +111,6 @@ const Dashboard = () => {
     q_digital_teaching_skills: [],
     q_teaching_comfort: 3,
     q_open_to_verification: false,
-    q_skill_proficiency: "",
   });
   useEffect(() => {
     fetchProfile();
