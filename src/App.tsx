@@ -13,6 +13,7 @@ import Matching from "./pages/Matching";
 import Messages from "./pages/Messages";
 import Browse from "./pages/Browse";
 import AdminModeration from "./pages/AdminModeration";
+import SafetyGuidelines from "./pages/SafetyGuidelines";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
               } 
             />
             <Route path="/browse" element={<Browse />} />
+            <Route path="/safety" element={<SafetyGuidelines />} />
             <Route 
               path="/admin" 
               element={
