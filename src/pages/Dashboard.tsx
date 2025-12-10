@@ -31,6 +31,7 @@ import {
   CheckCircle2,
   ClipboardList,
   Shield,
+  Coins,
 } from "lucide-react";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -47,6 +48,7 @@ interface Profile {
   age: number | null;
   skills_proficiency: Record<string, ProficiencyLevel> | null;
   credibility_score: number | null;
+  credits: number;
   // New questionnaire fields
   q_skills_to_share: string | null;
   q_digital_help_needed: string[] | null;
@@ -81,6 +83,7 @@ const Dashboard = () => {
   const [skillsWanted, setSkillsWanted] = useState<string[]>([]);
   const [skillsProficiency, setSkillsProficiency] = useState<Record<string, ProficiencyLevel>>({});
   const [credibilityScore, setCredibilityScore] = useState(0);
+  const [credits, setCredits] = useState(0);
 
   // Questionnaire answers
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
@@ -141,6 +144,7 @@ const Dashboard = () => {
           skills_wanted: data.skills_wanted || [],
           skills_proficiency: proficiency,
           credibility_score: data.credibility_score || 0,
+          credits: data.credits || 0,
         };
         setProfile(profileData);
         setFullName(data.full_name || "");
@@ -151,6 +155,7 @@ const Dashboard = () => {
         setSkillsWanted(data.skills_wanted || []);
         setSkillsProficiency(proficiency);
         setCredibilityScore(data.credibility_score || 0);
+        setCredits(data.credits || 0);
         setQuestionnaireAnswers({
           age: data.age || null,
           q_skills_to_share: data.q_skills_to_share || "",
@@ -272,6 +277,11 @@ const Dashboard = () => {
       // Determine if elderly or youth based on age
       const isElderly = (answers.age ?? 0) >= 40;
       
+      // Award 3 credits if user opts for verification and doesn't already have credits
+      const isVerified = isElderly ? answers.q_allow_archive : answers.q_open_to_verification;
+      const wasVerified = isElderly ? questionnaireAnswers.q_allow_archive : questionnaireAnswers.q_open_to_verification;
+      const newCredits = (isVerified && !wasVerified) ? credits + 3 : credits;
+      
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -289,12 +299,18 @@ const Dashboard = () => {
           q_allow_archive: isElderly ? answers.q_allow_archive : null,
           q_open_to_verification: !isElderly ? answers.q_open_to_verification : null,
           credibility_score: newCredibilityScore,
+          credits: newCredits,
         })
         .eq("user_id", user.id);
       if (error) throw error;
       setQuestionnaireAnswers(answers);
       setCredibilityScore(newCredibilityScore);
-      toast.success("Questionnaire completed!");
+      setCredits(newCredits);
+      if (isVerified && !wasVerified) {
+        toast.success("Questionnaire completed! You earned 3 credits for verification!");
+      } else {
+        toast.success("Questionnaire completed!");
+      }
       setShowQuestionnaire(false);
       fetchProfile();
     } catch (error: any) {
@@ -432,12 +448,21 @@ const Dashboard = () => {
       <main className="container py-8 md:py-12">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Welcome back, {fullName || "Friend"}! 👋
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Manage your profile and discover skill matches in your community.
-          </p>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
+                Welcome back, {fullName || "Friend"}! 👋
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Manage your profile and discover skill matches in your community.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-xl">
+              <Coins className="w-5 h-5 text-amber-500" />
+              <span className="font-semibold text-foreground">Credits:</span>
+              <span className="font-bold text-amber-600">{credits}</span>
+            </div>
+          </div>
         </div>
 
         {/* Profile Completion Check */}

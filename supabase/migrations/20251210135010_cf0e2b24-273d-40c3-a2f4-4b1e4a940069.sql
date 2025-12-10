@@ -1,0 +1,2 @@
+-- Add credits column to profiles table
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS credits integer NOT NULL DEFAULT 0;
