@@ -19,7 +19,7 @@ export const calculateCredibilityScore = (profile: {
   full_name?: string | null;
   bio?: string | null;
   phone_number?: string | null;
-  age_group?: string | null;
+  age?: number | null;
   skills_offered?: string[] | null;
   skills_wanted?: string[] | null;
   questionnaire_complete?: boolean;
@@ -35,8 +35,8 @@ export const calculateCredibilityScore = (profile: {
   // Phone number: 15 points
   if (profile.phone_number && profile.phone_number.trim()) score += 15;
   
-  // Age group: 10 points
-  if (profile.age_group) score += 10;
+  // Age: 10 points
+  if (profile.age) score += 10;
   
   // Skills offered (at least 1): 15 points
   if (profile.skills_offered && profile.skills_offered.length > 0) score += 15;
