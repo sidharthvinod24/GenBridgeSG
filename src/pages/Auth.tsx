@@ -63,7 +63,6 @@ const Auth = () => {
 
       // Move to OTP step
       setSignupStep("otp");
-      toast.info("Demo mode: Use OTP code 123456 to verify");
     }
   };
   const handleOtpVerify = async () => {
