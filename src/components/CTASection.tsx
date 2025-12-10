@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ctaBackground from "@/assets/cta-background.jpg";
 
 const CTASection = () => {
   const { ref, isVisible } = useScrollAnimation(0.1);
+  const { t } = useLanguage();
 
   return (
     <section className="py-20">
@@ -39,17 +41,16 @@ const CTASection = () => {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 border border-primary-foreground/20 mb-6">
               <Sparkles className="w-4 h-4 text-accent" />
               <span className="text-sm font-medium text-primary-foreground">
-                Join GenBridgeSG Today
+                {t.cta.button}
               </span>
             </div>
 
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-6 leading-tight">
-              Ready to Bridge Generations?
+              {t.cta.title}
             </h2>
             
             <p className="text-lg md:text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
-              Whether you're a senior with wisdom to share or a young adult eager to learn — 
-              your skills matter. Start connecting today with GenBridgeSG.
+              {t.cta.subtitle}
             </p>
 
             <Button 
@@ -59,7 +60,7 @@ const CTASection = () => {
               asChild
             >
               <Link to="/auth">
-                Create Free Account
+                {t.cta.button}
                 <ArrowRight className="ml-2" />
               </Link>
             </Button>

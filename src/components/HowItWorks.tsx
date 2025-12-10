@@ -1,37 +1,39 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { UserPlus, Search, MessageCircle, Handshake } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-
-const steps = [
-  {
-    icon: UserPlus,
-    step: "1",
-    title: "Create Your Profile",
-    description: "Share your skills and what you want to learn.",
-  },
-  {
-    icon: Search,
-    step: "2",
-    title: "Find Your Match",
-    description: "Get matched with compatible community members.",
-  },
-  {
-    icon: MessageCircle,
-    step: "3",
-    title: "Connect & Arrange",
-    description: "Chat and get an online meeting link generated for you.",
-  },
-  {
-    icon: Handshake,
-    step: "4",
-    title: "Swap & Grow",
-    description: "Exchange skills and build connections.",
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const HowItWorks = () => {
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation(0.1);
   const { ref: stepsRef, isVisible: stepsVisible } = useScrollAnimation(0.1);
+  const { t } = useLanguage();
+
+  const steps = [
+    {
+      icon: UserPlus,
+      step: "1",
+      title: t.howItWorks.step1Title,
+      description: t.howItWorks.step1Desc,
+    },
+    {
+      icon: Search,
+      step: "2",
+      title: t.howItWorks.step2Title,
+      description: t.howItWorks.step2Desc,
+    },
+    {
+      icon: MessageCircle,
+      step: "3",
+      title: t.howItWorks.step3Title,
+      description: t.howItWorks.step3Desc,
+    },
+    {
+      icon: Handshake,
+      step: "4",
+      title: t.howItWorks.step3Title,
+      description: t.howItWorks.step3Desc,
+    },
+  ];
 
   return (
     <section id="how-it-works" className="py-20 bg-gradient-to-b from-background to-primary-light/30">
@@ -43,10 +45,10 @@ const HowItWorks = () => {
           }`}
         >
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            How GenBridgeSG Works
+            {t.howItWorks.title}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Four simple steps to start exchanging skills with your community.
+            {t.howItWorks.subtitle}
           </p>
         </div>
 

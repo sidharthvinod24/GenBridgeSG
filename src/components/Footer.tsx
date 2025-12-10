@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Footer = () => {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-foreground text-background py-16">
       <div className="container">
@@ -15,28 +18,27 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-background/70 mb-6">
-              Connecting generations through skill exchange. 
-              Building a stronger Singapore, one swap at a time.
+              {t.footer.tagline}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">Quick Links</h4>
+            <h4 className="font-display font-bold text-lg mb-4">{t.footer.quickLinks}</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Browse Skills
+                <Link to="/browse" className="text-background/70 hover:text-primary transition-colors">
+                  {t.footer.browse}
                 </Link>
               </li>
               <li>
                 <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  How It Works
+                  {t.howItWorks.title}
                 </Link>
               </li>
               <li>
                 <Link to="/safety" className="text-background/70 hover:text-primary transition-colors">
-                  Safety Guidelines
+                  {t.footer.safety}
                 </Link>
               </li>
             </ul>
@@ -44,26 +46,21 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">Support</h4>
+            <h4 className="font-display font-bold text-lg mb-4">{t.footer.support}</h4>
             <ul className="space-y-3">
               <li>
                 <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Help Center
+                  {t.footer.helpCenter}
                 </Link>
               </li>
               <li>
                 <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Contact Us
+                  {t.footer.contactUs}
                 </Link>
               </li>
               <li>
                 <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Terms of Service
+                  {t.footer.faq}
                 </Link>
               </li>
             </ul>
@@ -73,7 +70,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-background/50 text-sm">
-            © 2024 GenBridgeSG. Made with ❤️ in Singapore
+            © 2024 GenBridgeSG. {t.footer.rights}
           </p>
           <div className="flex items-center gap-6">
             <span className="text-background/50 text-sm">

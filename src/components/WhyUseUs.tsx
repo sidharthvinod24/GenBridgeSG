@@ -6,37 +6,39 @@ import {
   Sparkles
 } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-
-const benefits = [
-  {
-    icon: Users,
-    title: "Bridge Generations",
-    description: "Connect young adults with seniors to share knowledge and build meaningful relationships across age groups.",
-    color: "bg-blue-50 text-blue-600 border-blue-200",
-  },
-  {
-    icon: Heart,
-    title: "Community First",
-    description: "Join a supportive community where everyone has something valuable to teach and learn.",
-    color: "bg-rose-50 text-rose-600 border-rose-200",
-  },
-  {
-    icon: Shield,
-    title: "Safe & Trusted",
-    description: "Verified profiles and a respectful environment ensure positive experiences for all users.",
-    color: "bg-green-50 text-green-600 border-green-200",
-  },
-  {
-    icon: Sparkles,
-    title: "Free to Use",
-    description: "No fees or subscriptions — just genuine skill exchange between community members.",
-    color: "bg-amber-50 text-amber-600 border-amber-200",
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const WhyUseUs = () => {
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation(0.1);
   const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation(0.1);
+  const { t } = useLanguage();
+
+  const benefits = [
+    {
+      icon: Users,
+      title: t.whyUseUs.feature1Title,
+      description: t.whyUseUs.feature1Desc,
+      color: "bg-blue-50 text-blue-600 border-blue-200",
+    },
+    {
+      icon: Heart,
+      title: t.whyUseUs.feature2Title,
+      description: t.whyUseUs.feature2Desc,
+      color: "bg-rose-50 text-rose-600 border-rose-200",
+    },
+    {
+      icon: Shield,
+      title: t.whyUseUs.feature3Title,
+      description: t.whyUseUs.feature3Desc,
+      color: "bg-green-50 text-green-600 border-green-200",
+    },
+    {
+      icon: Sparkles,
+      title: t.whyUseUs.feature4Title,
+      description: t.whyUseUs.feature4Desc,
+      color: "bg-amber-50 text-amber-600 border-amber-200",
+    },
+  ];
 
   return (
     <section id="why-use" className="py-20 bg-muted/30">
@@ -48,11 +50,10 @@ const WhyUseUs = () => {
           }`}
         >
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Why Use GenBridgeSG?
+            {t.whyUseUs.title}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            More than just skill swapping — we're building bridges between generations 
-            and strengthening our community.
+            {t.whyUseUs.subtitle}
           </p>
         </div>
 
