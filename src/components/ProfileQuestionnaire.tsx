@@ -14,6 +14,7 @@ export interface QuestionnaireAnswers {
   age: number | null;
   // Elderly fields (age >= 40)
   q_skills_to_share: string;
+  q_skill_proficiency: string;
   q_digital_help_needed: string[];
   q_languages_dialects: string[];
   q_communication_preference: string;
@@ -84,6 +85,13 @@ const communicationOptions = [
   { value: "chat-zoom", label: "Chat first, Zoom if needed" },
 ];
 
+const proficiencyOptions = [
+  { value: "beginner", label: "Beginner - Just started learning" },
+  { value: "intermediate", label: "Intermediate - Can do it independently" },
+  { value: "advanced", label: "Advanced - Very experienced" },
+  { value: "expert", label: "Expert - Can teach others confidently" },
+];
+
 const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: ProfileQuestionnaireProps) => {
   const [step, setStep] = useState<"age" | "questionnaire">("age");
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -95,6 +103,7 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
   // Define questions based on age group
   const elderlyQuestions = [
     "skills_to_share",
+    "skill_proficiency",
     "digital_help",
     "languages",
     "communication",
@@ -104,6 +113,7 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
 
   const youthQuestions = [
     "skill_to_teach",
+    "skill_proficiency",
     "cultural_interests",
     "digital_teaching",
     "teaching_comfort",
@@ -169,6 +179,8 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
       switch (q) {
         case "skills_to_share":
           return answers.q_skills_to_share?.trim().length > 0;
+        case "skill_proficiency":
+          return !!answers.q_skill_proficiency;
         case "digital_help":
           return answers.q_digital_help_needed?.length > 0;
         case "languages":
@@ -186,6 +198,8 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
       switch (q) {
         case "skill_to_teach":
           return answers.q_skill_to_teach?.trim().length > 0;
+        case "skill_proficiency":
+          return !!answers.q_skill_proficiency;
         case "cultural_interests":
           return answers.q_cultural_interests?.length > 0;
         case "digital_teaching":
@@ -279,6 +293,40 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
                 placeholder="Share what you'd like to teach..."
                 className="min-h-[120px] text-lg"
               />
+            </div>
+          );
+
+        case "skill_proficiency":
+          return (
+            <div className="space-y-4">
+              <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
+                How proficient are you in this skill?
+              </CardTitle>
+              <CardDescription className="text-center text-base mb-4">
+                Select your experience level
+              </CardDescription>
+              <RadioGroup
+                value={answers.q_skill_proficiency || ""}
+                onValueChange={(value) => setAnswers(prev => ({ ...prev, q_skill_proficiency: value }))}
+                className="space-y-3 mt-6"
+              >
+                {proficiencyOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    className={`flex items-center gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all ${
+                      answers.q_skill_proficiency === option.value
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                    onClick={() => setAnswers(prev => ({ ...prev, q_skill_proficiency: option.value }))}
+                  >
+                    <RadioGroupItem value={option.value} id={`proficiency-${option.value}`} className="h-6 w-6" />
+                    <Label htmlFor={`proficiency-${option.value}`} className="text-lg cursor-pointer">
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
             </div>
           );
 
@@ -455,6 +503,40 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
                 placeholder="Describe what you can teach..."
                 className="min-h-[120px] text-base"
               />
+            </div>
+          );
+
+        case "skill_proficiency":
+          return (
+            <div className="space-y-4">
+              <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
+                How proficient are you in this skill?
+              </CardTitle>
+              <CardDescription className="text-center text-base mb-4">
+                Select your experience level
+              </CardDescription>
+              <RadioGroup
+                value={answers.q_skill_proficiency || ""}
+                onValueChange={(value) => setAnswers(prev => ({ ...prev, q_skill_proficiency: value }))}
+                className="space-y-3 mt-6"
+              >
+                {proficiencyOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      answers.q_skill_proficiency === option.value
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                    onClick={() => setAnswers(prev => ({ ...prev, q_skill_proficiency: option.value }))}
+                  >
+                    <RadioGroupItem value={option.value} id={`youth-proficiency-${option.value}`} />
+                    <Label htmlFor={`youth-proficiency-${option.value}`} className="text-base cursor-pointer">
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
             </div>
           );
 
