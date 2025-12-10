@@ -182,9 +182,7 @@ const Auth = () => {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary mb-4 shadow-glow">
-              <Heart className="w-8 h-8 text-primary-foreground heartbeat" />
-            </div>
+            <img src="/src/assets/logo.png" alt="GenBridgeSG Logo" className="w-20 h-20 mb-4" />
             <h1 className="font-display text-3xl font-bold text-foreground mb-2">
               Gen<span className="text-gradient-hero">Bridge</span>SG
             </h1>
