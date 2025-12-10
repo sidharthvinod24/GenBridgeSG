@@ -9,13 +9,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary-dark shadow-card hover:shadow-elevated active:scale-[0.98]",
+        default:
+          "bg-primary text-primary-foreground hover:bg-primary-dark shadow-card hover:shadow-elevated active:scale-[0.98]",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-card",
         outline: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-soft",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        // Custom variants for SkillSwap
+        // Custom variants for GenBridge
         hero: "bg-gradient-to-r from-primary to-primary-dark text-primary-foreground shadow-elevated hover:shadow-glow hover:brightness-105 active:brightness-95",
         warm: "bg-secondary text-secondary-foreground shadow-card hover:shadow-elevated hover:brightness-105 active:brightness-95",
         accent: "bg-accent text-accent-foreground shadow-card hover:shadow-elevated font-bold",
