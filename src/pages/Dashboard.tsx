@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,6 +74,7 @@ const DURATION_OPTIONS = [
 ];
 const Dashboard = () => {
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { unreadCount } = useUnreadMessages();
   const { isAdmin } = useAdminRole();
@@ -452,9 +454,9 @@ const Dashboard = () => {
 
         <main className="container py-8 md:py-12">
           <div className="mb-8 text-center">
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">Tell Us About Yourself</h1>
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">{t.dashboard.tellAboutYourself}</h1>
             <p className="text-lg text-muted-foreground">
-              Answer these questions to help us find your perfect skill matches.
+              {t.dashboard.answerQuestions}
             </p>
           </div>
 
@@ -490,14 +492,14 @@ const Dashboard = () => {
               >
                 <Link to="/admin">
                   <Shield className="w-4 h-4 mr-2" />
-                  Admin
+                  {t.dashboard.admin}
                 </Link>
               </Button>
             )}
             <span className="text-sm text-muted-foreground hidden sm:block">{user?.email}</span>
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
+              {t.dashboard.signOut}
             </Button>
           </div>
         </div>
@@ -509,15 +511,15 @@ const Dashboard = () => {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
-                Welcome back, {fullName || "Friend"}! 👋
+                {t.dashboard.welcome}, {fullName || "Friend"}! 👋
               </h1>
               <p className="text-lg text-muted-foreground">
-                Manage your profile and discover skill matches in your community.
+                {t.dashboard.manageProfile}
               </p>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-xl">
               <Coins className="w-5 h-5 text-amber-500" />
-              <span className="font-semibold text-foreground">Credits:</span>
+              <span className="font-semibold text-foreground">{t.dashboard.credits}:</span>
               <span className="font-bold text-amber-600">{credits}</span>
             </div>
           </div>
@@ -529,19 +531,19 @@ const Dashboard = () => {
             fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && isQuestionnaireComplete;
           const completionSteps = [
             {
-              label: "Add your name",
+              label: t.dashboard.addName,
               done: !!fullName,
             },
             {
-              label: "Add skills you can teach",
+              label: t.dashboard.addSkillsTeach,
               done: skillsOffered.length > 0,
             },
             {
-              label: "Add skills you want to learn",
+              label: t.dashboard.addSkillsLearn,
               done: skillsWanted.length > 0,
             },
             {
-              label: "Complete the questionnaire",
+              label: t.dashboard.completeQuestionnaire,
               done: isQuestionnaireComplete,
             },
           ];
@@ -553,18 +555,18 @@ const Dashboard = () => {
                 <CardHeader>
                   <CardTitle className="font-display text-2xl flex items-center gap-2">
                     <AlertCircle className="w-6 h-6 text-primary" />
-                    Complete Your Profile to Start Matching
+                    {t.dashboard.completeProfile}
                   </CardTitle>
                   <CardDescription className="text-base">
-                    You need to complete your profile before you can discover skill matches.
+                    {t.dashboard.needComplete}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="font-medium">Profile completion</span>
+                      <span className="font-medium">{t.dashboard.profileCompletion}</span>
                       <span className="text-muted-foreground">
-                        {completedCount}/{completionSteps.length} steps
+                        {completedCount}/{completionSteps.length} {t.dashboard.steps}
                       </span>
                     </div>
                     <Progress value={progressPercent} className="h-2" />
@@ -587,13 +589,13 @@ const Dashboard = () => {
                     {!editing && (fullName === "" || skillsOffered.length === 0 || skillsWanted.length === 0) && (
                       <Button variant="hero" onClick={() => setEditing(true)} className="flex-1">
                         <Edit3 className="w-4 h-4 mr-2" />
-                        Edit Profile
+                        {t.dashboard.editProfile}
                       </Button>
                     )}
                     {!isQuestionnaireComplete && (
                       <Button variant="warm" onClick={() => setShowQuestionnaire(true)} className="flex-1">
                         <ClipboardList className="w-4 h-4 mr-2" />
-                        Complete Questionnaire
+                        {t.dashboard.completeQuestionnaire}
                       </Button>
                     )}
                   </div>
@@ -616,15 +618,15 @@ const Dashboard = () => {
                       <Heart className="w-8 h-8 text-primary-foreground" />
                     </div>
                     <div>
-                      <h3 className="font-display text-2xl font-bold mb-2">Find Your Skill Match</h3>
+                      <h3 className="font-display text-2xl font-bold mb-2">{t.dashboard.findSkillMatch}</h3>
                       <p className="text-muted-foreground">
-                        Swipe through potential matches and connect with people who can teach you or learn from you!
+                        {t.dashboard.swipeConnect}
                       </p>
                     </div>
                     <Button variant="hero" size="lg" asChild className="px-8">
                       <Link to="/matching">
                         <Heart className="w-5 h-5 mr-2" />
-                        Start Matching
+                        {t.dashboard.startMatching}
                         <ArrowRight className="w-5 h-5 ml-2" />
                       </Link>
                     </Button>
@@ -637,25 +639,25 @@ const Dashboard = () => {
             <Card className="shadow-elevated">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle className="font-display text-2xl">Your Profile</CardTitle>
+                  <CardTitle className="font-display text-2xl">{t.dashboard.yourProfile}</CardTitle>
                   <CardDescription>
-                    {editing ? "Edit your profile details" : "Your skill exchange profile"}
+                    {editing ? t.dashboard.editDetails : t.dashboard.skillExchangeProfile}
                   </CardDescription>
                 </div>
                 {!editing ? (
                   <Button variant="outline" onClick={() => setEditing(true)}>
                     <Edit3 className="w-4 h-4 mr-2" />
-                    Edit
+                    {t.dashboard.edit}
                   </Button>
                 ) : (
                   <div className="flex gap-2">
                     <Button variant="ghost" onClick={() => setEditing(false)}>
                       <X className="w-4 h-4 mr-2" />
-                      Cancel
+                      {t.dashboard.cancel}
                     </Button>
                     <Button variant="hero" onClick={handleSave} disabled={saving}>
                       <Save className="w-4 h-4 mr-2" />
-                      {saving ? "Saving..." : "Save"}
+                      {saving ? t.dashboard.saving : t.dashboard.save}
                     </Button>
                   </div>
                 )}
@@ -666,7 +668,7 @@ const Dashboard = () => {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-base font-medium">
-                      Full Name
+                      {t.dashboard.fullName}
                     </Label>
                     {editing ? (
                       <Input
@@ -677,14 +679,14 @@ const Dashboard = () => {
                         className="h-12"
                       />
                     ) : (
-                      <p className="text-lg text-foreground py-3">{fullName || "Not set"}</p>
+                      <p className="text-lg text-foreground py-3">{fullName || t.dashboard.notSet}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="phone" className="text-base font-medium flex items-center gap-2">
                       <Phone className="w-4 h-4" />
-                      Phone Number
+                      {t.dashboard.phoneNumber}
                     </Label>
                     {editing ? (
                       <Input
@@ -695,32 +697,32 @@ const Dashboard = () => {
                         className="h-12"
                       />
                     ) : (
-                      <p className="text-lg text-foreground py-3">{phoneNumber || "Not set"}</p>
+                      <p className="text-lg text-foreground py-3">{phoneNumber || t.dashboard.notSet}</p>
                     )}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-base font-medium">Age</Label>
+                  <Label className="text-base font-medium">{t.dashboard.age}</Label>
                   <p className="text-lg text-foreground py-3">
-                    {questionnaireAnswers.age ? `${questionnaireAnswers.age} years old` : "Complete questionnaire"}
+                    {questionnaireAnswers.age ? `${questionnaireAnswers.age} ${t.dashboard.yearsOld}` : t.dashboard.completeQuestionnaireAge}
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="bio" className="text-base font-medium">
-                    About You
+                    {t.dashboard.aboutYou}
                   </Label>
                   {editing ? (
                     <Textarea
                       id="bio"
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
-                      placeholder="Tell others about yourself and why you want to exchange skills..."
+                      placeholder={t.dashboard.tellOthers}
                       className="min-h-[100px]"
                     />
                   ) : (
-                    <p className="text-foreground py-3">{bio || "No bio yet"}</p>
+                    <p className="text-foreground py-3">{bio || t.dashboard.noBioYet}</p>
                   )}
                 </div>
 
@@ -728,7 +730,7 @@ const Dashboard = () => {
                 <div className="space-y-3">
                   <Label className="text-base font-medium flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    Skills You Can Teach
+                    {t.dashboard.skillsCanTeach}
                   </Label>
 
                   <SkillProficiencySelector
@@ -744,7 +746,7 @@ const Dashboard = () => {
                       value={skillOffered}
                       onChange={setSkillOffered}
                       onAdd={addSkillOffered}
-                      placeholder="Search skills you can teach..."
+                      placeholder={t.dashboard.searchSkillsTeach}
                       existingSkills={skillsOffered}
                     />
                   )}
@@ -754,7 +756,7 @@ const Dashboard = () => {
                 <div className="space-y-3">
                   <Label className="text-base font-medium flex items-center gap-2">
                     <Heart className="w-4 h-4 text-secondary" />
-                    Skills You Want to Learn
+                    {t.dashboard.skillsWantLearn}
                   </Label>
                   <div className="flex flex-wrap gap-2">
                     {skillsWanted.map((skill) => (
@@ -772,7 +774,7 @@ const Dashboard = () => {
                       </Badge>
                     ))}
                     {skillsWanted.length === 0 && !editing && (
-                      <span className="text-muted-foreground">No skills added yet</span>
+                      <span className="text-muted-foreground">{t.dashboard.noSkillsAdded}</span>
                     )}
                   </div>
                   {editing && (
@@ -780,7 +782,7 @@ const Dashboard = () => {
                       value={skillWanted}
                       onChange={setSkillWanted}
                       onAdd={addSkillWanted}
-                      placeholder="Search skills you want to learn..."
+                      placeholder={t.dashboard.searchSkillsLearn}
                       existingSkills={skillsWanted}
                     />
                   )}
@@ -790,13 +792,13 @@ const Dashboard = () => {
                 <div className="space-y-3">
                   <Label className="text-base font-medium flex items-center gap-2">
                     <Clock className="w-4 h-4 text-accent" />
-                    Preferred Session Duration
-                    <span className="text-sm font-normal text-muted-foreground">(30 mins = 1 credit)</span>
+                    {t.dashboard.preferredDuration}
+                    <span className="text-sm font-normal text-muted-foreground">({t.dashboard.durationCredits})</span>
                   </Label>
                   {editing ? (
                     <Select value={skillExchangeDuration} onValueChange={setSkillExchangeDuration}>
                       <SelectTrigger className="h-12 w-full sm:w-[250px]">
-                        <SelectValue placeholder="Select duration" />
+                        <SelectValue placeholder={t.dashboard.selectDuration} />
                       </SelectTrigger>
                       <SelectContent>
                         {DURATION_OPTIONS.map((option) => (
@@ -807,9 +809,16 @@ const Dashboard = () => {
                       </SelectContent>
                     </Select>
                   ) : (
-                    <p className="text-lg text-foreground py-3">
-                      {DURATION_OPTIONS.find((o) => o.value === skillExchangeDuration)?.label || "Not set"}
-                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {skillExchangeDuration ? (
+                        <Badge className="px-3 py-1.5 text-sm bg-accent/10 text-accent border-accent/20">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {DURATION_OPTIONS.find((o) => o.value === skillExchangeDuration)?.label || skillExchangeDuration}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">{t.dashboard.notSet}</span>
+                      )}
+                    </div>
                   )}
                 </div>
               </CardContent>
@@ -821,12 +830,12 @@ const Dashboard = () => {
                 <div>
                   <CardTitle className="font-display text-2xl flex items-center gap-2">
                     <ClipboardList className="w-6 h-6 text-primary" />
-                    Your Questionnaire
+                    {t.dashboard.yourQuestionnaire}
                   </CardTitle>
                   <CardDescription>
                     {isQuestionnaireComplete
-                      ? "Your answers help us find better matches"
-                      : "Complete the questionnaire to improve your matches"}
+                      ? t.dashboard.answersHelp
+                      : t.dashboard.completeImprove}
                   </CardDescription>
                 </div>
                 <Button
@@ -836,12 +845,12 @@ const Dashboard = () => {
                   {isQuestionnaireComplete ? (
                     <>
                       <Edit3 className="w-4 h-4 mr-2" />
-                      Edit
+                      {t.dashboard.edit}
                     </>
                   ) : (
                     <>
                       <ArrowRight className="w-4 h-4 mr-2" />
-                      Complete
+                      {t.common.next}
                     </>
                   )}
                 </Button>
@@ -850,7 +859,7 @@ const Dashboard = () => {
                 <CardContent>
                   <div className="flex items-center gap-2 text-green-600">
                     <CheckCircle2 className="w-5 h-5" />
-                    <span className="font-medium">Questionnaire completed</span>
+                    <span className="font-medium">{t.dashboard.questionnaireCompleted}</span>
                   </div>
                 </CardContent>
               )}

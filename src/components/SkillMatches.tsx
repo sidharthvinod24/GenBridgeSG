@@ -299,7 +299,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
         <CardHeader>
           <CardTitle className="font-display text-xl flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary" />
-            Finding Matches...
+            {t.skillMatches.findingMatches}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -317,7 +317,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
         <CardHeader>
           <CardTitle className="font-display text-xl flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary" />
-            Skill Matches
+            {t.skillMatches.skillMatches}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -325,10 +325,9 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
               <ArrowLeftRight className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">Add Your Skills First</h3>
+            <h3 className="font-semibold text-lg mb-2">{t.skillMatches.addSkillsFirst}</h3>
             <p className="text-muted-foreground">
-              Edit your profile to add skills you can teach and want to learn.
-              We'll find your perfect matches!
+              {t.skillMatches.addSkillsDesc}
             </p>
           </div>
         </CardContent>
@@ -342,7 +341,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
         <CardHeader>
           <CardTitle className="font-display text-xl flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary" />
-            Skill Matches
+            {t.skillMatches.skillMatches}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -350,9 +349,9 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
               <Heart className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">No Matches Yet</h3>
+            <h3 className="font-semibold text-lg mb-2">{t.skillMatches.noMatchesYet}</h3>
             <p className="text-muted-foreground">
-              We're looking for people with matching skills. Check back soon!
+              {t.skillMatches.noMatchesDesc}
             </p>
           </div>
         </CardContent>
@@ -366,7 +365,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
         <CardHeader>
           <CardTitle className="font-display text-xl flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary" />
-            Skill Matches
+            {t.skillMatches.skillMatches}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -374,18 +373,18 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
               <Sparkles className="w-10 h-10 text-primary" />
             </div>
-            <h3 className="font-semibold text-xl mb-2">You've seen all matches!</h3>
+            <h3 className="font-semibold text-xl mb-2">{t.skillMatches.seenAllMatches}</h3>
             <p className="text-muted-foreground mb-6">
-              Check your messages to connect with people you liked.
+              {t.skillMatches.seenAllMatchesDesc}
             </p>
             <div className="flex gap-3 justify-center">
               <Button variant="outline" onClick={() => navigate("/messages")}>
                 <MessageCircle className="w-4 h-4 mr-2" />
-                View Messages
+                {t.skillMatches.viewMessages}
               </Button>
               <Button onClick={() => { setCurrentIndex(0); setSkippedMatches([]); }}>
                 <RotateCcw className="w-4 h-4 mr-2" />
-                Start Over
+                {t.skillMatches.startOver}
               </Button>
             </div>
           </div>
@@ -409,7 +408,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
         <div className="flex items-center justify-between">
           <CardTitle className="font-display text-xl flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary heartbeat" />
-            Find Your Match
+            {t.skillMatches.findYourMatch}
           </CardTitle>
           <Badge variant="secondary" className="bg-primary/10 text-primary">
             {currentIndex + 1} / {matches.length}
@@ -453,20 +452,20 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
               className="absolute top-8 left-8 z-20 px-4 py-2 rounded-lg border-4 border-green-500 text-green-500 font-bold text-2xl rotate-[-20deg]"
               style={{ opacity: likeOpacity }}
             >
-              LIKE
+              {t.skillMatches.like}
             </div>
             <div 
               className="absolute top-8 right-8 z-20 px-4 py-2 rounded-lg border-4 border-red-500 text-red-500 font-bold text-2xl rotate-[20deg]"
               style={{ opacity: passOpacity }}
             >
-              NOPE
+              {t.skillMatches.nope}
             </div>
 
             {/* Perfect Match Banner */}
             {isPerfectMatch && (
               <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
                 <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-1 text-sm animate-pulse">
-                  ✨ Perfect Match!
+                  ✨ {t.skillMatches.perfectMatch}
                 </Badge>
               </div>
             )}
@@ -494,10 +493,10 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
                   </p>
                 )}
                 {currentMatch.skill_exchange_duration && (
-                  <p className="text-muted-foreground flex items-center justify-center gap-1 mt-1 text-sm">
-                    <Clock className="w-3 h-3" />
+                  <Badge className="bg-accent/10 text-accent border-accent/20 mt-2">
+                    <Clock className="w-3 h-3 mr-1" />
                     {DURATION_LABELS[currentMatch.skill_exchange_duration] || currentMatch.skill_exchange_duration}
-                  </p>
+                  </Badge>
                 )}
               </div>
 
@@ -507,7 +506,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
                   <div className="bg-primary/5 rounded-xl p-3">
                     <p className="text-xs font-semibold text-primary mb-2 flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
-                      Can teach you
+                      {t.skillMatches.canTeachYou}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {currentMatch.matchingSkillsTheyCanTeach.map((skill) => (
@@ -523,7 +522,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
                   <div className="bg-secondary/5 rounded-xl p-3">
                     <p className="text-xs font-semibold text-secondary mb-2 flex items-center gap-1">
                       <Heart className="w-3 h-3" />
-                      Wants to learn from you
+                      {t.skillMatches.wantsToLearn}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {currentMatch.matchingSkillsICanTeach.map((skill) => (
@@ -572,7 +571,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-4">
-          Drag to swipe or use the buttons
+          {t.skillMatches.dragToSwipe}
         </p>
       </CardContent>
     </Card>
