@@ -4,14 +4,32 @@ import { Shield, Star } from "lucide-react";
 interface CredibilityScoreProps {
   score: number;
   compact?: boolean;
+  translations?: {
+    credibilityScore: string;
+    scoreExcellent: string;
+    scoreGood: string;
+    scoreAverage: string;
+    scoreBelowAverage: string;
+    scoreNeedsImprovement: string;
+    scoreBasedOn: string;
+    completeToIncrease: string;
+  };
 }
 
-const getScoreLevel = (score: number) => {
-  if (score >= 90) return { label: "Excellent", color: "text-green-600", bg: "bg-green-100" };
-  if (score >= 70) return { label: "Good", color: "text-blue-600", bg: "bg-blue-100" };
-  if (score >= 50) return { label: "Average", color: "text-amber-600", bg: "bg-amber-100" };
-  if (score >= 30) return { label: "Below Average", color: "text-orange-600", bg: "bg-orange-100" };
-  return { label: "Needs Improvement", color: "text-red-600", bg: "bg-red-100" };
+const getScoreLevel = (score: number, translations?: CredibilityScoreProps['translations']) => {
+  const labels = {
+    excellent: translations?.scoreExcellent || "Excellent",
+    good: translations?.scoreGood || "Good",
+    average: translations?.scoreAverage || "Average",
+    belowAverage: translations?.scoreBelowAverage || "Below Average",
+    needsImprovement: translations?.scoreNeedsImprovement || "Needs Improvement",
+  };
+
+  if (score >= 90) return { label: labels.excellent, color: "text-green-600", bg: "bg-green-100" };
+  if (score >= 70) return { label: labels.good, color: "text-blue-600", bg: "bg-blue-100" };
+  if (score >= 50) return { label: labels.average, color: "text-amber-600", bg: "bg-amber-100" };
+  if (score >= 30) return { label: labels.belowAverage, color: "text-orange-600", bg: "bg-orange-100" };
+  return { label: labels.needsImprovement, color: "text-red-600", bg: "bg-red-100" };
 };
 
 // Calculate credibility score based on profile completeness
@@ -50,8 +68,8 @@ export const calculateCredibilityScore = (profile: {
   return Math.round(Math.min(score, 100));
 };
 
-const CredibilityScore = ({ score, compact = false }: CredibilityScoreProps) => {
-  const scoreLevel = getScoreLevel(score);
+const CredibilityScore = ({ score, compact = false, translations }: CredibilityScoreProps) => {
+  const scoreLevel = getScoreLevel(score, translations);
 
   if (compact) {
     return (
@@ -72,7 +90,7 @@ const CredibilityScore = ({ score, compact = false }: CredibilityScoreProps) => 
             <Shield className={`w-5 h-5 ${scoreLevel.color}`} />
           </div>
           <div>
-            <p className="text-sm font-medium text-foreground">Credibility Score</p>
+            <p className="text-sm font-medium text-foreground">{translations?.credibilityScore || "Credibility Score"}</p>
             <p className={`text-xs ${scoreLevel.color}`}>{scoreLevel.label}</p>
           </div>
         </div>
@@ -84,9 +102,9 @@ const CredibilityScore = ({ score, compact = false }: CredibilityScoreProps) => 
       <div className="text-xs text-muted-foreground space-y-1">
         <div className="flex items-center gap-1">
           <Star className="w-3 h-3" />
-          <p className="font-medium">Score based on profile completeness</p>
+          <p className="font-medium">{translations?.scoreBasedOn || "Score based on profile completeness"}</p>
         </div>
-        <p className="ml-4">Complete your profile details and add skills to increase your score!</p>
+        <p className="ml-4">{translations?.completeToIncrease || "Complete your profile details and add skills to increase your score!"}</p>
       </div>
     </div>
   );
