@@ -19,6 +19,8 @@ const LanguageSwitcher = ({ className }: LanguageSwitcherProps) => {
   const languages = [
     { code: "en" as Language, label: "English", flag: "🇬🇧" },
     { code: "zh" as Language, label: "中文", flag: "🇨🇳" },
+    { code: "ms" as Language, label: "Bahasa Melayu", flag: "🇲🇾" },
+    { code: "ta" as Language, label: "தமிழ்", flag: "🇮🇳" },
   ];
 
   return (
