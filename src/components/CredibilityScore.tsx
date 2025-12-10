@@ -20,31 +20,20 @@ export const calculateCredibilityScore = (profile: {
   bio?: string | null;
   phone_number?: string | null;
   age_group?: string | null;
-  skills_offered?: string[];
-  skills_wanted?: string[];
-  q_joining_reason?: string | null;
 }) => {
   let score = 0;
   
-  // Full name: 15 points
-  if (profile.full_name && profile.full_name.trim()) score += 15;
+  // Full name: 25 points
+  if (profile.full_name && profile.full_name.trim()) score += 25;
   
-  // Bio: 15 points
-  if (profile.bio && profile.bio.trim()) score += 15;
+  // Bio: 25 points
+  if (profile.bio && profile.bio.trim()) score += 25;
   
-  // Phone number: 10 points
-  if (profile.phone_number && profile.phone_number.trim()) score += 10;
+  // Phone number: 25 points
+  if (profile.phone_number && profile.phone_number.trim()) score += 25;
   
-  // Age group: 10 points
-  if (profile.age_group) score += 10;
-  
-  // Skills offered: up to 25 points (5 points per skill, max 5 skills)
-  const offeredCount = Math.min(profile.skills_offered?.length || 0, 5);
-  score += offeredCount * 5;
-  
-  // Skills wanted: up to 25 points (5 points per skill, max 5 skills)
-  const wantedCount = Math.min(profile.skills_wanted?.length || 0, 5);
-  score += wantedCount * 5;
+  // Age group: 25 points
+  if (profile.age_group) score += 25;
   
   return Math.min(score, 100);
 };
