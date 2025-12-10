@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MapPin, Sparkles, Heart, ArrowLeftRight, MessageCircle, X, RotateCcw, Clock } from "lucide-react";
 import { useStartConversation } from "@/hooks/useStartConversation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import MatchCelebration from "./MatchCelebration";
 
@@ -40,6 +41,7 @@ interface SkillMatchesProps {
 }
 
 const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatchesProps) => {
+  const { t } = useLanguage();
   const [matches, setMatches] = useState<MatchedProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);

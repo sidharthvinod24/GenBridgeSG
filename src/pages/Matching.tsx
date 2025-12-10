@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import SkillMatches from "@/components/SkillMatches";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { 
   ArrowLeft,
   AlertCircle,
@@ -16,6 +18,7 @@ import logo from "@/assets/logo.png";
 
 const Matching = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [fullName, setFullName] = useState("");
@@ -59,7 +62,7 @@ const Matching = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t.common.loading}</p>
         </div>
       </div>
     );
@@ -79,10 +82,11 @@ const Matching = () => {
             <div className="flex items-center gap-2">
               <img src={logo} alt="GenBridgeSG Logo" className="w-10 h-10 rounded-xl object-cover" />
               <span className="font-display font-bold text-xl text-foreground">
-                Gen<span className="text-primary">Bridge</span>SG
+                {t.matching.title}
               </span>
             </div>
           </div>
+          <LanguageSwitcher />
         </div>
       </header>
 
@@ -92,18 +96,18 @@ const Matching = () => {
             <CardHeader>
               <CardTitle className="font-display text-2xl flex items-center gap-2">
                 <AlertCircle className="w-6 h-6 text-primary" />
-                Complete Your Profile First
+                {t.matching.completeProfileFirst}
               </CardTitle>
               <CardDescription className="text-base">
-                You need to complete your profile before you can start matching.
+                {t.matching.completeProfileDesc}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {(() => {
                 const completionSteps = [
-                  { label: "Add your name", done: !!fullName },
-                  { label: "Add skills you can teach", done: skillsOffered.length > 0 },
-                  { label: "Add skills you want to learn", done: skillsWanted.length > 0 },
+                  { label: t.matching.addName, done: !!fullName },
+                  { label: t.matching.addSkillsTeach, done: skillsOffered.length > 0 },
+                  { label: t.matching.addSkillsLearn, done: skillsWanted.length > 0 },
                 ];
                 const completedCount = completionSteps.filter(s => s.done).length;
                 const progressPercent = (completedCount / completionSteps.length) * 100;
@@ -112,8 +116,8 @@ const Matching = () => {
                   <>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="font-medium">Profile completion</span>
-                        <span className="text-muted-foreground">{completedCount}/{completionSteps.length} steps</span>
+                        <span className="font-medium">{t.matching.profileCompletion}</span>
+                        <span className="text-muted-foreground">{completedCount}/{completionSteps.length} {t.matching.steps}</span>
                       </div>
                       <Progress value={progressPercent} className="h-2" />
                     </div>
@@ -136,7 +140,7 @@ const Matching = () => {
               })()}
               <Button variant="hero" onClick={() => navigate("/dashboard")} className="w-full mt-4">
                 <Edit3 className="w-4 h-4 mr-2" />
-                Go to Profile
+                {t.matching.goToProfile}
               </Button>
             </CardContent>
           </Card>
