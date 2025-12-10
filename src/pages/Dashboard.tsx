@@ -66,16 +66,19 @@ interface Profile {
   q_open_to_verification: boolean | null;
 }
 
-const DURATION_OPTIONS = [
-  { value: "30", label: "30 mins (1 Credit)" },
-  { value: "60", label: "60 mins (2 Credits)" },
-  { value: "90", label: "90 mins (3 Credits)" },
-  { value: "120", label: "120 mins (4 Credits)" },
-];
+const DURATION_VALUES = ["30", "60", "90", "120"] as const;
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+
+  // Duration options with translations
+  const DURATION_OPTIONS = [
+    { value: "30", label: t.dashboard.duration30 },
+    { value: "60", label: t.dashboard.duration60 },
+    { value: "90", label: t.dashboard.duration90 },
+    { value: "120", label: t.dashboard.duration120 },
+  ];
   const { unreadCount } = useUnreadMessages();
   const { isAdmin } = useAdminRole();
   const [profile, setProfile] = useState<Profile | null>(null);

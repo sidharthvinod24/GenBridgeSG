@@ -27,11 +27,14 @@ interface MatchedProfile {
   matchScore: number;
 }
 
-const DURATION_LABELS: Record<string, string> = {
-  "30": "30 mins",
-  "60": "60 mins",
-  "90": "90 mins",
-  "120": "120 mins",
+const getDurationLabel = (value: string, t: any) => {
+  const labels: Record<string, string> = {
+    "30": t.skillMatches.duration30,
+    "60": t.skillMatches.duration60,
+    "90": t.skillMatches.duration90,
+    "120": t.skillMatches.duration120,
+  };
+  return labels[value] || value;
 };
 
 interface SkillMatchesProps {
@@ -495,7 +498,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
                 {currentMatch.skill_exchange_duration && (
                   <Badge className="bg-accent/10 text-accent border-accent/20 mt-2">
                     <Clock className="w-3 h-3 mr-1" />
-                    {DURATION_LABELS[currentMatch.skill_exchange_duration] || currentMatch.skill_exchange_duration}
+                    {getDurationLabel(currentMatch.skill_exchange_duration, t)}
                   </Badge>
                 )}
               </div>
