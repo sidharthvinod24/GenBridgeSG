@@ -80,7 +80,16 @@ const Messages = () => {
           },
           (payload) => {
             const newMsg = payload.new as Message;
-            setMessages(prev => [...prev, newMsg]);
+            // Only add if not already in messages (avoid duplicates from optimistic updates)
+            setMessages(prev => {
+              const exists = prev.some(m => m.id === newMsg.id);
+              if (exists) return prev;
+              // Also filter out any temp messages from same sender at similar time
+              const filtered = prev.filter(m => 
+                !m.id.startsWith('temp-') || m.sender_id !== newMsg.sender_id
+              );
+              return [...filtered, newMsg];
+            });
             if (newMsg.sender_id !== user?.id) {
               markMessagesAsRead(selectedConversation.id);
             }
@@ -199,18 +208,40 @@ const Messages = () => {
       return;
     }
 
+    const messageContent = validation.data.content;
+    const tempId = `temp-${Date.now()}`;
+    
+    // Optimistic update - add message immediately to UI
+    const optimisticMessage: Message = {
+      id: tempId,
+      conversation_id: selectedConversation.id,
+      sender_id: user.id,
+      content: messageContent,
+      created_at: new Date().toISOString(),
+      read_at: null,
+    };
+    
+    setMessages(prev => [...prev, optimisticMessage]);
+    setNewMessage("");
+
     setSending(true);
     try {
-      const { error } = await supabase.from("messages").insert({
+      const { data, error } = await supabase.from("messages").insert({
         conversation_id: selectedConversation.id,
         sender_id: user.id,
-        content: validation.data.content,
-      });
+        content: messageContent,
+      }).select().single();
 
       if (error) throw error;
-      setNewMessage("");
+      
+      // Replace optimistic message with real one
+      setMessages(prev => prev.map(msg => 
+        msg.id === tempId ? data : msg
+      ));
     } catch (error: any) {
       console.error("Error sending message:", error);
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg.id !== tempId));
       toast.error("Failed to send message");
     } finally {
       setSending(false);
