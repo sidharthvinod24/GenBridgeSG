@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,6 +47,7 @@ const Navbar = () => {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
+          <LanguageSwitcher />
           {user ? (
             <Button variant="hero" size="default" asChild>
               <Link to="/dashboard">My Dashboard</Link>

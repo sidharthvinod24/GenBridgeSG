@@ -7,12 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import SkillMatches from "@/components/SkillMatches";
 import { 
-  Heart, 
   ArrowLeft,
   AlertCircle,
   CheckCircle2,
   Edit3
 } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const Matching = () => {
   const { user } = useAuth();
@@ -77,9 +77,7 @@ const Matching = () => {
               </Link>
             </Button>
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
-                <Heart className="w-5 h-5 text-primary-foreground" />
-              </div>
+              <img src={logo} alt="GenBridgeSG Logo" className="w-10 h-10 rounded-xl object-cover" />
               <span className="font-display font-bold text-xl text-foreground">
                 Gen<span className="text-primary">Bridge</span>SG
               </span>
