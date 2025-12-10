@@ -66,10 +66,10 @@ interface Profile {
 }
 
 const DURATION_OPTIONS = [
-  { value: "30", label: "30 mins" },
-  { value: "60", label: "60 mins" },
-  { value: "90", label: "90 mins" },
-  { value: "120", label: "120 mins" },
+  { value: "30", label: "30 mins (1 Credit)" },
+  { value: "60", label: "60 mins (2 Credits)" },
+  { value: "90", label: "90 mins (3 Credits)" },
+  { value: "120", label: "120 mins (4 Credits)" },
 ];
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -100,7 +100,6 @@ const Dashboard = () => {
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
     age: null,
     q_skills_to_share: "",
-    q_skill_proficiency: "",
     q_digital_help_needed: [],
     q_languages_dialects: [],
     q_communication_preference: "",
@@ -144,7 +143,7 @@ const Dashboard = () => {
             .eq("user_id", user.id);
           data.phone_number = user.user_metadata.phone_number;
         }
-        
+
         // Cast skills_proficiency properly from JSON
         const proficiency =
           typeof data.skills_proficiency === "object" && data.skills_proficiency !== null
@@ -173,7 +172,6 @@ const Dashboard = () => {
         setQuestionnaireAnswers({
           age: data.age || null,
           q_skills_to_share: data.q_skills_to_share || "",
-          q_skill_proficiency: (data as any).q_skill_proficiency || "",
           q_digital_help_needed: data.q_digital_help_needed || [],
           q_languages_dialects: data.q_languages_dialects || [],
           q_communication_preference: data.q_communication_preference || "",
@@ -254,7 +252,7 @@ const Dashboard = () => {
     // Award 3 credits when profile is fully complete (score = 100) and wasn't complete before
     const wasComplete = credibilityScore >= 100;
     const isNowComplete = newCredibilityScore >= 100;
-    const newCredits = (isNowComplete && !wasComplete) ? credits + 3 : credits;
+    const newCredits = isNowComplete && !wasComplete ? credits + 3 : credits;
 
     try {
       const { error } = await supabase
@@ -274,7 +272,7 @@ const Dashboard = () => {
       setSkillWanted("");
       setCredibilityScore(newCredibilityScore);
       setCredits(newCredits);
-      
+
       if (isNowComplete && !wasComplete) {
         toast.success("Profile complete! You earned 3 credits!");
       } else {
@@ -294,11 +292,11 @@ const Dashboard = () => {
     try {
       // Determine if elderly or youth based on age
       const isElderly = (answers.age ?? 0) >= 40;
-      
+
       // Auto-populate skills based on questionnaire answers
       let derivedSkillsOffered: string[] = [...skillsOffered];
       let derivedSkillsWanted: string[] = [...skillsWanted];
-      
+
       if (isElderly) {
         // Elderly: languages/dialects they speak become skills they can offer
         // Digital help they need becomes skills they want
@@ -318,7 +316,7 @@ const Dashboard = () => {
           derivedSkillsWanted = [...new Set([...derivedSkillsWanted, ...answers.q_cultural_interests])];
         }
       }
-      
+
       // Calculate new credibility score including questionnaire
       const newCredibilityScore = calculateCredibilityScore({
         full_name: fullName,
@@ -329,12 +327,12 @@ const Dashboard = () => {
         skills_wanted: derivedSkillsWanted,
         questionnaire_complete: !!answers.age,
       });
-      
+
       // Award 3 credits when profile is fully complete (score = 100) and wasn't complete before
       const wasComplete = credibilityScore >= 100;
       const isNowComplete = newCredibilityScore >= 100;
-      const newCredits = (isNowComplete && !wasComplete) ? credits + 3 : credits;
-      
+      const newCredits = isNowComplete && !wasComplete ? credits + 3 : credits;
+
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -701,26 +699,11 @@ const Dashboard = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-base font-medium">
-                    Age
-                  </Label>
+                  <Label className="text-base font-medium">Age</Label>
                   <p className="text-lg text-foreground py-3">
                     {questionnaireAnswers.age ? `${questionnaireAnswers.age} years old` : "Complete questionnaire"}
                   </p>
                 </div>
-
-                {/* What they want to share/teach from questionnaire */}
-                {profile?.q_skills_to_share && (
-                  <div className="space-y-2">
-                    <Label className="text-base font-medium flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-secondary" />
-                      {(questionnaireAnswers.age ?? 0) >= 40 ? "Knowledge to Share" : "Skill to Teach"}
-                    </Label>
-                    <p className="text-foreground py-3 bg-muted/50 rounded-lg px-4">
-                      {profile.q_skills_to_share}
-                    </p>
-                  </div>
-                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="bio" className="text-base font-medium">
@@ -823,7 +806,7 @@ const Dashboard = () => {
                     </Select>
                   ) : (
                     <p className="text-lg text-foreground py-3">
-                      {DURATION_OPTIONS.find(o => o.value === skillExchangeDuration)?.label || "Not set"}
+                      {DURATION_OPTIONS.find((o) => o.value === skillExchangeDuration)?.label || "Not set"}
                     </p>
                   )}
                 </div>
