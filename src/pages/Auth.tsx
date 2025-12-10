@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
+
 type SignupStep = "details" | "otp";
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [signupStep, setSignupStep] = useState<SignupStep>("details");
@@ -20,12 +23,20 @@ const Auth = () => {
   const [otpValue, setOtpValue] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
 
   // Mock OTP code for demo purposes
   const MOCK_OTP = "123456";
+
+  // Password strength validation
+  const isPasswordStrong = useMemo(() => {
+    return (
+      password.length >= 8 &&
+      /[A-Z]/.test(password) &&
+      /[a-z]/.test(password) &&
+      /\d/.test(password)
+    );
+  }, [password]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -33,17 +44,31 @@ const Auth = () => {
       navigate("/dashboard");
     }
   }, [user, navigate]);
+
+  const checkDuplicatePhone = async (phone: string): Promise<boolean> => {
+    const formattedPhone = `+65${phone}`;
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("phone_number", formattedPhone)
+      .maybeSingle();
+    
+    if (error) {
+      console.error("Error checking phone:", error);
+      return false;
+    }
+    return !!data;
+  };
+
   const handleDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin) {
       // Handle login
       setLoading(true);
       try {
-        const {
-          error
-        } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
-          password
+          password,
         });
         if (error) throw error;
         toast.success("Welcome back!");
@@ -54,10 +79,26 @@ const Auth = () => {
         setLoading(false);
       }
     } else {
+      // Validate password strength
+      if (!isPasswordStrong) {
+        toast.error("Please create a stronger password");
+        return;
+      }
+
       // Validate phone number format (Singapore: 8 digits starting with 8 or 9)
       const phoneRegex = /^[89]\d{7}$/;
       if (!phoneRegex.test(phoneNumber)) {
         toast.error("Please enter a valid Singapore phone number (8 digits starting with 8 or 9)");
+        return;
+      }
+
+      // Check for duplicate phone number
+      setLoading(true);
+      const isDuplicate = await checkDuplicatePhone(phoneNumber);
+      setLoading(false);
+      
+      if (isDuplicate) {
+        toast.error("This phone number is already registered");
         return;
       }
 
@@ -236,8 +277,9 @@ const Auth = () => {
                     </Label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-12 h-14 text-base" required minLength={6} />
+                      <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-12 h-14 text-base" required minLength={8} />
                     </div>
+                    {!isLogin && <PasswordStrengthIndicator password={password} />}
                   </div>
 
                   <Button type="submit" variant="hero" size="xl" className="w-full" disabled={loading}>
