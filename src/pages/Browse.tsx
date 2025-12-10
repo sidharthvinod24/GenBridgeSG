@@ -18,7 +18,6 @@ interface Profile {
   user_id: string;
   full_name: string | null;
   bio: string | null;
-  phone_number: string | null;
   avatar_url: string | null;
   skills_offered: string[];
   skills_wanted: string[];
@@ -161,13 +160,13 @@ const Browse = () => {
 
         setProfiles(profilesWithSkills);
       } else {
-        // For unauthenticated users, use direct query (public browse)
-        const { data, error } = await supabase.from("profiles").select("*");
+        // For unauthenticated users, use secure RPC function (no direct table access)
+        const { data, error } = await supabase.rpc('get_public_profiles');
 
         if (error) throw error;
 
         const profilesWithSkills = (data || []).filter(
-          (p) => p.skills_offered?.length > 0 || p.skills_wanted?.length > 0,
+          (p: any) => p.skills_offered?.length > 0 || p.skills_wanted?.length > 0,
         );
 
         setProfiles(profilesWithSkills);

@@ -77,20 +77,8 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const type = url.searchParams.get('type') || 'browse';
 
-    let query = supabase
-      .from('profiles')
-      .select('*')
-      .neq('user_id', user.id);
-
-    if (type === 'matching') {
-      // For matching, we need profiles with skills
-      query = query.not('skills_offered', 'is', null);
-    } else {
-      // For browse, get profiles with at least one skill
-      query = query.or('skills_offered.not.is.null,skills_wanted.not.is.null');
-    }
-
-    const { data: profiles, error } = await query;
+    // Use secure RPC function that only returns non-sensitive profile data
+    const { data: profiles, error } = await supabase.rpc('get_public_profiles');
 
     if (error) {
       console.error('Error fetching profiles:', error);
@@ -100,10 +88,25 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log(`User ${user.id} fetched ${profiles?.length || 0} profiles (type: ${type})`);
+    // Filter based on type
+    let filteredProfiles = profiles || [];
+    if (type === 'matching') {
+      // For matching, we need profiles with skills offered
+      filteredProfiles = filteredProfiles.filter((p: any) => 
+        p.skills_offered && p.skills_offered.length > 0
+      );
+    } else {
+      // For browse, get profiles with at least one skill
+      filteredProfiles = filteredProfiles.filter((p: any) => 
+        (p.skills_offered && p.skills_offered.length > 0) || 
+        (p.skills_wanted && p.skills_wanted.length > 0)
+      );
+    }
+
+    console.log(`User ${user.id} fetched ${filteredProfiles.length} profiles (type: ${type})`);
 
     return new Response(JSON.stringify({ 
-      profiles: profiles || [],
+      profiles: filteredProfiles,
       rateLimit: {
         remaining: rateCheck.remaining,
         resetIn: Math.ceil(rateCheck.resetIn / 1000)
