@@ -17,9 +17,7 @@ const Footer = () => {
                 Gen<span className="text-primary">Bridge</span>SG
               </span>
             </Link>
-            <p className="text-background/70 mb-6">
-              {t.footer.tagline}
-            </p>
+            <p className="text-background/70 mb-6">{t.footer.tagline}</p>
           </div>
 
           {/* Quick Links */}
@@ -69,13 +67,9 @@ const Footer = () => {
 
         {/* Bottom */}
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-background/50 text-sm">
-            © 2024 GenBridgeSG. {t.footer.rights}
-          </p>
+          <p className="text-background/50 text-sm">© 2025 GenBridgeSG. {t.footer.rights}</p>
           <div className="flex items-center gap-6">
-            <span className="text-background/50 text-sm">
-              🇸🇬 Proudly Singaporean
-            </span>
+            <span className="text-background/50 text-sm">🇸🇬 Proudly Singaporean</span>
           </div>
         </div>
       </div>
