@@ -81,19 +81,40 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
       const profiles = data?.profiles || [];
       const matchedProfiles: MatchedProfile[] = [];
 
+      console.log("Matching debug - userSkillsOffered:", userSkillsOffered);
+      console.log("Matching debug - userSkillsWanted:", userSkillsWanted);
+      console.log("Matching debug - total profiles fetched:", profiles.length);
+
       profiles.forEach((profile: any) => {
+        // Skip profiles that don't have any skills
+        const profileSkillsOffered = profile.skills_offered || [];
+        const profileSkillsWanted = profile.skills_wanted || [];
+        
+        // Only consider profiles that have at least one skill
+        if (profileSkillsOffered.length === 0 && profileSkillsWanted.length === 0) {
+          console.log(`Skipping ${profile.full_name} - no skills`);
+          return;
+        }
+
         const skillsICanTeach = userSkillsOffered.filter((skill) =>
-          profile.skills_wanted?.some(
+          profileSkillsWanted.some(
             (wanted: string) => wanted.toLowerCase() === skill.toLowerCase()
           )
         );
 
-        const skillsTheyCanTeach = (profile.skills_offered || []).filter(
+        const skillsTheyCanTeach = profileSkillsOffered.filter(
           (skill: string) =>
             userSkillsWanted.some(
               (wanted) => wanted.toLowerCase() === skill.toLowerCase()
             )
         );
+
+        console.log(`Profile ${profile.full_name}:`, {
+          theirSkillsOffered: profileSkillsOffered,
+          theirSkillsWanted: profileSkillsWanted,
+          skillsICanTeach,
+          skillsTheyCanTeach
+        });
 
         if (skillsICanTeach.length > 0 || skillsTheyCanTeach.length > 0) {
           const matchScore =
@@ -106,9 +127,11 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
             matchingSkillsTheyCanTeach: skillsTheyCanTeach,
             matchScore,
           });
+          console.log(`Added ${profile.full_name} as match with score ${matchScore}`);
         }
       });
 
+      console.log("Matching debug - total matches found:", matchedProfiles.length);
       matchedProfiles.sort((a, b) => b.matchScore - a.matchScore);
       setMatches(matchedProfiles);
     } catch (error) {
