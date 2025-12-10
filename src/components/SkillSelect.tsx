@@ -44,7 +44,7 @@ const SKILL_OPTIONS = [
 interface SkillSelectProps {
   value: string;
   onChange: (value: string) => void;
-  onAdd: () => void;
+  onAdd: (skill?: string) => void;
   placeholder?: string;
   existingSkills?: string[];
 }
@@ -90,7 +90,7 @@ const SkillSelect = ({
   const handleSelect = (skill: string) => {
     onChange(skill);
     setIsOpen(false);
-    setTimeout(() => onAdd(), 0);
+    onAdd(skill);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -153,7 +153,7 @@ const SkillSelect = ({
           </div>
         )}
       </div>
-      <Button type="button" variant="outline" onClick={onAdd} className="h-12">
+      <Button type="button" variant="outline" onClick={() => onAdd()} className="h-12">
         <Plus className="w-4 h-4" />
       </Button>
     </div>

@@ -258,9 +258,9 @@ const Dashboard = () => {
     }
   };
 
-  const addSkillOffered = () => {
-    if (skillOffered.trim() && !skillsOffered.includes(skillOffered.trim())) {
-      const newSkill = skillOffered.trim();
+  const addSkillOffered = (skill?: string) => {
+    const newSkill = (skill || skillOffered).trim();
+    if (newSkill && !skillsOffered.includes(newSkill)) {
       setSkillsOffered([...skillsOffered, newSkill]);
       // Default new skills to beginner proficiency
       setSkillsProficiency(prev => ({ ...prev, [newSkill]: "beginner" }));
@@ -268,9 +268,10 @@ const Dashboard = () => {
     }
   };
 
-  const addSkillWanted = () => {
-    if (skillWanted.trim() && !skillsWanted.includes(skillWanted.trim())) {
-      setSkillsWanted([...skillsWanted, skillWanted.trim()]);
+  const addSkillWanted = (skill?: string) => {
+    const newSkill = (skill || skillWanted).trim();
+    if (newSkill && !skillsWanted.includes(newSkill)) {
+      setSkillsWanted([...skillsWanted, newSkill]);
       setSkillWanted("");
     }
   };
