@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { ArrowLeft, ArrowRight, Check, Sparkles, User } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export interface QuestionnaireAnswers {
   age: number | null;
@@ -93,10 +94,69 @@ const proficiencyOptions = [
 ];
 
 const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: ProfileQuestionnaireProps) => {
+  const { t } = useLanguage();
   const [step, setStep] = useState<"age" | "questionnaire">("age");
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<QuestionnaireAnswers>(initialAnswers);
   const [ageInput, setAgeInput] = useState(initialAnswers.age?.toString() || "");
+
+  // Translated options
+  const digitalHelpOptionsTranslated = [
+    { value: "Using smartphone", label: t.questionnaire.usingSmartphone },
+    { value: "E-payments", label: t.questionnaire.ePayments },
+    { value: "Scam awareness", label: t.questionnaire.scamAwareness },
+    { value: "Social apps", label: t.questionnaire.socialApps },
+    { value: "Government digital services", label: t.questionnaire.govDigitalServices },
+    { value: "Other", label: t.questionnaire.other },
+  ];
+
+  const languageOptionsTranslated = [
+    { value: "English", label: t.questionnaire.english },
+    { value: "Mandarin", label: t.questionnaire.mandarin },
+    { value: "Malay", label: t.questionnaire.malay },
+    { value: "Tamil", label: t.questionnaire.tamil },
+    { value: "Hokkien", label: t.questionnaire.hokkien },
+    { value: "Teochew", label: t.questionnaire.teochew },
+    { value: "Cantonese", label: t.questionnaire.cantonese },
+    { value: "Hakka", label: t.questionnaire.hakka },
+    { value: "Other dialects", label: t.questionnaire.otherDialects },
+  ];
+
+  const culturalInterestOptionsTranslated = [
+    { value: "Dialects", label: t.questionnaire.dialects },
+    { value: "Traditional crafts", label: t.questionnaire.traditionalCrafts },
+    { value: "Recipes", label: t.questionnaire.recipes },
+    { value: "SG history", label: t.questionnaire.sgHistory },
+    { value: "Cultural practices", label: t.questionnaire.culturalPractices },
+  ];
+
+  const digitalTeachingOptionsTranslated = [
+    { value: "Smartphone basics", label: t.questionnaire.smartphoneBasics },
+    { value: "E-payments", label: t.questionnaire.ePayments },
+    { value: "Scam detection", label: t.questionnaire.scamDetection },
+    { value: "Social apps", label: t.questionnaire.socialApps },
+    { value: "Troubleshooting", label: t.questionnaire.troubleshooting },
+    { value: "Government digital services", label: t.questionnaire.govDigitalServices },
+  ];
+
+  const availabilityOptionsTranslated = [
+    { value: "Morning", label: t.questionnaire.morning },
+    { value: "Afternoon", label: t.questionnaire.afternoon },
+    { value: "Evening", label: t.questionnaire.evening },
+    { value: "Weekends only", label: t.questionnaire.weekendsOnly },
+  ];
+
+  const communicationOptionsTranslated = [
+    { value: "chat", label: t.questionnaire.chatOnly },
+    { value: "chat-zoom", label: t.questionnaire.chatZoom },
+  ];
+
+  const proficiencyOptionsTranslated = [
+    { value: "beginner", label: t.questionnaire.proficiencyBeginner },
+    { value: "intermediate", label: t.questionnaire.proficiencyIntermediate },
+    { value: "advanced", label: t.questionnaire.proficiencyAdvanced },
+    { value: "expert", label: t.questionnaire.proficiencyExpert },
+  ];
 
   const isElderly = (answers.age ?? 0) >= 40;
 
@@ -227,14 +287,14 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
         <CardHeader className="text-center pb-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4 mx-auto">
             <User className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Step 1</span>
+            <span className="text-sm font-medium text-primary">{t.questionnaire.step} 1</span>
           </div>
           <Progress value={progress} className="h-2 mb-4" />
           <CardTitle className="font-display text-xl md:text-2xl leading-relaxed">
-            Please tell us your age so we can customise your experience
+            {t.questionnaire.ageTitle}
           </CardTitle>
           <CardDescription className="text-base">
-            We'll show you questions tailored to your generation
+            {t.questionnaire.ageDesc}
           </CardDescription>
         </CardHeader>
 
@@ -244,7 +304,7 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
               type="number"
               value={ageInput}
               onChange={(e) => setAgeInput(e.target.value)}
-              placeholder="Enter your age"
+              placeholder={t.questionnaire.enterAge}
               className="text-center text-2xl h-16 w-40 font-bold"
               min={1}
               max={120}
@@ -254,7 +314,7 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           <div className="flex items-center justify-between pt-4">
             <Button variant="ghost" onClick={onCancel}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Cancel
+              {t.questionnaire.cancel}
             </Button>
 
             <Button
@@ -263,7 +323,7 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
               disabled={!canProceed()}
               size="lg"
             >
-              Continue
+              {t.questionnaire.continue}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
@@ -282,15 +342,15 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                What knowledge or skills would you like to share with someone younger?
+                {t.questionnaire.skillsToShareTitle}
               </CardTitle>
               <CardDescription className="text-center text-base mb-4">
-                Examples: dialects, recipes, traditional crafts, stories
+                {t.questionnaire.skillsToShareDesc}
               </CardDescription>
               <Textarea
                 value={answers.q_skills_to_share || ""}
                 onChange={(e) => setAnswers(prev => ({ ...prev, q_skills_to_share: e.target.value }))}
-                placeholder="Share what you'd like to teach..."
+                placeholder={t.questionnaire.skillsToSharePlaceholder}
                 className="min-h-[120px] text-lg"
               />
             </div>
@@ -300,17 +360,17 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                How proficient are you in this skill?
+                {t.questionnaire.proficiencyTitle}
               </CardTitle>
               <CardDescription className="text-center text-base mb-4">
-                Select your experience level
+                {t.questionnaire.proficiencyDesc}
               </CardDescription>
               <RadioGroup
                 value={answers.q_skill_proficiency || ""}
                 onValueChange={(value) => setAnswers(prev => ({ ...prev, q_skill_proficiency: value }))}
                 className="space-y-3 mt-6"
               >
-                {proficiencyOptions.map((option) => (
+                {proficiencyOptionsTranslated.map((option) => (
                   <div
                     key={option.value}
                     className={`flex items-center gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all ${
@@ -334,27 +394,27 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                What digital help would you like to receive?
+                {t.questionnaire.digitalHelpTitle}
               </CardTitle>
               <CardDescription className="text-center text-base mb-4">
-                Select all that apply
+                {t.questionnaire.selectAllApply}
               </CardDescription>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {digitalHelpOptions.map((option) => (
+                {digitalHelpOptionsTranslated.map((option) => (
                   <div
-                    key={option}
-                    onClick={() => handleMultiSelect("q_digital_help_needed", option)}
+                    key={option.value}
+                    onClick={() => handleMultiSelect("q_digital_help_needed", option.value)}
                     className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      answers.q_digital_help_needed?.includes(option)
+                      answers.q_digital_help_needed?.includes(option.value)
                         ? "border-primary bg-primary/10"
                         : "border-border hover:border-primary/50"
                     }`}
                   >
                     <Checkbox
-                      checked={answers.q_digital_help_needed?.includes(option)}
+                      checked={answers.q_digital_help_needed?.includes(option.value)}
                       className="h-6 w-6"
                     />
-                    <span className="text-lg">{option}</span>
+                    <span className="text-lg">{option.label}</span>
                   </div>
                 ))}
               </div>
@@ -365,27 +425,27 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                Which languages or dialects do you speak well?
+                {t.questionnaire.languagesTitle}
               </CardTitle>
               <CardDescription className="text-center text-base mb-4">
-                Select all that apply
+                {t.questionnaire.selectAllApply}
               </CardDescription>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {languageOptions.map((option) => (
+                {languageOptionsTranslated.map((option) => (
                   <div
-                    key={option}
-                    onClick={() => handleMultiSelect("q_languages_dialects", option)}
+                    key={option.value}
+                    onClick={() => handleMultiSelect("q_languages_dialects", option.value)}
                     className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      answers.q_languages_dialects?.includes(option)
+                      answers.q_languages_dialects?.includes(option.value)
                         ? "border-primary bg-primary/10"
                         : "border-border hover:border-primary/50"
                     }`}
                   >
                     <Checkbox
-                      checked={answers.q_languages_dialects?.includes(option)}
+                      checked={answers.q_languages_dialects?.includes(option.value)}
                       className="h-5 w-5"
                     />
-                    <span className="text-base">{option}</span>
+                    <span className="text-base">{option.label}</span>
                   </div>
                 ))}
               </div>
@@ -396,14 +456,14 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                How would you like to communicate?
+                {t.questionnaire.communicationTitle}
               </CardTitle>
               <RadioGroup
                 value={answers.q_communication_preference || ""}
                 onValueChange={(value) => setAnswers(prev => ({ ...prev, q_communication_preference: value }))}
                 className="space-y-3 mt-6"
               >
-                {communicationOptions.map((option) => (
+                {communicationOptionsTranslated.map((option) => (
                   <div
                     key={option.value}
                     className={`flex items-center gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all ${
@@ -427,27 +487,27 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                When are you usually free?
+                {t.questionnaire.availabilityTitle}
               </CardTitle>
               <CardDescription className="text-center text-base mb-4">
-                Select all that apply
+                {t.questionnaire.selectAllApply}
               </CardDescription>
               <div className="grid grid-cols-2 gap-3">
-                {availabilityOptions.map((option) => (
+                {availabilityOptionsTranslated.map((option) => (
                   <div
-                    key={option}
-                    onClick={() => handleMultiSelect("q_availability", option)}
+                    key={option.value}
+                    onClick={() => handleMultiSelect("q_availability", option.value)}
                     className={`flex items-center justify-center gap-3 p-5 rounded-xl border-2 cursor-pointer transition-all text-center ${
-                      answers.q_availability?.includes(option)
+                      answers.q_availability?.includes(option.value)
                         ? "border-primary bg-primary/10"
                         : "border-border hover:border-primary/50"
                     }`}
                   >
                     <Checkbox
-                      checked={answers.q_availability?.includes(option)}
+                      checked={answers.q_availability?.includes(option.value)}
                       className="h-6 w-6"
                     />
-                    <span className="text-lg font-medium">{option}</span>
+                    <span className="text-lg font-medium">{option.label}</span>
                   </div>
                 ))}
               </div>
@@ -458,7 +518,7 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                Do you allow your shared stories or knowledge to be recorded and preserved in our cultural archive?
+                {t.questionnaire.archiveTitle}
               </CardTitle>
               <RadioGroup
                 value={answers.q_allow_archive ? "yes" : "no"}
@@ -466,8 +526,8 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
                 className="space-y-3 mt-6"
               >
                 {[
-                  { value: "yes", label: "Yes, I'd like to contribute to the archive" },
-                  { value: "no", label: "No, I prefer to keep my knowledge private" },
+                  { value: "yes", label: t.questionnaire.archiveYes },
+                  { value: "no", label: t.questionnaire.archiveNo },
                 ].map((option) => (
                   <div
                     key={option.value}
@@ -495,12 +555,12 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                What skill or hobby can you confidently teach to someone else?
+                {t.questionnaire.skillToTeachTitle}
               </CardTitle>
               <Textarea
                 value={answers.q_skill_to_teach || ""}
                 onChange={(e) => setAnswers(prev => ({ ...prev, q_skill_to_teach: e.target.value }))}
-                placeholder="Describe what you can teach..."
+                placeholder={t.questionnaire.skillToTeachPlaceholder}
                 className="min-h-[120px] text-base"
               />
             </div>
@@ -510,17 +570,17 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                How proficient are you in this skill?
+                {t.questionnaire.proficiencyTitle}
               </CardTitle>
               <CardDescription className="text-center text-base mb-4">
-                Select your experience level
+                {t.questionnaire.proficiencyDesc}
               </CardDescription>
               <RadioGroup
                 value={answers.q_skill_proficiency || ""}
                 onValueChange={(value) => setAnswers(prev => ({ ...prev, q_skill_proficiency: value }))}
                 className="space-y-3 mt-6"
               >
-                {proficiencyOptions.map((option) => (
+                {proficiencyOptionsTranslated.map((option) => (
                   <div
                     key={option.value}
                     className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
@@ -544,27 +604,27 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                What cultural skills or knowledge would you like to learn?
+                {t.questionnaire.culturalInterestsTitle}
               </CardTitle>
               <CardDescription className="text-center text-base mb-4">
-                Select all that interest you
+                {t.questionnaire.selectAllInterest}
               </CardDescription>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {culturalInterestOptions.map((option) => (
+                {culturalInterestOptionsTranslated.map((option) => (
                   <div
-                    key={option}
-                    onClick={() => handleMultiSelect("q_cultural_interests", option)}
+                    key={option.value}
+                    onClick={() => handleMultiSelect("q_cultural_interests", option.value)}
                     className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      answers.q_cultural_interests?.includes(option)
+                      answers.q_cultural_interests?.includes(option.value)
                         ? "border-primary bg-primary/10"
                         : "border-border hover:border-primary/50"
                     }`}
                   >
                     <Checkbox
-                      checked={answers.q_cultural_interests?.includes(option)}
+                      checked={answers.q_cultural_interests?.includes(option.value)}
                       className="h-5 w-5"
                     />
-                    <span className="text-base">{option}</span>
+                    <span className="text-base">{option.label}</span>
                   </div>
                 ))}
               </div>
@@ -575,27 +635,27 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                Which digital skills are you confident teaching?
+                {t.questionnaire.digitalTeachingTitle}
               </CardTitle>
               <CardDescription className="text-center text-base mb-4">
-                Select all that apply
+                {t.questionnaire.selectAllApply}
               </CardDescription>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {digitalTeachingOptions.map((option) => (
+                {digitalTeachingOptionsTranslated.map((option) => (
                   <div
-                    key={option}
-                    onClick={() => handleMultiSelect("q_digital_teaching_skills", option)}
+                    key={option.value}
+                    onClick={() => handleMultiSelect("q_digital_teaching_skills", option.value)}
                     className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      answers.q_digital_teaching_skills?.includes(option)
+                      answers.q_digital_teaching_skills?.includes(option.value)
                         ? "border-primary bg-primary/10"
                         : "border-border hover:border-primary/50"
                     }`}
                   >
                     <Checkbox
-                      checked={answers.q_digital_teaching_skills?.includes(option)}
+                      checked={answers.q_digital_teaching_skills?.includes(option.value)}
                       className="h-5 w-5"
                     />
-                    <span className="text-base">{option}</span>
+                    <span className="text-base">{option.label}</span>
                   </div>
                 ))}
               </div>
@@ -606,13 +666,12 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-6">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                How comfortable are you teaching someone unfamiliar with technology?
+                {t.questionnaire.teachingComfortTitle}
               </CardTitle>
+              <CardDescription className="text-center text-base mb-4">
+                {t.questionnaire.teachingComfortDesc}
+              </CardDescription>
               <div className="px-4 py-8">
-                <div className="flex justify-between mb-4 text-sm text-muted-foreground">
-                  <span>Not comfortable</span>
-                  <span>Very comfortable</span>
-                </div>
                 <Slider
                   value={[answers.q_teaching_comfort || 3]}
                   onValueChange={(value) => setAnswers(prev => ({ ...prev, q_teaching_comfort: value[0] }))}
@@ -644,14 +703,14 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                How would you prefer to communicate?
+                {t.questionnaire.communicationTitle}
               </CardTitle>
               <RadioGroup
                 value={answers.q_communication_preference || ""}
                 onValueChange={(value) => setAnswers(prev => ({ ...prev, q_communication_preference: value }))}
                 className="space-y-3 mt-6"
               >
-                {communicationOptions.map((option) => (
+                {communicationOptionsTranslated.map((option) => (
                   <div
                     key={option.value}
                     className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
@@ -675,27 +734,27 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                When are you available?
+                {t.questionnaire.availabilityTitle}
               </CardTitle>
               <CardDescription className="text-center text-base mb-4">
-                Select all time blocks that work for you
+                {t.questionnaire.selectAllApply}
               </CardDescription>
               <div className="grid grid-cols-2 gap-3">
-                {availabilityOptions.map((option) => (
+                {availabilityOptionsTranslated.map((option) => (
                   <div
-                    key={option}
-                    onClick={() => handleMultiSelect("q_availability", option)}
+                    key={option.value}
+                    onClick={() => handleMultiSelect("q_availability", option.value)}
                     className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      answers.q_availability?.includes(option)
+                      answers.q_availability?.includes(option.value)
                         ? "border-primary bg-primary/10"
                         : "border-border hover:border-primary/50"
                     }`}
                   >
                     <Checkbox
-                      checked={answers.q_availability?.includes(option)}
+                      checked={answers.q_availability?.includes(option.value)}
                       className="h-5 w-5"
                     />
-                    <span className="font-medium">{option}</span>
+                    <span className="font-medium">{option.label}</span>
                   </div>
                 ))}
               </div>
@@ -706,19 +765,16 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
           return (
             <div className="space-y-4">
               <CardTitle className="font-display text-xl md:text-2xl leading-relaxed text-center">
-                Are you open to optional verification for trust and credibility?
+                {t.questionnaire.verificationTitle}
               </CardTitle>
-              <CardDescription className="text-center text-base mb-4">
-                Verified users get higher visibility in matches
-              </CardDescription>
               <RadioGroup
                 value={answers.q_open_to_verification ? "yes" : "no"}
                 onValueChange={(value) => setAnswers(prev => ({ ...prev, q_open_to_verification: value === "yes" }))}
                 className="space-y-3 mt-6"
               >
                 {[
-                  { value: "yes", label: "Yes, I'm open to verification" },
-                  { value: "no", label: "No, not at this time" },
+                  { value: "yes", label: t.questionnaire.verificationYes },
+                  { value: "no", label: t.questionnaire.verificationNo },
                 ].map((option) => (
                   <div
                     key={option.value}
@@ -766,7 +822,7 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
             disabled={saving}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Previous
+            {t.questionnaire.previous}
           </Button>
 
           {isLastStep ? (
@@ -776,7 +832,7 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
               disabled={!canProceed() || saving}
               size="lg"
             >
-              {saving ? "Saving..." : "Complete Profile"}
+              {saving ? t.questionnaire.saving : t.questionnaire.finish}
               <Check className="w-4 h-4 ml-2" />
             </Button>
           ) : (
@@ -786,7 +842,7 @@ const ProfileQuestionnaire = ({ initialAnswers, onSave, onCancel, saving }: Prof
               disabled={!canProceed()}
               size="lg"
             >
-              Next
+              {t.questionnaire.next}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           )}
