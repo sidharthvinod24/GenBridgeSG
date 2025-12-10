@@ -75,6 +75,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
           age_group: string | null
           avatar_url: string | null
           bio: string | null
@@ -83,16 +84,26 @@ export type Database = {
           full_name: string | null
           id: string
           phone_number: string | null
+          q_allow_archive: boolean | null
+          q_availability: string[] | null
+          q_communication_preference: string | null
           q_conversation_preference: string | null
+          q_cultural_interests: string[] | null
+          q_digital_help_needed: string[] | null
+          q_digital_teaching_skills: string[] | null
           q_explaining_patience: string | null
           q_frustrating_task: string | null
           q_hands_or_screens: string | null
           q_joining_reason: string | null
+          q_languages_dialects: string[] | null
           q_learning_style: string | null
+          q_open_to_verification: boolean | null
           q_other_generation: string | null
           q_proud_story: string | null
           q_skill_or_hobby: string | null
+          q_skills_to_share: string | null
           q_talk_topic: string | null
+          q_teaching_comfort: number | null
           skills_offered: string[] | null
           skills_proficiency: Json | null
           skills_wanted: string[] | null
@@ -100,6 +111,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          age?: number | null
           age_group?: string | null
           avatar_url?: string | null
           bio?: string | null
@@ -108,16 +120,26 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone_number?: string | null
+          q_allow_archive?: boolean | null
+          q_availability?: string[] | null
+          q_communication_preference?: string | null
           q_conversation_preference?: string | null
+          q_cultural_interests?: string[] | null
+          q_digital_help_needed?: string[] | null
+          q_digital_teaching_skills?: string[] | null
           q_explaining_patience?: string | null
           q_frustrating_task?: string | null
           q_hands_or_screens?: string | null
           q_joining_reason?: string | null
+          q_languages_dialects?: string[] | null
           q_learning_style?: string | null
+          q_open_to_verification?: boolean | null
           q_other_generation?: string | null
           q_proud_story?: string | null
           q_skill_or_hobby?: string | null
+          q_skills_to_share?: string | null
           q_talk_topic?: string | null
+          q_teaching_comfort?: number | null
           skills_offered?: string[] | null
           skills_proficiency?: Json | null
           skills_wanted?: string[] | null
@@ -125,6 +147,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          age?: number | null
           age_group?: string | null
           avatar_url?: string | null
           bio?: string | null
@@ -133,16 +156,26 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone_number?: string | null
+          q_allow_archive?: boolean | null
+          q_availability?: string[] | null
+          q_communication_preference?: string | null
           q_conversation_preference?: string | null
+          q_cultural_interests?: string[] | null
+          q_digital_help_needed?: string[] | null
+          q_digital_teaching_skills?: string[] | null
           q_explaining_patience?: string | null
           q_frustrating_task?: string | null
           q_hands_or_screens?: string | null
           q_joining_reason?: string | null
+          q_languages_dialects?: string[] | null
           q_learning_style?: string | null
+          q_open_to_verification?: boolean | null
           q_other_generation?: string | null
           q_proud_story?: string | null
           q_skill_or_hobby?: string | null
+          q_skills_to_share?: string | null
           q_talk_topic?: string | null
+          q_teaching_comfort?: number | null
           skills_offered?: string[] | null
           skills_proficiency?: Json | null
           skills_wanted?: string[] | null
