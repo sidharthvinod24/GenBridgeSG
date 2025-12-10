@@ -804,10 +804,6 @@ const Dashboard = () => {
                     <span className={fullName ? "text-foreground" : "text-muted-foreground"}>Name added</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${location ? "bg-green-500" : "bg-muted"}`} />
-                    <span className={location ? "text-foreground" : "text-muted-foreground"}>Location set</span>
-                  </div>
-                  <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${skillsOffered.length > 0 ? "bg-green-500" : "bg-muted"}`} />
                     <span className={skillsOffered.length > 0 ? "text-foreground" : "text-muted-foreground"}>
                       Skills to teach
