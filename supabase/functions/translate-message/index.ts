@@ -6,6 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Input validation constants
+const MAX_TEXT_LENGTH = 5000;
+const VALID_LANGUAGES = ["en", "zh", "ms", "ta", "English", "Chinese", "Malay", "Tamil"];
+
 // Rate limiting configuration
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT = 30; // requests per window
@@ -27,6 +31,37 @@ const checkRateLimit = (userId: string): { allowed: boolean; remaining: number }
   userLimit.count++;
   return { allowed: true, remaining: RATE_LIMIT - userLimit.count };
 };
+
+// Input validation function
+function validateInput(body: unknown): { valid: boolean; error?: string; data?: { text: string; targetLanguage: string } } {
+  if (typeof body !== "object" || body === null) {
+    return { valid: false, error: "Request body must be an object" };
+  }
+
+  const { text, targetLanguage } = body as { text?: unknown; targetLanguage?: unknown };
+
+  if (typeof text !== "string") {
+    return { valid: false, error: "Text must be a string" };
+  }
+
+  if (text.trim().length === 0) {
+    return { valid: false, error: "Text cannot be empty" };
+  }
+
+  if (text.length > MAX_TEXT_LENGTH) {
+    return { valid: false, error: `Text exceeds maximum length of ${MAX_TEXT_LENGTH} characters` };
+  }
+
+  if (typeof targetLanguage !== "string") {
+    return { valid: false, error: "Target language must be a string" };
+  }
+
+  if (!VALID_LANGUAGES.includes(targetLanguage)) {
+    return { valid: false, error: `Invalid target language. Must be one of: ${VALID_LANGUAGES.join(", ")}` };
+  }
+
+  return { valid: true, data: { text: text.trim(), targetLanguage } };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -76,14 +111,27 @@ serve(async (req) => {
       );
     }
 
-    const { text, targetLanguage } = await req.json();
-
-    if (!text || !targetLanguage) {
+    // Parse and validate input
+    let requestBody: unknown;
+    try {
+      requestBody = await req.json();
+    } catch {
       return new Response(
-        JSON.stringify({ error: "Missing text or targetLanguage" }),
+        JSON.stringify({ error: "Invalid JSON body" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const validation = validateInput(requestBody);
+    if (!validation.valid) {
+      console.log(`Input validation failed for user ${user.id}: ${validation.error}`);
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { text, targetLanguage } = validation.data!;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
