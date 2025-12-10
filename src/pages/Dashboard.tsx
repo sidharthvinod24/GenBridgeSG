@@ -16,8 +16,24 @@ import ProfileQuestionnaire from "@/components/ProfileQuestionnaire";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { validateProfile } from "@/lib/validation";
-import { Heart, LogOut, Phone, Edit3, Save, X, Sparkles, Users, ArrowRight, MessageCircle, AlertCircle, CheckCircle2, ClipboardList, Shield } from "lucide-react";
+import {
+  Heart,
+  LogOut,
+  Phone,
+  Edit3,
+  Save,
+  X,
+  Sparkles,
+  Users,
+  ArrowRight,
+  MessageCircle,
+  AlertCircle,
+  CheckCircle2,
+  ClipboardList,
+  Shield,
+} from "lucide-react";
 import { toast } from "sonner";
+import logo from "@/assets/logo.png";
 interface Profile {
   id: string;
   user_id: string;
@@ -40,17 +56,10 @@ interface QuestionnaireAnswers {
   q_joining_reason: string;
 }
 const Dashboard = () => {
-  const {
-    user,
-    signOut
-  } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const {
-    unreadCount
-  } = useUnreadMessages();
-  const {
-    isAdmin
-  } = useAdminRole();
+  const { unreadCount } = useUnreadMessages();
+  const { isAdmin } = useAdminRole();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -73,7 +82,7 @@ const Dashboard = () => {
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
     q_skill_or_hobby: "",
     q_learning_style: "",
-    q_joining_reason: ""
+    q_joining_reason: "",
   });
   useEffect(() => {
     fetchProfile();
@@ -81,33 +90,34 @@ const Dashboard = () => {
   const fetchProfile = async () => {
     if (!user) return;
     try {
-      let {
-        data,
-        error
-      } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+      let { data, error } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
       if (error) throw error;
 
       // If no profile exists, create one
       if (!data) {
-        const {
-          data: newProfile,
-          error: insertError
-        } = await supabase.from("profiles").insert({
-          user_id: user.id,
-          full_name: user.user_metadata?.full_name || ""
-        }).select().single();
+        const { data: newProfile, error: insertError } = await supabase
+          .from("profiles")
+          .insert({
+            user_id: user.id,
+            full_name: user.user_metadata?.full_name || "",
+          })
+          .select()
+          .single();
         if (insertError) throw insertError;
         data = newProfile;
       }
       if (data) {
         // Cast skills_proficiency properly from JSON
-        const proficiency = typeof data.skills_proficiency === 'object' && data.skills_proficiency !== null ? data.skills_proficiency as Record<string, ProficiencyLevel> : {};
+        const proficiency =
+          typeof data.skills_proficiency === "object" && data.skills_proficiency !== null
+            ? (data.skills_proficiency as Record<string, ProficiencyLevel>)
+            : {};
         const profileData: Profile = {
           ...data,
           skills_offered: data.skills_offered || [],
           skills_wanted: data.skills_wanted || [],
           skills_proficiency: proficiency,
-          credibility_score: data.credibility_score || 0
+          credibility_score: data.credibility_score || 0,
         };
         setProfile(profileData);
         setFullName(data.full_name || "");
@@ -121,7 +131,7 @@ const Dashboard = () => {
         setQuestionnaireAnswers({
           q_skill_or_hobby: data.q_skill_or_hobby || "",
           q_learning_style: data.q_learning_style || "",
-          q_joining_reason: data.q_joining_reason || ""
+          q_joining_reason: data.q_joining_reason || "",
         });
       }
     } catch (error: any) {
@@ -146,15 +156,15 @@ const Dashboard = () => {
 
     // Update proficiency for any new skills (default to beginner)
     const updatedProficiency = {
-      ...skillsProficiency
+      ...skillsProficiency,
     };
-    finalSkillsOffered.forEach(skill => {
+    finalSkillsOffered.forEach((skill) => {
       if (!updatedProficiency[skill]) {
         updatedProficiency[skill] = "beginner";
       }
     });
     // Remove proficiency for skills that were removed
-    Object.keys(updatedProficiency).forEach(skill => {
+    Object.keys(updatedProficiency).forEach((skill) => {
       if (!finalSkillsOffered.includes(skill)) {
         delete updatedProficiency[skill];
       }
@@ -168,7 +178,7 @@ const Dashboard = () => {
       age_group: ageGroup,
       skills_offered: finalSkillsOffered,
       skills_wanted: finalSkillsWanted,
-      skills_proficiency: updatedProficiency
+      skills_proficiency: updatedProficiency,
     };
 
     // Calculate credibility score based on profile completeness
@@ -176,7 +186,7 @@ const Dashboard = () => {
       full_name: fullName,
       bio,
       phone_number: phoneNumber,
-      age_group: ageGroup
+      age_group: ageGroup,
     });
     const validation = validateProfile(profileData);
     if (!validation.success) {
@@ -186,12 +196,13 @@ const Dashboard = () => {
       return;
     }
     try {
-      const {
-        error
-      } = await supabase.from("profiles").update({
-        ...profileData,
-        credibility_score: newCredibilityScore
-      }).eq("user_id", user.id);
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          ...profileData,
+          credibility_score: newCredibilityScore,
+        })
+        .eq("user_id", user.id);
       if (error) throw error;
 
       // Update local state with the final values
@@ -212,13 +223,14 @@ const Dashboard = () => {
     if (!user) return;
     setSaving(true);
     try {
-      const {
-        error
-      } = await supabase.from("profiles").update({
-        q_skill_or_hobby: answers.q_skill_or_hobby,
-        q_learning_style: answers.q_learning_style,
-        q_joining_reason: answers.q_joining_reason
-      }).eq("user_id", user.id);
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          q_skill_or_hobby: answers.q_skill_or_hobby,
+          q_learning_style: answers.q_learning_style,
+          q_joining_reason: answers.q_joining_reason,
+        })
+        .eq("user_id", user.id);
       if (error) throw error;
       setQuestionnaireAnswers(answers);
       toast.success("Questionnaire completed!");
@@ -235,9 +247,9 @@ const Dashboard = () => {
     if (newSkill && !skillsOffered.includes(newSkill)) {
       setSkillsOffered([...skillsOffered, newSkill]);
       // Default new skills to beginner proficiency
-      setSkillsProficiency(prev => ({
+      setSkillsProficiency((prev) => ({
         ...prev,
-        [newSkill]: "beginner"
+        [newSkill]: "beginner",
       }));
       setSkillOffered("");
     }
@@ -250,24 +262,24 @@ const Dashboard = () => {
     }
   };
   const removeSkillOffered = (skill: string) => {
-    setSkillsOffered(skillsOffered.filter(s => s !== skill));
+    setSkillsOffered(skillsOffered.filter((s) => s !== skill));
     // Also remove from proficiency map
-    setSkillsProficiency(prev => {
+    setSkillsProficiency((prev) => {
       const updated = {
-        ...prev
+        ...prev,
       };
       delete updated[skill];
       return updated;
     });
   };
   const handleProficiencyChange = (skill: string, level: ProficiencyLevel) => {
-    setSkillsProficiency(prev => ({
+    setSkillsProficiency((prev) => ({
       ...prev,
-      [skill]: level
+      [skill]: level,
     }));
   };
   const removeSkillWanted = (skill: string) => {
-    setSkillsWanted(skillsWanted.filter(s => s !== skill));
+    setSkillsWanted(skillsWanted.filter((s) => s !== skill));
   };
   const handleSignOut = async () => {
     await signOut();
@@ -275,17 +287,20 @@ const Dashboard = () => {
   };
   const isQuestionnaireComplete = questionnaireAnswers.q_joining_reason !== "";
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background">
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           <p className="text-muted-foreground">Loading your profile...</p>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   // Show questionnaire view
   if (showQuestionnaire) {
-    return <div className="min-h-screen bg-gradient-to-b from-primary-light/30 via-background to-secondary-light/20">
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-primary-light/30 via-background to-secondary-light/20">
         {/* Header */}
         <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
           <div className="container flex items-center justify-between h-18 py-4">
@@ -302,41 +317,49 @@ const Dashboard = () => {
 
         <main className="container py-8 md:py-12">
           <div className="mb-8 text-center">
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
-              Tell Us About Yourself
-            </h1>
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">Tell Us About Yourself</h1>
             <p className="text-lg text-muted-foreground">
               Answer these questions to help us find your perfect skill matches.
             </p>
           </div>
 
-          <ProfileQuestionnaire initialAnswers={questionnaireAnswers} onSave={handleSaveQuestionnaire} onCancel={() => setShowQuestionnaire(false)} saving={saving} />
+          <ProfileQuestionnaire
+            initialAnswers={questionnaireAnswers}
+            onSave={handleSaveQuestionnaire}
+            onCancel={() => setShowQuestionnaire(false)}
+            saving={saving}
+          />
         </main>
-      </div>;
+      </div>
+    );
   }
-  return <div className="min-h-screen bg-gradient-to-b from-primary-light/30 via-background to-secondary-light/20">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-primary-light/30 via-background to-secondary-light/20">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="container flex items-center justify-between h-18 py-4">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
-              <Heart className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="GenBridgeSG Logo" className="w-10 h-10 rounded-xl object-cover" />
             <span className="font-display font-bold text-xl text-foreground">
               Gen<span className="text-primary">Bridge</span>SG
             </span>
           </Link>
 
           <div className="flex items-center gap-3">
-            {isAdmin && <Button variant="outline" size="sm" asChild className="text-destructive border-destructive/30 hover:bg-destructive/10">
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="text-destructive border-destructive/30 hover:bg-destructive/10"
+              >
                 <Link to="/admin">
                   <Shield className="w-4 h-4 mr-2" />
                   Admin
                 </Link>
-              </Button>}
-            <span className="text-sm text-muted-foreground hidden sm:block">
-              {user?.email}
-            </span>
+              </Button>
+            )}
+            <span className="text-sm text-muted-foreground hidden sm:block">{user?.email}</span>
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
@@ -358,24 +381,31 @@ const Dashboard = () => {
 
         {/* Profile Completion Check */}
         {(() => {
-        const isProfileComplete = fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && isQuestionnaireComplete;
-        const completionSteps = [{
-          label: "Add your name",
-          done: !!fullName
-        }, {
-          label: "Add skills you can teach",
-          done: skillsOffered.length > 0
-        }, {
-          label: "Add skills you want to learn",
-          done: skillsWanted.length > 0
-        }, {
-          label: "Complete the questionnaire",
-          done: isQuestionnaireComplete
-        }];
-        const completedCount = completionSteps.filter(s => s.done).length;
-        const progressPercent = completedCount / completionSteps.length * 100;
-        if (!isProfileComplete) {
-          return <Card className="border-primary/50 bg-gradient-to-br from-primary-light/50 to-secondary-light/30 mb-8">
+          const isProfileComplete =
+            fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && isQuestionnaireComplete;
+          const completionSteps = [
+            {
+              label: "Add your name",
+              done: !!fullName,
+            },
+            {
+              label: "Add skills you can teach",
+              done: skillsOffered.length > 0,
+            },
+            {
+              label: "Add skills you want to learn",
+              done: skillsWanted.length > 0,
+            },
+            {
+              label: "Complete the questionnaire",
+              done: isQuestionnaireComplete,
+            },
+          ];
+          const completedCount = completionSteps.filter((s) => s.done).length;
+          const progressPercent = (completedCount / completionSteps.length) * 100;
+          if (!isProfileComplete) {
+            return (
+              <Card className="border-primary/50 bg-gradient-to-br from-primary-light/50 to-secondary-light/30 mb-8">
                 <CardHeader>
                   <CardTitle className="font-display text-2xl flex items-center gap-2">
                     <AlertCircle className="w-6 h-6 text-primary" />
@@ -389,39 +419,53 @@ const Dashboard = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="font-medium">Profile completion</span>
-                      <span className="text-muted-foreground">{completedCount}/{completionSteps.length} steps</span>
+                      <span className="text-muted-foreground">
+                        {completedCount}/{completionSteps.length} steps
+                      </span>
                     </div>
                     <Progress value={progressPercent} className="h-2" />
                   </div>
                   <div className="space-y-2">
-                    {completionSteps.map((step, i) => <div key={i} className="flex items-center gap-2 text-sm">
-                        {step.done ? <CheckCircle2 className="w-4 h-4 text-green-600" /> : <div className="w-4 h-4 rounded-full border-2 border-muted-foreground" />}
+                    {completionSteps.map((step, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm">
+                        {step.done ? (
+                          <CheckCircle2 className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <div className="w-4 h-4 rounded-full border-2 border-muted-foreground" />
+                        )}
                         <span className={step.done ? "text-muted-foreground line-through" : "font-medium"}>
                           {step.label}
                         </span>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 mt-4">
-                    {!editing && (fullName === "" || skillsOffered.length === 0 || skillsWanted.length === 0) && <Button variant="hero" onClick={() => setEditing(true)} className="flex-1">
+                    {!editing && (fullName === "" || skillsOffered.length === 0 || skillsWanted.length === 0) && (
+                      <Button variant="hero" onClick={() => setEditing(true)} className="flex-1">
                         <Edit3 className="w-4 h-4 mr-2" />
                         Edit Profile
-                      </Button>}
-                    {!isQuestionnaireComplete && <Button variant="warm" onClick={() => setShowQuestionnaire(true)} className="flex-1">
+                      </Button>
+                    )}
+                    {!isQuestionnaireComplete && (
+                      <Button variant="warm" onClick={() => setShowQuestionnaire(true)} className="flex-1">
                         <ClipboardList className="w-4 h-4 mr-2" />
                         Complete Questionnaire
-                      </Button>}
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
-              </Card>;
-        }
-        return null;
-      })()}
+              </Card>
+            );
+          }
+          return null;
+        })()}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Link to Matching Page - Only show if profile is complete */}
-            {user && fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && isQuestionnaireComplete && <Card className="shadow-elevated bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+            {user && fullName && skillsOffered.length > 0 && skillsWanted.length > 0 && isQuestionnaireComplete && (
+              <Card className="shadow-elevated bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
                 <CardContent className="py-8">
                   <div className="text-center space-y-4">
                     <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
@@ -442,7 +486,8 @@ const Dashboard = () => {
                     </Button>
                   </div>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
 
             {/* Profile Card */}
             <Card className="shadow-elevated">
@@ -453,10 +498,13 @@ const Dashboard = () => {
                     {editing ? "Edit your profile details" : "Your skill exchange profile"}
                   </CardDescription>
                 </div>
-                {!editing ? <Button variant="outline" onClick={() => setEditing(true)}>
+                {!editing ? (
+                  <Button variant="outline" onClick={() => setEditing(true)}>
                     <Edit3 className="w-4 h-4 mr-2" />
                     Edit
-                  </Button> : <div className="flex gap-2">
+                  </Button>
+                ) : (
+                  <div className="flex gap-2">
                     <Button variant="ghost" onClick={() => setEditing(false)}>
                       <X className="w-4 h-4 mr-2" />
                       Cancel
@@ -465,7 +513,8 @@ const Dashboard = () => {
                       <Save className="w-4 h-4 mr-2" />
                       {saving ? "Saving..." : "Save"}
                     </Button>
-                  </div>}
+                  </div>
+                )}
               </CardHeader>
 
               <CardContent className="space-y-6">
@@ -475,9 +524,17 @@ const Dashboard = () => {
                     <Label htmlFor="name" className="text-base font-medium">
                       Full Name
                     </Label>
-                    {editing ? <Input id="name" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your name" className="h-12" /> : <p className="text-lg text-foreground py-3">
-                        {fullName || "Not set"}
-                      </p>}
+                    {editing ? (
+                      <Input
+                        id="name"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Your name"
+                        className="h-12"
+                      />
+                    ) : (
+                      <p className="text-lg text-foreground py-3">{fullName || "Not set"}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -485,9 +542,17 @@ const Dashboard = () => {
                       <Phone className="w-4 h-4" />
                       Phone Number
                     </Label>
-                    {editing ? <Input id="phone" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} placeholder="e.g., +65 9123 4567" className="h-12" /> : <p className="text-lg text-foreground py-3">
-                        {phoneNumber || "Not set"}
-                      </p>}
+                    {editing ? (
+                      <Input
+                        id="phone"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="e.g., +65 9123 4567"
+                        className="h-12"
+                      />
+                    ) : (
+                      <p className="text-lg text-foreground py-3">{phoneNumber || "Not set"}</p>
+                    )}
                   </div>
                 </div>
 
@@ -495,7 +560,13 @@ const Dashboard = () => {
                   <Label htmlFor="ageGroup" className="text-base font-medium">
                     Age Group
                   </Label>
-                  {editing ? <select id="ageGroup" value={ageGroup} onChange={e => setAgeGroup(e.target.value)} className="w-full h-12 px-4 rounded-lg border border-input bg-background text-foreground">
+                  {editing ? (
+                    <select
+                      id="ageGroup"
+                      value={ageGroup}
+                      onChange={(e) => setAgeGroup(e.target.value)}
+                      className="w-full h-12 px-4 rounded-lg border border-input bg-background text-foreground"
+                    >
                       <option value="">Select age group</option>
                       <option value="18-25">18-25</option>
                       <option value="26-35">26-35</option>
@@ -503,18 +574,27 @@ const Dashboard = () => {
                       <option value="46-55">46-55</option>
                       <option value="56-65">56-65</option>
                       <option value="65+">65+</option>
-                    </select> : <p className="text-lg text-foreground py-3">
-                      {ageGroup || "Not set"}
-                    </p>}
+                    </select>
+                  ) : (
+                    <p className="text-lg text-foreground py-3">{ageGroup || "Not set"}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="bio" className="text-base font-medium">
                     About You
                   </Label>
-                  {editing ? <Textarea id="bio" value={bio} onChange={e => setBio(e.target.value)} placeholder="Tell others about yourself and why you want to exchange skills..." className="min-h-[100px]" /> : <p className="text-foreground py-3">
-                      {bio || "No bio yet"}
-                    </p>}
+                  {editing ? (
+                    <Textarea
+                      id="bio"
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      placeholder="Tell others about yourself and why you want to exchange skills..."
+                      className="min-h-[100px]"
+                    />
+                  ) : (
+                    <p className="text-foreground py-3">{bio || "No bio yet"}</p>
+                  )}
                 </div>
 
                 {/* Skills Offered with Proficiency */}
@@ -522,12 +602,25 @@ const Dashboard = () => {
                   <Label className="text-base font-medium flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-primary" />
                     Skills You Can Teach
-                    
                   </Label>
-                  
-                  <SkillProficiencySelector skills={skillsOffered} proficiencies={skillsProficiency} onProficiencyChange={handleProficiencyChange} onRemoveSkill={removeSkillOffered} editing={editing} />
-                  
-                  {editing && <SkillSelect value={skillOffered} onChange={setSkillOffered} onAdd={addSkillOffered} placeholder="Search skills you can teach..." existingSkills={skillsOffered} />}
+
+                  <SkillProficiencySelector
+                    skills={skillsOffered}
+                    proficiencies={skillsProficiency}
+                    onProficiencyChange={handleProficiencyChange}
+                    onRemoveSkill={removeSkillOffered}
+                    editing={editing}
+                  />
+
+                  {editing && (
+                    <SkillSelect
+                      value={skillOffered}
+                      onChange={setSkillOffered}
+                      onAdd={addSkillOffered}
+                      placeholder="Search skills you can teach..."
+                      existingSkills={skillsOffered}
+                    />
+                  )}
                 </div>
 
                 {/* Skills Wanted */}
@@ -537,15 +630,33 @@ const Dashboard = () => {
                     Skills You Want to Learn
                   </Label>
                   <div className="flex flex-wrap gap-2">
-                    {skillsWanted.map(skill => <Badge key={skill} variant="secondary" className="px-3 py-1.5 text-sm bg-secondary-light text-secondary border-secondary/20">
+                    {skillsWanted.map((skill) => (
+                      <Badge
+                        key={skill}
+                        variant="secondary"
+                        className="px-3 py-1.5 text-sm bg-secondary-light text-secondary border-secondary/20"
+                      >
                         {skill}
-                        {editing && <button onClick={() => removeSkillWanted(skill)} className="ml-2 hover:text-destructive">
+                        {editing && (
+                          <button onClick={() => removeSkillWanted(skill)} className="ml-2 hover:text-destructive">
                             <X className="w-3 h-3" />
-                          </button>}
-                      </Badge>)}
-                    {skillsWanted.length === 0 && !editing && <span className="text-muted-foreground">No skills added yet</span>}
+                          </button>
+                        )}
+                      </Badge>
+                    ))}
+                    {skillsWanted.length === 0 && !editing && (
+                      <span className="text-muted-foreground">No skills added yet</span>
+                    )}
                   </div>
-                  {editing && <SkillSelect value={skillWanted} onChange={setSkillWanted} onAdd={addSkillWanted} placeholder="Search skills you want to learn..." existingSkills={skillsWanted} />}
+                  {editing && (
+                    <SkillSelect
+                      value={skillWanted}
+                      onChange={setSkillWanted}
+                      onAdd={addSkillWanted}
+                      placeholder="Search skills you want to learn..."
+                      existingSkills={skillsWanted}
+                    />
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -559,25 +670,36 @@ const Dashboard = () => {
                     Your Questionnaire
                   </CardTitle>
                   <CardDescription>
-                    {isQuestionnaireComplete ? "Your answers help us find better matches" : "Complete the questionnaire to improve your matches"}
+                    {isQuestionnaireComplete
+                      ? "Your answers help us find better matches"
+                      : "Complete the questionnaire to improve your matches"}
                   </CardDescription>
                 </div>
-                <Button variant={isQuestionnaireComplete ? "outline" : "hero"} onClick={() => setShowQuestionnaire(true)}>
-                  {isQuestionnaireComplete ? <>
+                <Button
+                  variant={isQuestionnaireComplete ? "outline" : "hero"}
+                  onClick={() => setShowQuestionnaire(true)}
+                >
+                  {isQuestionnaireComplete ? (
+                    <>
                       <Edit3 className="w-4 h-4 mr-2" />
                       Edit
-                    </> : <>
+                    </>
+                  ) : (
+                    <>
                       <ArrowRight className="w-4 h-4 mr-2" />
                       Complete
-                    </>}
+                    </>
+                  )}
                 </Button>
               </CardHeader>
-              {isQuestionnaireComplete && <CardContent>
+              {isQuestionnaireComplete && (
+                <CardContent>
                   <div className="flex items-center gap-2 text-green-600">
                     <CheckCircle2 className="w-5 h-5" />
                     <span className="font-medium">Questionnaire completed</span>
                   </div>
-                </CardContent>}
+                </CardContent>
+              )}
             </Card>
           </div>
 
@@ -613,9 +735,11 @@ const Dashboard = () => {
                   <Link to="/messages">
                     <MessageCircle className="w-5 h-5 mr-3" />
                     Messages
-                    {unreadCount > 0 && <span className="absolute right-12 bg-destructive text-destructive-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    {unreadCount > 0 && (
+                      <span className="absolute right-12 bg-destructive text-destructive-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                         {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>}
+                      </span>
+                    )}
                     <ArrowRight className="w-4 h-4 ml-auto" />
                   </Link>
                 </Button>
@@ -631,15 +755,11 @@ const Dashboard = () => {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${fullName ? "bg-green-500" : "bg-muted"}`} />
-                    <span className={fullName ? "text-foreground" : "text-muted-foreground"}>
-                      Name added
-                    </span>
+                    <span className={fullName ? "text-foreground" : "text-muted-foreground"}>Name added</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${location ? "bg-green-500" : "bg-muted"}`} />
-                    <span className={location ? "text-foreground" : "text-muted-foreground"}>
-                      Location set
-                    </span>
+                    <span className={location ? "text-foreground" : "text-muted-foreground"}>Location set</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${skillsOffered.length > 0 ? "bg-green-500" : "bg-muted"}`} />
@@ -664,7 +784,8 @@ const Dashboard = () => {
                 {/* Tip */}
                 <div className="mt-6 p-4 rounded-lg bg-accent/10 border border-accent/20">
                   <p className="text-sm text-muted-foreground">
-                    💡 <strong>Tip:</strong> Complete your profile and questionnaire to find your perfect skill swap matches!
+                    💡 <strong>Tip:</strong> Complete your profile and questionnaire to find your perfect skill swap
+                    matches!
                   </p>
                 </div>
               </CardContent>
@@ -672,6 +793,7 @@ const Dashboard = () => {
           </div>
         </div>
       </main>
-    </div>;
+    </div>
+  );
 };
 export default Dashboard;
