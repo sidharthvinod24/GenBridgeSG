@@ -63,16 +63,25 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
     }
 
     try {
-      const { data: profiles, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .neq("user_id", userId);
+      // Use rate-limited edge function
+      const { data, error } = await supabase.functions.invoke('browse-profiles', {
+        body: null,
+      });
 
-      if (error) throw error;
+      if (error) {
+        // Check for rate limit error
+        if (error.message?.includes('429') || error.message?.includes('Rate limit')) {
+          toast.error("Too many requests. Please wait a moment before viewing more matches.");
+          setLoading(false);
+          return;
+        }
+        throw error;
+      }
 
+      const profiles = data?.profiles || [];
       const matchedProfiles: MatchedProfile[] = [];
 
-      profiles?.forEach((profile) => {
+      profiles.forEach((profile: any) => {
         const skillsICanTeach = userSkillsOffered.filter((skill) =>
           profile.skills_wanted?.some(
             (wanted: string) => wanted.toLowerCase() === skill.toLowerCase()
@@ -104,6 +113,7 @@ const SkillMatches = ({ userSkillsOffered, userSkillsWanted, userId }: SkillMatc
       setMatches(matchedProfiles);
     } catch (error) {
       console.error("Error fetching matches:", error);
+      toast.error("Failed to load matches");
     } finally {
       setLoading(false);
     }
