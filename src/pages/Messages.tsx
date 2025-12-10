@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,6 +47,7 @@ interface Message {
 
 const Messages = () => {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -66,7 +68,6 @@ const Messages = () => {
       fetchMessages(selectedConversation.id);
       markMessagesAsRead(selectedConversation.id);
       
-      // Subscribe to new messages
       const channel = supabase
         .channel(`messages-${selectedConversation.id}`)
         .on(
@@ -80,7 +81,6 @@ const Messages = () => {
           (payload) => {
             const newMsg = payload.new as Message;
             setMessages(prev => [...prev, newMsg]);
-            // Mark as read if from other user
             if (newMsg.sender_id !== user?.id) {
               markMessagesAsRead(selectedConversation.id);
             }
@@ -132,7 +132,6 @@ const Messages = () => {
 
       if (error) throw error;
 
-      // Fetch other user profiles
       const enrichedConvos = await Promise.all(
         (convos || []).map(async (convo) => {
           const otherUserId = convo.participant_one === user.id 
@@ -148,7 +147,6 @@ const Messages = () => {
             avatar_url: profileData[0].avatar_url
           } : null;
 
-          // Get last message
           const { data: lastMsg } = await supabase
             .from("messages")
             .select("content, created_at")
@@ -194,7 +192,6 @@ const Messages = () => {
     e.preventDefault();
     if (!user || !selectedConversation || !newMessage.trim()) return;
 
-    // Validate message content before sending
     const validation = validateMessage(newMessage.trim());
     if (!validation.success) {
       const errorMessage = validation.error.errors[0]?.message || "Invalid message";
@@ -234,7 +231,7 @@ const Messages = () => {
     if (days === 0) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else if (days === 1) {
-      return "Yesterday";
+      return t.common.yesterday;
     } else if (days < 7) {
       return date.toLocaleDateString([], { weekday: 'short' });
     }
@@ -246,7 +243,7 @@ const Messages = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground">Loading messages...</p>
+          <p className="text-muted-foreground">{t.messages.loadingMessages}</p>
         </div>
       </div>
     );
@@ -266,14 +263,13 @@ const Messages = () => {
             <Link to="/" className="flex items-center gap-2">
               <img src={logo} alt="GenBridgeSG Logo" className="w-10 h-10 rounded-xl object-cover" />
               <span className="font-display font-bold text-xl text-foreground">
-                Messages
+                {t.messages.title}
               </span>
             </Link>
           </div>
           
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
-            {/* Report Button */}
             <ReportUser
               chatPartners={conversations.map(c => ({
                 user_id: c.otherUser?.user_id || "",
@@ -291,7 +287,7 @@ const Messages = () => {
             <CardHeader className="border-b">
               <CardTitle className="font-display text-lg flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-primary" />
-                Conversations
+                {t.messages.conversations}
               </CardTitle>
             </CardHeader>
             <ScrollArea className="h-[calc(100%-70px)]">
@@ -301,12 +297,12 @@ const Messages = () => {
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                       <MessageCircle className="w-8 h-8 text-muted-foreground" />
                     </div>
-                    <h3 className="font-semibold text-lg mb-2">No conversations yet</h3>
+                    <h3 className="font-semibold text-lg mb-2">{t.messages.noConversations}</h3>
                     <p className="text-muted-foreground text-sm">
-                      Start a conversation from your skill matches!
+                      {t.messages.startConversation}
                     </p>
                     <Button variant="hero" className="mt-4" asChild>
-                      <Link to="/dashboard">Find Matches</Link>
+                      <Link to="/dashboard">{t.messages.findMatches}</Link>
                     </Button>
                   </div>
                 ) : (
@@ -330,7 +326,7 @@ const Messages = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <p className="font-medium truncate">
-                                {convo.otherUser?.full_name || "Anonymous"}
+                                {convo.otherUser?.full_name || t.common.anonymous}
                               </p>
                               {convo.lastMessage && (
                                 <span className="text-xs text-muted-foreground">
@@ -368,13 +364,12 @@ const Messages = () => {
                       </Avatar>
                       <div>
                         <h3 className="font-display font-bold">
-                          {selectedConversation.otherUser?.full_name || "Anonymous"}
+                          {selectedConversation.otherUser?.full_name || t.common.anonymous}
                         </h3>
-                        <p className="text-xs text-muted-foreground">Skill Exchange Partner</p>
+                        <p className="text-xs text-muted-foreground">{t.messages.skillExchangePartner}</p>
                       </div>
                     </div>
                     
-                    {/* Inline Report Button for this specific user */}
                     {selectedConversation.otherUser?.user_id && (
                       <ReportUser 
                         chatPartners={[{
@@ -389,7 +384,6 @@ const Messages = () => {
                 {/* Messages */}
                 <ScrollArea className="flex-1 p-4">
                   <div className="space-y-4">
-                    {/* Scam Alert Banner */}
                     <ScamAlertBanner />
                     
                     {messages.map((message) => {
@@ -398,9 +392,7 @@ const Messages = () => {
                       
                       return (
                         <div key={message.id}>
-                          <div
-                            className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                          >
+                          <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                             <div className="flex flex-col">
                               <div
                                 className={`max-w-[70%] rounded-2xl px-4 py-2 ${
@@ -427,7 +419,6 @@ const Messages = () => {
                             </div>
                           </div>
                           
-                          {/* Scam Warning */}
                           {scamWarning.isScammy && (
                             <div className={`flex justify-start mt-2 ml-2`}>
                               <div className={`flex items-start gap-2 p-2 rounded-lg text-xs max-w-[70%] ${
@@ -440,14 +431,14 @@ const Messages = () => {
                                 <ShieldAlert className="w-4 h-4 flex-shrink-0 mt-0.5" />
                                 <div>
                                   <p className="font-semibold">
-                                    {scamWarning.severity === 'high' ? '⚠️ High Risk Message' : 'Potential Scam Warning'}
+                                    {scamWarning.severity === 'high' ? `⚠️ ${t.messages.scamWarning}` : t.messages.scamWarning}
                                   </p>
                                   <ul className="mt-1 space-y-0.5">
                                     {scamWarning.reasons.map((reason, idx) => (
                                       <li key={idx}>• {reason}</li>
                                     ))}
                                   </ul>
-                                  <p className="mt-1 opacity-80">Never share financial info. When in doubt, report this user.</p>
+                                  <p className="mt-1 opacity-80">{t.messages.neverShare}</p>
                                 </div>
                               </div>
                             </div>
@@ -465,7 +456,7 @@ const Messages = () => {
                     <Input
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type a message..."
+                      placeholder={t.messages.typeMessage}
                       className="flex-1 h-12"
                       disabled={sending}
                     />
@@ -481,9 +472,9 @@ const Messages = () => {
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                     <MessageCircle className="w-10 h-10 text-muted-foreground" />
                   </div>
-                  <h3 className="font-display font-bold text-xl mb-2">Select a conversation</h3>
+                  <h3 className="font-display font-bold text-xl mb-2">{t.messages.conversations}</h3>
                   <p className="text-muted-foreground">
-                    Choose a conversation from the list to start chatting
+                    {t.messages.startConversation}
                   </p>
                 </div>
               </div>
