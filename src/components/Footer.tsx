@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className="bg-foreground text-background py-16">
       <div className="container">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
+        <div className="grid md:grid-cols-3 gap-12 mb-12">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
@@ -37,39 +37,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Community Stories
-                </Link>
-              </li>
-              <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
                   Safety Guidelines
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Categories */}
-          <div>
-            <h4 className="font-display font-bold text-lg mb-4">Categories</h4>
-            <ul className="space-y-3">
-              <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Technology
-                </Link>
-              </li>
-              <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Cooking & Food
-                </Link>
-              </li>
-              <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Arts & Crafts
-                </Link>
-              </li>
-              <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  Languages
                 </Link>
               </li>
             </ul>
