@@ -22,7 +22,7 @@ export const calculateCredibilityScore = (profile: {
   age_group?: string | null;
   skills_offered?: string[] | null;
   skills_wanted?: string[] | null;
-  q_joining_reason?: string | null;
+  questionnaire_complete?: boolean;
 }) => {
   let score = 0;
   
@@ -45,7 +45,7 @@ export const calculateCredibilityScore = (profile: {
   if (profile.skills_wanted && profile.skills_wanted.length > 0) score += 15;
   
   // Questionnaire completed: 20 points
-  if (profile.q_joining_reason && profile.q_joining_reason.trim()) score += 20;
+  if (profile.questionnaire_complete) score += 20;
   
   return Math.round(Math.min(score, 100));
 };

@@ -12,7 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import SkillSelect from "@/components/SkillSelect";
 import SkillProficiencySelector, { ProficiencyLevel } from "@/components/SkillProficiencySelector";
 import CredibilityScore, { calculateCredibilityScore } from "@/components/CredibilityScore";
-import ProfileQuestionnaire from "@/components/ProfileQuestionnaire";
+import ProfileQuestionnaire, { QuestionnaireAnswers } from "@/components/ProfileQuestionnaire";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { validateProfile } from "@/lib/validation";
@@ -44,16 +44,20 @@ interface Profile {
   skills_offered: string[];
   skills_wanted: string[];
   age_group: string | null;
-  q_skill_or_hobby: string | null;
-  q_learning_style: string | null;
-  q_joining_reason: string | null;
+  age: number | null;
   skills_proficiency: Record<string, ProficiencyLevel> | null;
   credibility_score: number | null;
-}
-interface QuestionnaireAnswers {
-  q_skill_or_hobby: string;
-  q_learning_style: string;
-  q_joining_reason: string;
+  // New questionnaire fields
+  q_skills_to_share: string | null;
+  q_digital_help_needed: string[] | null;
+  q_languages_dialects: string[] | null;
+  q_cultural_interests: string[] | null;
+  q_digital_teaching_skills: string[] | null;
+  q_teaching_comfort: number | null;
+  q_communication_preference: string | null;
+  q_availability: string[] | null;
+  q_allow_archive: boolean | null;
+  q_open_to_verification: boolean | null;
 }
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -80,9 +84,18 @@ const Dashboard = () => {
 
   // Questionnaire answers
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
-    q_skill_or_hobby: "",
-    q_learning_style: "",
-    q_joining_reason: "",
+    age: null,
+    q_skills_to_share: "",
+    q_digital_help_needed: [],
+    q_languages_dialects: [],
+    q_communication_preference: "",
+    q_availability: [],
+    q_allow_archive: false,
+    q_skill_to_teach: "",
+    q_cultural_interests: [],
+    q_digital_teaching_skills: [],
+    q_teaching_comfort: 3,
+    q_open_to_verification: false,
   });
   useEffect(() => {
     fetchProfile();
@@ -139,9 +152,18 @@ const Dashboard = () => {
         setSkillsProficiency(proficiency);
         setCredibilityScore(data.credibility_score || 0);
         setQuestionnaireAnswers({
-          q_skill_or_hobby: data.q_skill_or_hobby || "",
-          q_learning_style: data.q_learning_style || "",
-          q_joining_reason: data.q_joining_reason || "",
+          age: data.age || null,
+          q_skills_to_share: data.q_skills_to_share || "",
+          q_digital_help_needed: data.q_digital_help_needed || [],
+          q_languages_dialects: data.q_languages_dialects || [],
+          q_communication_preference: data.q_communication_preference || "",
+          q_availability: data.q_availability || [],
+          q_allow_archive: data.q_allow_archive || false,
+          q_skill_to_teach: data.q_skills_to_share || "",
+          q_cultural_interests: data.q_cultural_interests || [],
+          q_digital_teaching_skills: data.q_digital_teaching_skills || [],
+          q_teaching_comfort: data.q_teaching_comfort || 3,
+          q_open_to_verification: data.q_open_to_verification || false,
         });
       }
     } catch (error: any) {
@@ -199,7 +221,7 @@ const Dashboard = () => {
       age_group: ageGroup,
       skills_offered: finalSkillsOffered,
       skills_wanted: finalSkillsWanted,
-      q_joining_reason: questionnaireAnswers.q_joining_reason,
+      questionnaire_complete: !!questionnaireAnswers.age,
     });
     const validation = validateProfile(profileData);
     if (!validation.success) {
@@ -244,15 +266,27 @@ const Dashboard = () => {
         age_group: ageGroup,
         skills_offered: skillsOffered,
         skills_wanted: skillsWanted,
-        q_joining_reason: answers.q_joining_reason,
+        questionnaire_complete: !!answers.age,
       });
+      
+      // Determine if elderly or youth based on age
+      const isElderly = (answers.age ?? 0) >= 40;
       
       const { error } = await supabase
         .from("profiles")
         .update({
-          q_skill_or_hobby: answers.q_skill_or_hobby,
-          q_learning_style: answers.q_learning_style,
-          q_joining_reason: answers.q_joining_reason,
+          age: answers.age,
+          q_skills_to_share: isElderly ? answers.q_skills_to_share : null,
+          q_digital_help_needed: isElderly ? answers.q_digital_help_needed : null,
+          q_languages_dialects: isElderly ? answers.q_languages_dialects : null,
+          q_skill_to_teach: !isElderly ? answers.q_skill_to_teach : null,
+          q_cultural_interests: !isElderly ? answers.q_cultural_interests : null,
+          q_digital_teaching_skills: !isElderly ? answers.q_digital_teaching_skills : null,
+          q_teaching_comfort: !isElderly ? answers.q_teaching_comfort : null,
+          q_communication_preference: answers.q_communication_preference,
+          q_availability: answers.q_availability,
+          q_allow_archive: isElderly ? answers.q_allow_archive : null,
+          q_open_to_verification: !isElderly ? answers.q_open_to_verification : null,
           credibility_score: newCredibilityScore,
         })
         .eq("user_id", user.id);
@@ -311,7 +345,7 @@ const Dashboard = () => {
     await signOut();
     navigate("/");
   };
-  const isQuestionnaireComplete = questionnaireAnswers.q_joining_reason !== "";
+  const isQuestionnaireComplete = !!questionnaireAnswers.age;
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
