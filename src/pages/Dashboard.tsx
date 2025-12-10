@@ -93,13 +93,14 @@ const Dashboard = () => {
       let { data, error } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
       if (error) throw error;
 
-      // If no profile exists, create one
+      // If no profile exists, create one with metadata from signup
       if (!data) {
         const { data: newProfile, error: insertError } = await supabase
           .from("profiles")
           .insert({
             user_id: user.id,
             full_name: user.user_metadata?.full_name || "",
+            phone_number: user.user_metadata?.phone_number || null,
           })
           .select()
           .single();
@@ -107,6 +108,15 @@ const Dashboard = () => {
         data = newProfile;
       }
       if (data) {
+        // If profile exists but phone is missing, try to sync from user metadata
+        if (!data.phone_number && user.user_metadata?.phone_number) {
+          await supabase
+            .from("profiles")
+            .update({ phone_number: user.user_metadata.phone_number })
+            .eq("user_id", user.id);
+          data.phone_number = user.user_metadata.phone_number;
+        }
+        
         // Cast skills_proficiency properly from JSON
         const proficiency =
           typeof data.skills_proficiency === "object" && data.skills_proficiency !== null
