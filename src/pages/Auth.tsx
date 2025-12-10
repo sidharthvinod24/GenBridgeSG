@@ -9,9 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-
 type SignupStep = "details" | "otp";
-
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [signupStep, setSignupStep] = useState<SignupStep>("details");
@@ -22,7 +20,9 @@ const Auth = () => {
   const [otpValue, setOtpValue] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
 
   // Mock OTP code for demo purposes
   const MOCK_OTP = "123456";
@@ -33,17 +33,17 @@ const Auth = () => {
       navigate("/dashboard");
     }
   }, [user, navigate]);
-
   const handleDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (isLogin) {
       // Handle login
       setLoading(true);
       try {
-        const { error } = await supabase.auth.signInWithPassword({
+        const {
+          error
+        } = await supabase.auth.signInWithPassword({
           email,
-          password,
+          password
         });
         if (error) throw error;
         toast.success("Welcome back!");
@@ -60,13 +60,12 @@ const Auth = () => {
         toast.error("Please enter a valid Singapore phone number (8 digits starting with 8 or 9)");
         return;
       }
-      
+
       // Move to OTP step
       setSignupStep("otp");
       toast.info("Demo mode: Use OTP code 123456 to verify");
     }
   };
-
   const handleOtpVerify = async () => {
     if (otpValue.length !== 6) {
       toast.error("Please enter the complete 6-digit code");
@@ -78,35 +77,35 @@ const Auth = () => {
       toast.error("Invalid OTP code. Demo mode: Use 123456");
       return;
     }
-
     setLoading(true);
     try {
       // Create the account
-      const { data, error } = await supabase.auth.signUp({
+      const {
+        data,
+        error
+      } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
-            full_name: name,
-          },
-        },
+            full_name: name
+          }
+        }
       });
-      
       if (error) throw error;
 
       // Update the profile with phone number
       if (data.user) {
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .update({ phone_number: `+65${phoneNumber}` })
-          .eq("user_id", data.user.id);
-        
+        const {
+          error: profileError
+        } = await supabase.from("profiles").update({
+          phone_number: `+65${phoneNumber}`
+        }).eq("user_id", data.user.id);
         if (profileError) {
           console.error("Error updating phone number:", profileError);
         }
       }
-
       toast.success("Account created successfully!");
       resetForm();
       setIsLogin(true);
@@ -116,7 +115,6 @@ const Auth = () => {
       setLoading(false);
     }
   };
-
   const resetForm = () => {
     setEmail("");
     setPassword("");
@@ -125,20 +123,14 @@ const Auth = () => {
     setOtpValue("");
     setSignupStep("details");
   };
-
   const handleBackToDetails = () => {
     setSignupStep("details");
     setOtpValue("");
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light via-background to-secondary-light flex flex-col">
+  return <div className="min-h-screen bg-gradient-to-br from-primary-light via-background to-secondary-light flex flex-col">
       {/* Header */}
       <header className="p-6">
-        <Link 
-          to="/" 
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
+        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-5 h-5" />
           <span className="font-medium">Back to Home</span>
         </Link>
@@ -164,33 +156,18 @@ const Auth = () => {
           <Card className="border-0 shadow-elevated">
             <CardHeader className="text-center pb-4">
               <CardTitle className="font-display text-2xl">
-                {isLogin 
-                  ? "Welcome Back" 
-                  : signupStep === "otp" 
-                    ? "Verify Your Phone" 
-                    : "Join Our Community"
-                }
+                {isLogin ? "Welcome Back" : signupStep === "otp" ? "Verify Your Phone" : "Join Our Community"}
               </CardTitle>
               <CardDescription className="text-base">
-                {isLogin 
-                  ? "Sign in to continue your skill-sharing journey" 
-                  : signupStep === "otp"
-                    ? `Enter the 6-digit code sent to +65 ${phoneNumber}`
-                    : "Create an account to start exchanging skills"
-                }
+                {isLogin ? "Sign in to continue your skill-sharing journey" : signupStep === "otp" ? `Enter the 6-digit code sent to +65 ${phoneNumber}` : "Create an account to start exchanging skills"}
               </CardDescription>
             </CardHeader>
 
             <CardContent>
               {/* OTP Verification Step */}
-              {!isLogin && signupStep === "otp" ? (
-                <div className="space-y-6">
+              {!isLogin && signupStep === "otp" ? <div className="space-y-6">
                   <div className="flex justify-center">
-                    <InputOTP
-                      maxLength={6}
-                      value={otpValue}
-                      onChange={setOtpValue}
-                    >
+                    <InputOTP maxLength={6} value={otpValue} onChange={setOtpValue}>
                       <InputOTPGroup>
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
@@ -203,49 +180,27 @@ const Auth = () => {
                   </div>
 
                   <div className="text-center text-sm text-muted-foreground">
-                    <p>Demo mode: Use code <span className="font-mono font-bold text-primary">123456</span></p>
+                    
                   </div>
 
-                  <Button 
-                    onClick={handleOtpVerify}
-                    variant="hero" 
-                    size="xl" 
-                    className="w-full"
-                    disabled={loading || otpValue.length !== 6}
-                  >
+                  <Button onClick={handleOtpVerify} variant="hero" size="xl" className="w-full" disabled={loading || otpValue.length !== 6}>
                     {loading ? "Creating account..." : "Verify & Create Account"}
                   </Button>
 
-                  <Button 
-                    type="button"
-                    variant="ghost" 
-                    className="w-full"
-                    onClick={handleBackToDetails}
-                  >
+                  <Button type="button" variant="ghost" className="w-full" onClick={handleBackToDetails}>
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to details
                   </Button>
-                </div>
-              ) : (
-                /* Details Form */
-                <form onSubmit={handleDetailsSubmit} className="space-y-5">
-                  {!isLogin && (
-                    <>
+                </div> : (/* Details Form */
+            <form onSubmit={handleDetailsSubmit} className="space-y-5">
+                  {!isLogin && <>
                       <div className="space-y-2">
                         <Label htmlFor="name" className="text-base font-medium">
                           Full Name
                         </Label>
                         <div className="relative">
                           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                          <Input
-                            id="name"
-                            type="text"
-                            placeholder="Enter your name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="pl-12 h-14 text-base"
-                            required
-                          />
+                          <Input id="name" type="text" placeholder="Enter your name" value={name} onChange={e => setName(e.target.value)} className="pl-12 h-14 text-base" required />
                         </div>
                       </div>
 
@@ -258,23 +213,13 @@ const Auth = () => {
                           <div className="absolute left-12 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
                             +65
                           </div>
-                          <Input
-                            id="phone"
-                            type="tel"
-                            placeholder="8123 4567"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                            className="pl-24 h-14 text-base"
-                            required
-                            maxLength={8}
-                          />
+                          <Input id="phone" type="tel" placeholder="8123 4567" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value.replace(/\D/g, "").slice(0, 8))} className="pl-24 h-14 text-base" required maxLength={8} />
                         </div>
                         <p className="text-xs text-muted-foreground">
                           Singapore mobile number (8 digits)
                         </p>
                       </div>
-                    </>
-                  )}
+                    </>}
 
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-base font-medium">
@@ -282,15 +227,7 @@ const Auth = () => {
                     </Label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-12 h-14 text-base"
-                        required
-                      />
+                      <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-12 h-14 text-base" required />
                     </div>
                   </div>
 
@@ -300,56 +237,30 @@ const Auth = () => {
                     </Label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-12 h-14 text-base"
-                        required
-                        minLength={6}
-                      />
+                      <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-12 h-14 text-base" required minLength={6} />
                     </div>
                   </div>
 
-                  <Button 
-                    type="submit" 
-                    variant="hero" 
-                    size="xl" 
-                    className="w-full"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      "Please wait..."
-                    ) : (
-                      <>
+                  <Button type="submit" variant="hero" size="xl" className="w-full" disabled={loading}>
+                    {loading ? "Please wait..." : <>
                         {isLogin ? "Sign In" : "Continue"}
                         <Sparkles className="ml-2 w-5 h-5" />
-                      </>
-                    )}
+                      </>}
                   </Button>
-                </form>
-              )}
+                </form>)}
 
               {/* Toggle - only show when not in OTP step */}
-              {(isLogin || signupStep === "details") && (
-                <div className="mt-8 text-center">
+              {(isLogin || signupStep === "details") && <div className="mt-8 text-center">
                   <p className="text-muted-foreground">
                     {isLogin ? "Don't have an account?" : "Already have an account?"}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsLogin(!isLogin);
-                      resetForm();
-                    }}
-                    className="mt-2 font-semibold text-primary hover:text-primary-dark transition-colors"
-                  >
+                  <button type="button" onClick={() => {
+                setIsLogin(!isLogin);
+                resetForm();
+              }} className="mt-2 font-semibold text-primary hover:text-primary-dark transition-colors">
                     {isLogin ? "Sign up for free" : "Sign in instead"}
                   </button>
-                </div>
-              )}
+                </div>}
             </CardContent>
           </Card>
 
@@ -361,8 +272,6 @@ const Auth = () => {
           </div>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Auth;
