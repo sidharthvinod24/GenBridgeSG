@@ -1,4 +1,4 @@
-# GenBridgeSG 🌉
+# GenBridgeSG 🫶
 
 **Singapore's skill exchange marketplace connecting generations.**
 
@@ -139,17 +139,6 @@ GenBridgeSG/
 
 ---
 
-## 🔐 Environment Variables
-
-The following environment variables are required:
-
-| Variable | Description |
-|----------|-------------|
-| `VITE_SUPABASE_URL` | Your Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous key |
-
----
-
 ## 🤝 Contributing
 
 We welcome contributions from the community! Whether it's:
@@ -173,8 +162,7 @@ This project is private and proprietary. All rights reserved.
 
 For questions, support, or feedback:
 
-- **Website**: [https://genbridge.sg](https://genbridge.sg)
-- **Email**: support@genbridge.sg
+- **Website**: [https://genbridgesg.com](https://genbridge.sg)
 - **GitHub Issues**: For bug reports and feature requests
 
 ---
