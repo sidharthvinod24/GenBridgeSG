@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { MessageCircle, Send, X, Bot, User, Sparkles } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -12,105 +13,66 @@ interface Message {
 
 interface PredefinedAnswer {
   keywords: string[];
-  response: string;
+  responseKey: string;
 }
 
 const predefinedAnswers: PredefinedAnswer[] = [
-  {
-    keywords: ["how", "matching", "work", "match"],
-    response: "Our matching system finds people whose skills complement yours! When your **offered skills** match what someone else **wants to learn**, and vice versa, you get matched. A **Perfect Match** ✨ happens when both of you can teach each other something!",
-  },
-  {
-    keywords: ["perfect", "match"],
-    response: "A **Perfect Match** ✨ is when both users can help each other! For example, if you teach cooking and want to learn guitar, and someone teaches guitar and wants to learn cooking - that's a Perfect Match! These are the best opportunities for skill exchange.",
-  },
-  {
-    keywords: ["profile", "setup", "create", "complete"],
-    response: "To complete your profile:\n\n1. **Add your name** - so others know who you are\n2. **List skills you can teach** - what are you good at?\n3. **List skills you want to learn** - what interests you?\n4. **Complete the questionnaire** - help us match you better!\n\nThe more complete your profile, the better your matches! 🎯",
-  },
-  {
-    keywords: ["start", "conversation", "message", "chat", "contact"],
-    response: "To start a conversation:\n\n1. Go to the **Matching** page\n2. Find someone you'd like to connect with\n3. Swipe right or tap the **heart icon** ❤️\n4. Once matched, you can message them!\n\nTip: Introduce yourself and mention which skills you're interested in exchanging.",
-  },
-  {
-    keywords: ["skill", "add", "offer", "teach", "learn"],
-    response: "You can manage your skills in your **Dashboard**:\n\n• **Skills you can teach**: Things you're good at and willing to share\n• **Skills you want to learn**: Things you'd like others to teach you\n\nExamples: Cooking, Guitar, Photography, Languages, Tech skills, Gardening, and more! 🌟",
-  },
-  {
-    keywords: ["browse", "find", "search", "discover"],
-    response: "You can discover skills in two ways:\n\n1. **Browse page** - Search and filter all available skills by category, location, or age group\n2. **Matching page** - See personalized matches based on your skill preferences\n\nBoth are great ways to find your next skill swap partner! 🔍",
-  },
-  {
-    keywords: ["safe", "safety", "trust", "secure"],
-    response: "Your safety is important! Here are some tips:\n\n• Meet in public places for skill exchanges\n• Start with video calls if you prefer\n• Trust your instincts\n• Report any suspicious behavior\n\nOur community is built on mutual respect and learning together! 🤝",
-  },
-  {
-    keywords: ["free", "cost", "pay", "price", "money"],
-    response: "GenBridgeSG is a **free** skill exchange platform! 🎉\n\nThe concept is simple: you teach something you know, and learn something new in return. No money changes hands - just knowledge and skills!\n\nIt's a win-win for everyone in the community.",
-  },
-  {
-    keywords: ["singapore", "location", "where", "area"],
-    response: "GenBridgeSG is designed for the **Singapore community**! 🇸🇬\n\nYou can add your location (like Tampines, Jurong, etc.) to find matches nearby. This makes it easier to meet up for skill exchange sessions!",
-  },
-  {
-    keywords: ["generation", "elderly", "senior", "young", "bridge"],
-    response: "GenBridgeSG bridges generations! 🌉\n\nWe connect **young adults** with **seniors** to exchange skills and wisdom. Seniors can share traditional knowledge and life experience, while younger members can help with technology and modern skills.\n\nIt's about building meaningful connections across age groups!",
-  },
-  {
-    keywords: ["hello", "hi", "hey", "good morning", "good afternoon", "good evening"],
-    response: "Hello! 👋 Welcome to GenBridgeSG! I'm here to help you find skill matches and answer your questions. What would you like to know about?",
-  },
-  {
-    keywords: ["thank", "thanks", "appreciate"],
-    response: "You're welcome! 😊 Happy to help! If you have any more questions about skill swapping, feel free to ask. Good luck with your skill exchange journey! 🌟",
-  },
-  {
-    keywords: ["help", "support", "assist"],
-    response: "I'm here to help! Here are some things I can assist with:\n\n• How matching works\n• Setting up your profile\n• Starting conversations\n• Finding skills to learn or teach\n• Tips for successful skill exchanges\n\nJust ask me anything! 💡",
-  },
-];
-
-const quickReplies = [
-  "How does matching work?",
-  "What's a Perfect Match?",
-  "How do I complete my profile?",
-  "How do I message someone?",
-];
-
-const findPredefinedAnswer = (input: string): string | null => {
-  const lowerInput = input.toLowerCase();
-  
-  for (const qa of predefinedAnswers) {
-    const matchCount = qa.keywords.filter(keyword => 
-      lowerInput.includes(keyword.toLowerCase())
-    ).length;
-    
-    // Match if at least one keyword is found
-    if (matchCount > 0) {
-      return qa.response;
-    }
-  }
-  
-  return null;
-};
-
-const fallbackResponses = [
-  "I'm not sure I understand that question. Could you try asking about:\n\n• How matching works\n• Setting up your profile\n• Starting conversations\n• Finding skills to learn\n\nOr click one of the quick reply buttons below! 💡",
-  "Hmm, I don't have an answer for that specific question. Try asking about skill matching, profiles, or how to connect with others! 🤔",
-  "I'm a simple assistant focused on GenBridgeSG basics. Ask me about matching, profiles, or messaging and I'll be happy to help! 😊",
+  { keywords: ["how", "matching", "work", "match", "如何", "匹配", "工作"], responseKey: "matchingHow" },
+  { keywords: ["perfect", "match", "完美"], responseKey: "perfectMatchDesc" },
+  { keywords: ["profile", "setup", "create", "complete", "资料", "设置", "创建", "完善"], responseKey: "profileSetup" },
+  { keywords: ["start", "conversation", "message", "chat", "contact", "开始", "对话", "消息", "聊天", "联系"], responseKey: "startConvoDesc" },
+  { keywords: ["skill", "add", "offer", "teach", "learn", "技能", "添加", "教", "学"], responseKey: "skillManage" },
+  { keywords: ["browse", "find", "search", "discover", "浏览", "找", "搜索", "发现"], responseKey: "browseDesc" },
+  { keywords: ["safe", "safety", "trust", "secure", "安全", "信任"], responseKey: "safetyTips" },
+  { keywords: ["free", "cost", "pay", "price", "money", "免费", "费用", "付费", "价格", "钱"], responseKey: "freeInfo" },
+  { keywords: ["singapore", "location", "where", "area", "新加坡", "位置", "哪里", "地区"], responseKey: "locationInfo" },
+  { keywords: ["generation", "elderly", "senior", "young", "bridge", "代际", "老年", "长者", "年轻", "桥梁"], responseKey: "generationInfo" },
+  { keywords: ["hello", "hi", "hey", "good morning", "good afternoon", "good evening", "你好", "您好", "早上好", "下午好", "晚上好"], responseKey: "helloResponse" },
+  { keywords: ["thank", "thanks", "appreciate", "谢谢", "感谢"], responseKey: "thanksResponse" },
+  { keywords: ["help", "support", "assist", "帮助", "支持", "协助"], responseKey: "helpResponse" },
 ];
 
 const AIChatbot = () => {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hi! I'm the GenBridgeSG Assistant 👋 I can help you understand how skill matching works and guide you through the platform. What would you like to know?",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize greeting when language changes or component mounts
+  useEffect(() => {
+    setMessages([{ role: "assistant", content: t.chatbot.greeting }]);
+  }, [t.chatbot.greeting]);
+
+  const quickReplies = [
+    t.chatbot.quickReply1,
+    t.chatbot.quickReply2,
+    t.chatbot.quickReply3,
+    t.chatbot.quickReply4,
+  ];
+
+  const fallbackResponses = [
+    t.chatbot.fallback1,
+    t.chatbot.fallback2,
+    t.chatbot.fallback3,
+  ];
+
+  const findPredefinedAnswer = (inputText: string): string | null => {
+    const lowerInput = inputText.toLowerCase();
+    
+    for (const qa of predefinedAnswers) {
+      const matchCount = qa.keywords.filter(keyword => 
+        lowerInput.includes(keyword.toLowerCase())
+      ).length;
+      
+      if (matchCount > 0) {
+        return (t.chatbot as Record<string, string>)[qa.responseKey] || null;
+      }
+    }
+    
+    return null;
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -132,13 +94,12 @@ const AIChatbot = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput("");
 
-    // Find predefined answer or use fallback
     setTimeout(() => {
       const answer = findPredefinedAnswer(messageText);
       const response = answer || fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
       
       setMessages(prev => [...prev, { role: "assistant", content: response }]);
-    }, 500); // Small delay for natural feel
+    }, 500);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -173,8 +134,8 @@ const AIChatbot = () => {
                 <Bot className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-display font-semibold">GenBridgeSG Assistant</h3>
-                <p className="text-xs opacity-80">Quick answers & help</p>
+                <h3 className="font-display font-semibold">{t.chatbot.assistant}</h3>
+                <p className="text-xs opacity-80">{t.chatbot.quickAnswers}</p>
               </div>
             </div>
             <Button
@@ -244,7 +205,7 @@ const AIChatbot = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask a question..."
+                placeholder={t.chatbot.askQuestion}
                 className="flex-1"
               />
               <Button

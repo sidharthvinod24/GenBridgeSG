@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,6 +41,7 @@ const countWords = (text: string): number => {
 
 const ReportUser = ({ chatPartners }: ReportUserProps) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [description, setDescription] = useState("");
@@ -50,12 +52,12 @@ const ReportUser = ({ chatPartners }: ReportUserProps) => {
 
   const handleSubmit = async () => {
     if (!user || !selectedUserId || !description.trim()) {
-      toast.error("Please select a user and describe what happened");
+      toast.error(t.report.selectAndDescribe);
       return;
     }
 
     if (isOverLimit) {
-      toast.error(`Description must be ${MAX_WORDS} words or less`);
+      toast.error(`${t.report.shortenDesc} ${MAX_WORDS} ${t.report.wordsOrLess}`);
       return;
     }
 
@@ -69,13 +71,13 @@ const ReportUser = ({ chatPartners }: ReportUserProps) => {
 
       if (error) throw error;
 
-      toast.success("Report submitted successfully");
+      toast.success(t.report.reportSuccess);
       setOpen(false);
       setSelectedUserId("");
       setDescription("");
     } catch (error: any) {
       console.error("Error submitting report:", error);
-      toast.error("Failed to submit report");
+      toast.error(t.report.reportFailed);
     } finally {
       setSubmitting(false);
     }
@@ -90,31 +92,31 @@ const ReportUser = ({ chatPartners }: ReportUserProps) => {
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
           <Flag className="w-4 h-4 mr-2" />
-          Report User
+          {t.report.reportUser}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-destructive" />
-            Report a User
+            {t.report.reportAUser}
           </DialogTitle>
           <DialogDescription>
-            Report inappropriate behavior or policy violations. Your report will be reviewed by our team.
+            {t.report.reportDesc}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="user-select">Who are you reporting?</Label>
+            <Label htmlFor="user-select">{t.report.whoReporting}</Label>
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
               <SelectTrigger id="user-select">
-                <SelectValue placeholder="Select a user" />
+                <SelectValue placeholder={t.report.selectUser} />
               </SelectTrigger>
               <SelectContent>
                 {chatPartners.map((partner) => (
                   <SelectItem key={partner.user_id} value={partner.user_id}>
-                    {partner.full_name || "Anonymous User"}
+                    {partner.full_name || t.report.anonymousUser}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -123,21 +125,21 @@ const ReportUser = ({ chatPartners }: ReportUserProps) => {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="description">What happened?</Label>
+              <Label htmlFor="description">{t.report.whatHappened}</Label>
               <span className={`text-xs ${isOverLimit ? "text-destructive font-medium" : "text-muted-foreground"}`}>
-                {wordCount}/{MAX_WORDS} words
+                {wordCount}/{MAX_WORDS} {t.report.words}
               </span>
             </div>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Please describe what happened in detail..."
+              placeholder={t.report.descPlaceholder}
               className={`min-h-[150px] resize-none ${isOverLimit ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
             {isOverLimit && (
               <p className="text-xs text-destructive">
-                Please shorten your description to {MAX_WORDS} words or less.
+                {t.report.shortenDesc} {MAX_WORDS} {t.report.wordsOrLess}
               </p>
             )}
           </div>
@@ -145,14 +147,14 @@ const ReportUser = ({ chatPartners }: ReportUserProps) => {
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={submitting}>
-            Cancel
+            {t.report.cancel}
           </Button>
           <Button 
             variant="destructive" 
             onClick={handleSubmit} 
             disabled={submitting || !selectedUserId || !description.trim() || isOverLimit}
           >
-            {submitting ? "Submitting..." : "Submit Report"}
+            {submitting ? t.report.submitting : t.report.submitReport}
           </Button>
         </DialogFooter>
       </DialogContent>
