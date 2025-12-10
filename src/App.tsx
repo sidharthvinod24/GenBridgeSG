@@ -38,7 +38,7 @@ const App = () => (
             <Route 
               path="/matching" 
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requireCompleteProfile>
                   <Matching />
                 </ProtectedRoute>
               }
@@ -46,7 +46,7 @@ const App = () => (
             <Route
               path="/messages" 
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requireCompleteProfile>
                   <Messages />
                 </ProtectedRoute>
               } 

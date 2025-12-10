@@ -82,7 +82,7 @@ export type Database = {
           credibility_score: number | null
           full_name: string | null
           id: string
-          location: string | null
+          phone_number: string | null
           q_conversation_preference: string | null
           q_explaining_patience: string | null
           q_frustrating_task: string | null
@@ -107,7 +107,7 @@ export type Database = {
           credibility_score?: number | null
           full_name?: string | null
           id?: string
-          location?: string | null
+          phone_number?: string | null
           q_conversation_preference?: string | null
           q_explaining_patience?: string | null
           q_frustrating_task?: string | null
@@ -132,7 +132,7 @@ export type Database = {
           credibility_score?: number | null
           full_name?: string | null
           id?: string
-          location?: string | null
+          phone_number?: string | null
           q_conversation_preference?: string | null
           q_explaining_patience?: string | null
           q_frustrating_task?: string | null

@@ -14,6 +14,41 @@ const getScoreLevel = (score: number) => {
   return { label: "Needs Improvement", color: "text-red-600", bg: "bg-red-100" };
 };
 
+// Calculate credibility score based on profile completeness
+export const calculateCredibilityScore = (profile: {
+  full_name?: string | null;
+  bio?: string | null;
+  phone_number?: string | null;
+  age_group?: string | null;
+  skills_offered?: string[];
+  skills_wanted?: string[];
+  q_joining_reason?: string | null;
+}) => {
+  let score = 0;
+  
+  // Full name: 15 points
+  if (profile.full_name && profile.full_name.trim()) score += 15;
+  
+  // Bio: 15 points
+  if (profile.bio && profile.bio.trim()) score += 15;
+  
+  // Phone number: 10 points
+  if (profile.phone_number && profile.phone_number.trim()) score += 10;
+  
+  // Age group: 10 points
+  if (profile.age_group) score += 10;
+  
+  // Skills offered: up to 25 points (5 points per skill, max 5 skills)
+  const offeredCount = Math.min(profile.skills_offered?.length || 0, 5);
+  score += offeredCount * 5;
+  
+  // Skills wanted: up to 25 points (5 points per skill, max 5 skills)
+  const wantedCount = Math.min(profile.skills_wanted?.length || 0, 5);
+  score += wantedCount * 5;
+  
+  return Math.min(score, 100);
+};
+
 const CredibilityScore = ({ score, compact = false }: CredibilityScoreProps) => {
   const scoreLevel = getScoreLevel(score);
 
@@ -48,9 +83,9 @@ const CredibilityScore = ({ score, compact = false }: CredibilityScoreProps) => 
       <div className="text-xs text-muted-foreground space-y-1">
         <div className="flex items-center gap-1">
           <Star className="w-3 h-3" />
-          <p className="font-medium">Score based on reviews from skill exchanges</p>
+          <p className="font-medium">Score based on profile completeness</p>
         </div>
-        <p className="ml-4">Connect with others and get reviews to build your credibility!</p>
+        <p className="ml-4">Complete your profile details and add skills to increase your score!</p>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ const proficiencyLevelSchema = z.enum(["beginner", "intermediate", "advanced", "
 export const profileSchema = z.object({
   full_name: z.string().trim().max(100, "Name must be less than 100 characters").optional().nullable(),
   bio: z.string().trim().max(1000, "Bio must be less than 1000 characters").optional().nullable(),
-  location: z.string().trim().max(100, "Location must be less than 100 characters").optional().nullable(),
+  phone_number: z.string().trim().max(20, "Phone number must be less than 20 characters").optional().nullable(),
   age_group: z.string().optional().nullable(),
   skills_offered: z.array(z.string().trim().max(50, "Skill name too long")).max(20, "Maximum 20 skills").optional(),
   skills_wanted: z.array(z.string().trim().max(50, "Skill name too long")).max(20, "Maximum 20 skills").optional(),
