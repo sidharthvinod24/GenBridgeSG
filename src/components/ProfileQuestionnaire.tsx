@@ -59,7 +59,7 @@ const culturalInterestOptions = [
   "Dialects",
   "Traditional crafts",
   "Recipes",
-  "Oral history",
+  "SG history",
   "Cultural practices",
 ];
 
