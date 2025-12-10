@@ -393,9 +393,9 @@ const Messages = () => {
                       return (
                         <div key={message.id}>
                           <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                            <div className="flex flex-col">
+                            <div className="flex flex-col max-w-[70%]">
                               <div
-                                className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                                className={`rounded-2xl px-4 py-2 ${
                                   isMe
                                     ? "bg-primary text-primary-foreground rounded-br-md"
                                     : scamWarning.isScammy
@@ -403,7 +403,7 @@ const Messages = () => {
                                       : "bg-muted rounded-bl-md"
                                 }`}
                               >
-                                <p className="text-sm">
+                                <p className="text-sm whitespace-pre-wrap break-words">
                                   {translatedMessages[message.id] || message.content}
                                 </p>
                                 <p className={`text-xs mt-1 ${isMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
