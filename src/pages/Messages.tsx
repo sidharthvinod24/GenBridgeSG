@@ -7,10 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Heart, ArrowLeft, Send, MessageCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Heart, ArrowLeft, Send, MessageCircle, Flag, AlertTriangle, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { validateMessage } from "@/lib/validation";
+import { detectScamPatterns, ScamWarning } from "@/lib/scamDetection";
 import ReportUser from "@/components/ReportUser";
+import ScamAlertBanner from "@/components/ScamAlertBanner";
 
 interface Conversation {
   id: string;
@@ -348,43 +351,89 @@ const Messages = () => {
               <>
                 {/* Chat Header */}
                 <CardHeader className="border-b py-3">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10 border-2 border-primary/20">
-                      <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-primary-foreground text-sm font-bold">
-                        {getInitials(selectedConversation.otherUser?.full_name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-display font-bold">
-                        {selectedConversation.otherUser?.full_name || "Anonymous"}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">Skill Exchange Partner</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-10 h-10 border-2 border-primary/20">
+                        <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-primary-foreground text-sm font-bold">
+                          {getInitials(selectedConversation.otherUser?.full_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-display font-bold">
+                          {selectedConversation.otherUser?.full_name || "Anonymous"}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">Skill Exchange Partner</p>
+                      </div>
                     </div>
+                    
+                    {/* Inline Report Button for this specific user */}
+                    {selectedConversation.otherUser?.user_id && (
+                      <ReportUser 
+                        chatPartners={[{
+                          user_id: selectedConversation.otherUser.user_id,
+                          full_name: selectedConversation.otherUser.full_name
+                        }]}
+                      />
+                    )}
                   </div>
                 </CardHeader>
 
                 {/* Messages */}
                 <ScrollArea className="flex-1 p-4">
                   <div className="space-y-4">
+                    {/* Scam Alert Banner */}
+                    <ScamAlertBanner />
+                    
                     {messages.map((message) => {
                       const isMe = message.sender_id === user?.id;
+                      const scamWarning: ScamWarning = !isMe ? detectScamPatterns(message.content) : { isScammy: false, severity: 'low', reasons: [] };
+                      
                       return (
-                        <div
-                          key={message.id}
-                          className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                        >
+                        <div key={message.id}>
                           <div
-                            className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                              isMe
-                                ? "bg-primary text-primary-foreground rounded-br-md"
-                                : "bg-muted rounded-bl-md"
-                            }`}
+                            className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                           >
-                            <p className="text-sm">{message.content}</p>
-                            <p className={`text-xs mt-1 ${isMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                              {formatTime(message.created_at)}
-                            </p>
+                            <div
+                              className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                                isMe
+                                  ? "bg-primary text-primary-foreground rounded-br-md"
+                                  : scamWarning.isScammy
+                                    ? "bg-amber-100 dark:bg-amber-900/50 border border-amber-300 dark:border-amber-700 rounded-bl-md"
+                                    : "bg-muted rounded-bl-md"
+                              }`}
+                            >
+                              <p className="text-sm">{message.content}</p>
+                              <p className={`text-xs mt-1 ${isMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                                {formatTime(message.created_at)}
+                              </p>
+                            </div>
                           </div>
+                          
+                          {/* Scam Warning */}
+                          {scamWarning.isScammy && (
+                            <div className={`flex justify-start mt-2 ml-2`}>
+                              <div className={`flex items-start gap-2 p-2 rounded-lg text-xs max-w-[70%] ${
+                                scamWarning.severity === 'high' 
+                                  ? 'bg-destructive/10 text-destructive border border-destructive/20' 
+                                  : scamWarning.severity === 'medium'
+                                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800'
+                                    : 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300'
+                              }`}>
+                                <ShieldAlert className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="font-semibold">
+                                    {scamWarning.severity === 'high' ? '⚠️ High Risk Message' : 'Potential Scam Warning'}
+                                  </p>
+                                  <ul className="mt-1 space-y-0.5">
+                                    {scamWarning.reasons.map((reason, idx) => (
+                                      <li key={idx}>• {reason}</li>
+                                    ))}
+                                  </ul>
+                                  <p className="mt-1 opacity-80">Never share financial info. When in doubt, report this user.</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
