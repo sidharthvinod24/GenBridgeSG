@@ -235,12 +235,18 @@ const Dashboard = () => {
       setSaving(false);
       return;
     }
+    // Award 3 credits when profile is fully complete (score = 100) and wasn't complete before
+    const wasComplete = credibilityScore >= 100;
+    const isNowComplete = newCredibilityScore >= 100;
+    const newCredits = (isNowComplete && !wasComplete) ? credits + 3 : credits;
+
     try {
       const { error } = await supabase
         .from("profiles")
         .update({
           ...profileData,
           credibility_score: newCredibilityScore,
+          credits: newCredits,
         })
         .eq("user_id", user.id);
       if (error) throw error;
@@ -250,7 +256,14 @@ const Dashboard = () => {
       setSkillsWanted(finalSkillsWanted);
       setSkillOffered("");
       setSkillWanted("");
-      toast.success("Profile updated!");
+      setCredibilityScore(newCredibilityScore);
+      setCredits(newCredits);
+      
+      if (isNowComplete && !wasComplete) {
+        toast.success("Profile complete! You earned 3 credits!");
+      } else {
+        toast.success("Profile updated!");
+      }
       setEditing(false);
       fetchProfile();
     } catch (error: any) {
@@ -277,10 +290,10 @@ const Dashboard = () => {
       // Determine if elderly or youth based on age
       const isElderly = (answers.age ?? 0) >= 40;
       
-      // Award 3 credits if user opts for verification and doesn't already have credits
-      const isVerified = isElderly ? answers.q_allow_archive : answers.q_open_to_verification;
-      const wasVerified = isElderly ? questionnaireAnswers.q_allow_archive : questionnaireAnswers.q_open_to_verification;
-      const newCredits = (isVerified && !wasVerified) ? credits + 3 : credits;
+      // Award 3 credits when profile is fully complete (score = 100) and wasn't complete before
+      const wasComplete = credibilityScore >= 100;
+      const isNowComplete = newCredibilityScore >= 100;
+      const newCredits = (isNowComplete && !wasComplete) ? credits + 3 : credits;
       
       const { error } = await supabase
         .from("profiles")
@@ -306,8 +319,8 @@ const Dashboard = () => {
       setQuestionnaireAnswers(answers);
       setCredibilityScore(newCredibilityScore);
       setCredits(newCredits);
-      if (isVerified && !wasVerified) {
-        toast.success("Questionnaire completed! You earned 3 credits for verification!");
+      if (isNowComplete && !wasComplete) {
+        toast.success("Profile complete! You earned 3 credits!");
       } else {
         toast.success("Questionnaire completed!");
       }
