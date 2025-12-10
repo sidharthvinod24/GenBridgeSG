@@ -580,7 +580,7 @@ const Dashboard = () => {
 
               <CardContent className="space-y-6">
                 {/* Basic Info */}
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-base font-medium">
                       Full Name
@@ -614,6 +614,15 @@ const Dashboard = () => {
                     ) : (
                       <p className="text-lg text-foreground py-3">{phoneNumber || "Not set"}</p>
                     )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-base font-medium">
+                      Age
+                    </Label>
+                    <p className="text-lg text-foreground py-3">
+                      {questionnaireAnswers.age ? `${questionnaireAnswers.age} years old` : "Complete questionnaire"}
+                    </p>
                   </div>
                 </div>
 
