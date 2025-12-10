@@ -17,9 +17,10 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
       manifest: {
-        name: "SkillSwap SG - Exchange Skills, Build Community",
-        short_name: "SkillSwap SG",
-        description: "A marketplace where Singaporeans exchange skills as services. Connect with young adults and seniors to teach and learn.",
+        name: "GenBridgeSG - Exchange Skills, Build Community",
+        short_name: "GenBridgeSG",
+        description:
+          "A marketplace where Singaporeans exchange skills as services. Connect with young adults and seniors to teach and learn.",
         theme_color: "#1a9988",
         background_color: "#fcfefd",
         display: "standalone",
