@@ -3,10 +3,12 @@ import { Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Hero = () => {
   const { ref, isVisible } = useScrollAnimation(0.1);
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
@@ -28,33 +30,31 @@ const Hero = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-light border border-primary/20 mb-8">
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-primary">
-              Bridging Generations Through Skills
+              {t.hero.subtitle.slice(0, 40)}...
             </span>
           </div>
 
           {/* Headline */}
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight mb-6">
-            Bridge Generations,{" "}
-            <span className="text-gradient-hero">Share Skills</span>
+            {t.hero.title}
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            GenBridgeSG connects young adults and seniors to exchange skills, 
-            wisdom, and build meaningful relationships across generations.
+            {t.hero.subtitle}
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button variant="hero" size="xl" className="w-full sm:w-auto" asChild>
               <Link to="/auth">
-                Start Matching
+                {t.hero.getStarted}
                 <Sparkles className="ml-2" />
               </Link>
             </Button>
             <Button variant="outline" size="xl" className="w-full sm:w-auto" asChild>
               <Link to={user ? "/browse" : "/auth"}>
-                Browse Skills
+                {t.hero.learnMore}
               </Link>
             </Button>
           </div>

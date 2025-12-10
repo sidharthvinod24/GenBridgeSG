@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
 import {
@@ -7,22 +6,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-export type Language = "en" | "zh";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Language } from "@/lib/translations";
 
 interface LanguageSwitcherProps {
   className?: string;
 }
 
 const LanguageSwitcher = ({ className }: LanguageSwitcherProps) => {
-  const [currentLang, setCurrentLang] = useState<Language>(() => {
-    return (localStorage.getItem("app-language") as Language) || "en";
-  });
-
-  useEffect(() => {
-    localStorage.setItem("app-language", currentLang);
-    document.documentElement.lang = currentLang === "zh" ? "zh-CN" : "en";
-  }, [currentLang]);
+  const { language, setLanguage } = useLanguage();
 
   const languages = [
     { code: "en" as Language, label: "English", flag: "🇬🇧" },
@@ -36,12 +28,12 @@ const LanguageSwitcher = ({ className }: LanguageSwitcherProps) => {
           <Globe className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="bg-popover">
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => setCurrentLang(lang.code)}
-            className={currentLang === lang.code ? "bg-primary/10" : ""}
+            onClick={() => setLanguage(lang.code)}
+            className={language === lang.code ? "bg-primary/10" : ""}
           >
             <span className="mr-2">{lang.flag}</span>
             {lang.label}

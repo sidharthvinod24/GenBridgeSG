@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import logo from "@/assets/logo.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -35,13 +37,13 @@ const Navbar = () => {
             to={user ? "/browse" : "/auth"} 
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            Browse Skills
+            {t.nav.browse}
           </Link>
           <button 
             onClick={() => scrollToSection("how-it-works")}
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
-            How It Works
+            {t.howItWorks.title}
           </button>
         </div>
 
@@ -50,15 +52,15 @@ const Navbar = () => {
           <LanguageSwitcher />
           {user ? (
             <Button variant="hero" size="default" asChild>
-              <Link to="/dashboard">My Dashboard</Link>
+              <Link to="/dashboard">{t.nav.dashboard}</Link>
             </Button>
           ) : (
             <>
               <Button variant="ghost" size="default" asChild>
-                <Link to="/auth">Sign In</Link>
+                <Link to="/auth">{t.nav.login}</Link>
               </Button>
               <Button variant="hero" size="default" asChild>
-                <Link to="/auth">Get Started</Link>
+                <Link to="/auth">{t.hero.getStarted}</Link>
               </Button>
             </>
           )}
@@ -83,26 +85,30 @@ const Navbar = () => {
               className="text-lg font-medium text-foreground py-3 border-b border-border"
               onClick={() => setIsOpen(false)}
             >
-              Browse Skills
+              {t.nav.browse}
             </Link>
             <button 
               onClick={() => scrollToSection("how-it-works")}
               className="text-lg font-medium text-foreground py-3 border-b border-border text-left"
             >
-              How It Works
+              {t.howItWorks.title}
             </button>
+            <div className="flex items-center justify-between py-3 border-b border-border">
+              <span className="text-lg font-medium text-foreground">Language</span>
+              <LanguageSwitcher />
+            </div>
             <div className="flex flex-col gap-3 pt-4">
               {user ? (
                 <Button variant="hero" size="lg" className="w-full" asChild>
-                  <Link to="/dashboard" onClick={() => setIsOpen(false)}>My Dashboard</Link>
+                  <Link to="/dashboard" onClick={() => setIsOpen(false)}>{t.nav.dashboard}</Link>
                 </Button>
               ) : (
                 <>
                   <Button variant="outline" size="lg" className="w-full" asChild>
-                    <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
+                    <Link to="/auth" onClick={() => setIsOpen(false)}>{t.nav.login}</Link>
                   </Button>
                   <Button variant="hero" size="lg" className="w-full" asChild>
-                    <Link to="/auth" onClick={() => setIsOpen(false)}>Get Started</Link>
+                    <Link to="/auth" onClick={() => setIsOpen(false)}>{t.hero.getStarted}</Link>
                   </Button>
                 </>
               )}
