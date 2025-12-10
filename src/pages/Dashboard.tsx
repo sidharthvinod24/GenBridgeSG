@@ -290,19 +290,43 @@ const Dashboard = () => {
     if (!user) return;
     setSaving(true);
     try {
+      // Determine if elderly or youth based on age
+      const isElderly = (answers.age ?? 0) >= 40;
+      
+      // Auto-populate skills based on questionnaire answers
+      let derivedSkillsOffered: string[] = [...skillsOffered];
+      let derivedSkillsWanted: string[] = [...skillsWanted];
+      
+      if (isElderly) {
+        // Elderly: languages/dialects they speak become skills they can offer
+        // Digital help they need becomes skills they want
+        if (answers.q_languages_dialects?.length) {
+          derivedSkillsOffered = [...new Set([...derivedSkillsOffered, ...answers.q_languages_dialects])];
+        }
+        if (answers.q_digital_help_needed?.length) {
+          derivedSkillsWanted = [...new Set([...derivedSkillsWanted, ...answers.q_digital_help_needed])];
+        }
+      } else {
+        // Youth: digital teaching skills become skills they can offer
+        // Cultural interests become skills they want to learn
+        if (answers.q_digital_teaching_skills?.length) {
+          derivedSkillsOffered = [...new Set([...derivedSkillsOffered, ...answers.q_digital_teaching_skills])];
+        }
+        if (answers.q_cultural_interests?.length) {
+          derivedSkillsWanted = [...new Set([...derivedSkillsWanted, ...answers.q_cultural_interests])];
+        }
+      }
+      
       // Calculate new credibility score including questionnaire
       const newCredibilityScore = calculateCredibilityScore({
         full_name: fullName,
         bio,
         phone_number: phoneNumber,
         age: answers.age,
-        skills_offered: skillsOffered,
-        skills_wanted: skillsWanted,
+        skills_offered: derivedSkillsOffered,
+        skills_wanted: derivedSkillsWanted,
         questionnaire_complete: !!answers.age,
       });
-      
-      // Determine if elderly or youth based on age
-      const isElderly = (answers.age ?? 0) >= 40;
       
       // Award 3 credits when profile is fully complete (score = 100) and wasn't complete before
       const wasComplete = credibilityScore >= 100;
@@ -313,6 +337,9 @@ const Dashboard = () => {
         .from("profiles")
         .update({
           age: answers.age,
+          // Auto-update skills from questionnaire
+          skills_offered: derivedSkillsOffered,
+          skills_wanted: derivedSkillsWanted,
           // For elderly: q_skills_to_share stores what they want to share
           // For youth: q_skills_to_share stores what they can teach (q_skill_to_teach)
           q_skills_to_share: isElderly ? answers.q_skills_to_share : answers.q_skill_to_teach,
@@ -331,12 +358,14 @@ const Dashboard = () => {
         .eq("user_id", user.id);
       if (error) throw error;
       setQuestionnaireAnswers(answers);
+      setSkillsOffered(derivedSkillsOffered);
+      setSkillsWanted(derivedSkillsWanted);
       setCredibilityScore(newCredibilityScore);
       setCredits(newCredits);
       if (isNowComplete && !wasComplete) {
         toast.success("Profile complete! You earned 3 credits!");
       } else {
-        toast.success("Questionnaire completed!");
+        toast.success("Questionnaire completed! Skills updated automatically.");
       }
       setShowQuestionnaire(false);
       fetchProfile();
