@@ -19,7 +19,7 @@ const Navbar = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
-      <nav className="container flex items-center justify-between h-18 py-4">
+      <nav className="container flex items-center justify-between h-18 py-4 px-4 md:px-6 lg:px-8">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="GenBridgeSG Logo" className="w-10 h-10 rounded-xl object-cover" />
