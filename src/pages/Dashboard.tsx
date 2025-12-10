@@ -807,7 +807,7 @@ const Dashboard = () => {
                       </SelectContent>
                     </Select>
                   ) : (
-                    <p className="text-lg text-foreground py-3">
+                    <p className="px-3 py-1.5 text-sm bg-secondary-light text-secondary border-secondary/20">
                       {DURATION_OPTIONS.find((o) => o.value === skillExchangeDuration)?.label || "Not set"}
                     </p>
                   )}
