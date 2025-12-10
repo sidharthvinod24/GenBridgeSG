@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Check, X } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PasswordStrengthIndicatorProps {
   password: string;
@@ -11,21 +12,23 @@ interface Requirement {
 }
 
 const PasswordStrengthIndicator = ({ password }: PasswordStrengthIndicatorProps) => {
+  const { t } = useLanguage();
+
   const requirements: Requirement[] = useMemo(() => [
-    { label: "At least 8 characters", met: password.length >= 8 },
-    { label: "Contains uppercase letter", met: /[A-Z]/.test(password) },
-    { label: "Contains lowercase letter", met: /[a-z]/.test(password) },
-    { label: "Contains a number", met: /\d/.test(password) },
-  ], [password]);
+    { label: t.password.minChars, met: password.length >= 8 },
+    { label: t.password.uppercase, met: /[A-Z]/.test(password) },
+    { label: t.password.lowercase, met: /[a-z]/.test(password) },
+    { label: t.password.number, met: /\d/.test(password) },
+  ], [password, t]);
 
   const strength = useMemo(() => {
     const metCount = requirements.filter(r => r.met).length;
     if (metCount === 0) return { level: 0, label: "", color: "" };
-    if (metCount === 1) return { level: 1, label: "Weak", color: "bg-destructive" };
-    if (metCount === 2) return { level: 2, label: "Fair", color: "bg-orange-500" };
-    if (metCount === 3) return { level: 3, label: "Good", color: "bg-yellow-500" };
-    return { level: 4, label: "Strong", color: "bg-green-500" };
-  }, [requirements]);
+    if (metCount === 1) return { level: 1, label: t.password.weak, color: "bg-destructive" };
+    if (metCount === 2) return { level: 2, label: t.password.fair, color: "bg-orange-500" };
+    if (metCount === 3) return { level: 3, label: t.password.good, color: "bg-yellow-500" };
+    return { level: 4, label: t.password.strong, color: "bg-green-500" };
+  }, [requirements, t]);
 
   const isStrong = strength.level === 4;
 
@@ -36,7 +39,7 @@ const PasswordStrengthIndicator = ({ password }: PasswordStrengthIndicatorProps)
       {/* Strength bar */}
       <div className="space-y-1">
         <div className="flex justify-between text-xs">
-          <span className="text-muted-foreground">Password strength</span>
+          <span className="text-muted-foreground">{t.password.strength}</span>
           <span className={`font-medium ${isStrong ? "text-green-600" : "text-muted-foreground"}`}>
             {strength.label}
           </span>

@@ -28,11 +28,14 @@ interface Profile {
   skill_exchange_duration: string | null;
 }
 
-const DURATION_LABELS: Record<string, string> = {
-  "30": "30 mins",
-  "60": "60 mins",
-  "90": "90 mins",
-  "120": "120 mins",
+const getDurationLabel = (value: string, t: any) => {
+  const labels: Record<string, string> = {
+    "30": t.skillMatches.duration30,
+    "60": t.skillMatches.duration60,
+    "90": t.skillMatches.duration90,
+    "120": t.skillMatches.duration120,
+  };
+  return labels[value] || value;
 };
 
 const AGE_GROUPS = [
@@ -341,7 +344,7 @@ const Browse = () => {
                   {profile.skill_exchange_duration && (
                     <div className="mb-4 flex items-center gap-1 text-xs text-muted-foreground">
                       <Clock className="w-3 h-3" />
-                      <span>{DURATION_LABELS[profile.skill_exchange_duration] || profile.skill_exchange_duration}</span>
+                      <span>{getDurationLabel(profile.skill_exchange_duration, t)}</span>
                     </div>
                   )}
                   <Button variant="hero" size="sm" className="w-full" onClick={() => handleStartChat(profile.user_id)}>
