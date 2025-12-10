@@ -48,7 +48,7 @@ const CTASection = () => {
               <Button 
                 variant="accent" 
                 size="xl" 
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto text-base sm:text-lg md:text-xl"
                 asChild
               >
                 <Link to="/auth">
