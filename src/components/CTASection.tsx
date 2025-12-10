@@ -44,26 +44,17 @@ const CTASection = () => {
               your skills matter. Start connecting today with GenBridgeSG.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button 
-                variant="accent" 
-                size="xl" 
-                className="w-full sm:w-auto text-base sm:text-lg md:text-xl"
-                asChild
-              >
-                <Link to="/auth">
-                  Create Free Account
-                  <ArrowRight className="ml-2" />
-                </Link>
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="xl" 
-                className="w-full sm:w-auto text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-              >
-                Learn More
-              </Button>
-            </div>
+            <Button 
+              variant="accent" 
+              size="xl" 
+              className="w-full sm:w-auto text-base sm:text-lg md:text-xl"
+              asChild
+            >
+              <Link to="/auth">
+                Create Free Account
+                <ArrowRight className="ml-2" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
