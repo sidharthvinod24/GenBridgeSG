@@ -197,8 +197,6 @@ const Dashboard = () => {
       bio,
       phone_number: phoneNumber,
       age_group: ageGroup,
-      skills_offered: finalSkillsOffered,
-      skills_wanted: finalSkillsWanted,
     });
     
     const validation = validateProfile(profileData);
