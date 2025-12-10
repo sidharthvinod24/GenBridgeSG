@@ -81,6 +81,10 @@ export const translations = {
       canTeachYou: "Can teach you",
       wantsToLearn: "Wants to learn from you",
       dragToSwipe: "Drag to swipe or use the buttons",
+      duration30: "30 mins",
+      duration60: "60 mins",
+      duration90: "90 mins",
+      duration120: "120 mins",
     },
     // Common
     common: {
@@ -195,6 +199,10 @@ export const translations = {
       preferredDuration: "Preferred Session Duration",
       durationCredits: "30 mins = 1 credit",
       selectDuration: "Select duration",
+      duration30: "30 mins (1 Credit)",
+      duration60: "60 mins (2 Credits)",
+      duration90: "90 mins (3 Credits)",
+      duration120: "120 mins (4 Credits)",
       yourQuestionnaire: "Your Questionnaire",
       answersHelp: "Your answers help us find better matches",
       completeImprove: "Complete the questionnaire to improve your matches",
@@ -342,6 +350,10 @@ export const translations = {
       canTeachYou: "可以教您",
       wantsToLearn: "想向您学习",
       dragToSwipe: "拖动滑动或使用按钮",
+      duration30: "30分钟",
+      duration60: "60分钟",
+      duration90: "90分钟",
+      duration120: "120分钟",
     },
     // Common
     common: {
@@ -456,6 +468,10 @@ export const translations = {
       preferredDuration: "首选课程时长",
       durationCredits: "30分钟 = 1积分",
       selectDuration: "选择时长",
+      duration30: "30分钟（1积分）",
+      duration60: "60分钟（2积分）",
+      duration90: "90分钟（3积分）",
+      duration120: "120分钟（4积分）",
       yourQuestionnaire: "您的问卷",
       answersHelp: "您的回答帮助我们找到更好的匹配",
       completeImprove: "完成问卷以改善您的匹配",
