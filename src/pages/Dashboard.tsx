@@ -580,7 +580,7 @@ const Dashboard = () => {
 
               <CardContent className="space-y-6">
                 {/* Basic Info */}
-                <div className="grid sm:grid-cols-3 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-base font-medium">
                       Full Name
@@ -615,39 +615,15 @@ const Dashboard = () => {
                       <p className="text-lg text-foreground py-3">{phoneNumber || "Not set"}</p>
                     )}
                   </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-base font-medium">
-                      Age
-                    </Label>
-                    <p className="text-lg text-foreground py-3">
-                      {questionnaireAnswers.age ? `${questionnaireAnswers.age} years old` : "Complete questionnaire"}
-                    </p>
-                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="ageGroup" className="text-base font-medium">
-                    Age Group
+                  <Label className="text-base font-medium">
+                    Age
                   </Label>
-                  {editing ? (
-                    <select
-                      id="ageGroup"
-                      value={ageGroup}
-                      onChange={(e) => setAgeGroup(e.target.value)}
-                      className="w-full h-12 px-4 rounded-lg border border-input bg-background text-foreground"
-                    >
-                      <option value="">Select age group</option>
-                      <option value="18-25">18-25</option>
-                      <option value="26-35">26-35</option>
-                      <option value="36-45">36-45</option>
-                      <option value="46-55">46-55</option>
-                      <option value="56-65">56-65</option>
-                      <option value="65+">65+</option>
-                    </select>
-                  ) : (
-                    <p className="text-lg text-foreground py-3">{ageGroup || "Not set"}</p>
-                  )}
+                  <p className="text-lg text-foreground py-3">
+                    {questionnaireAnswers.age ? `${questionnaireAnswers.age} years old` : "Complete questionnaire"}
+                  </p>
                 </div>
 
                 <div className="space-y-2">
