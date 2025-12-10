@@ -81,6 +81,7 @@ export type Database = {
           bio: string | null
           created_at: string
           credibility_score: number | null
+          credits: number
           full_name: string | null
           id: string
           phone_number: string | null
@@ -117,6 +118,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           credibility_score?: number | null
+          credits?: number
           full_name?: string | null
           id?: string
           phone_number?: string | null
@@ -153,6 +155,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           credibility_score?: number | null
+          credits?: number
           full_name?: string | null
           id?: string
           phone_number?: string | null
