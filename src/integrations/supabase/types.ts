@@ -105,6 +105,7 @@ export type Database = {
           q_skills_to_share: string | null
           q_talk_topic: string | null
           q_teaching_comfort: number | null
+          skill_exchange_duration: string | null
           skills_offered: string[] | null
           skills_proficiency: Json | null
           skills_wanted: string[] | null
@@ -142,6 +143,7 @@ export type Database = {
           q_skills_to_share?: string | null
           q_talk_topic?: string | null
           q_teaching_comfort?: number | null
+          skill_exchange_duration?: string | null
           skills_offered?: string[] | null
           skills_proficiency?: Json | null
           skills_wanted?: string[] | null
@@ -179,6 +181,7 @@ export type Database = {
           q_skills_to_share?: string | null
           q_talk_topic?: string | null
           q_teaching_comfort?: number | null
+          skill_exchange_duration?: string | null
           skills_offered?: string[] | null
           skills_proficiency?: Json | null
           skills_wanted?: string[] | null

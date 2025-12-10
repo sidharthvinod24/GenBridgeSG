@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import logo from "@/assets/logo.png";
 import CredibilityScore, { getScoreLevel } from "@/components/CredibilityScore";
-import { Heart, ArrowLeft, Search, Filter, X, Sparkles, MessageCircle, Users, Shield } from "lucide-react";
+import { Heart, ArrowLeft, Search, Filter, X, Sparkles, MessageCircle, Users, Shield, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
@@ -24,7 +24,17 @@ interface Profile {
   skills_wanted: string[];
   age_group: string | null;
   credibility_score: number | null;
+  skill_exchange_duration: string | null;
 }
+
+const DURATION_LABELS: Record<string, string> = {
+  "30min": "30 min",
+  "1hr": "1 hour",
+  "2hr": "2 hours",
+  "half-day": "Half day",
+  "full-day": "Full day",
+  "flexible": "Flexible",
+};
 
 // Skill categories for filtering
 const SKILL_CATEGORIES = [
@@ -488,6 +498,14 @@ const Browse = () => {
                           </Badge>
                         )}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Duration */}
+                  {profile.skill_exchange_duration && (
+                    <div className="mb-4 flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock className="w-3 h-3" />
+                      <span>{DURATION_LABELS[profile.skill_exchange_duration] || profile.skill_exchange_duration}</span>
                     </div>
                   )}
 
