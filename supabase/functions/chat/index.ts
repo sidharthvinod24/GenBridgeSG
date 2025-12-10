@@ -6,6 +6,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Input validation constants
+const MAX_MESSAGE_LENGTH = 2000;
+const MAX_MESSAGES_COUNT = 50;
+const VALID_ROLES = ["user", "assistant", "system"];
+
 // Rate limiting
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT = 20; // requests per window
@@ -26,6 +31,49 @@ function checkRateLimit(userId: string): { allowed: boolean; remaining: number }
 
   userLimit.count++;
   return { allowed: true, remaining: RATE_LIMIT - userLimit.count };
+}
+
+// Input validation function
+function validateMessages(messages: unknown): { valid: boolean; error?: string; data?: Array<{ role: string; content: string }> } {
+  if (!Array.isArray(messages)) {
+    return { valid: false, error: "Messages must be an array" };
+  }
+
+  if (messages.length === 0) {
+    return { valid: false, error: "Messages array cannot be empty" };
+  }
+
+  if (messages.length > MAX_MESSAGES_COUNT) {
+    return { valid: false, error: `Too many messages. Maximum allowed: ${MAX_MESSAGES_COUNT}` };
+  }
+
+  const validatedMessages: Array<{ role: string; content: string }> = [];
+
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    
+    if (typeof msg !== "object" || msg === null) {
+      return { valid: false, error: `Message at index ${i} must be an object` };
+    }
+
+    const { role, content } = msg as { role?: unknown; content?: unknown };
+
+    if (typeof role !== "string" || !VALID_ROLES.includes(role)) {
+      return { valid: false, error: `Invalid role at index ${i}. Must be one of: ${VALID_ROLES.join(", ")}` };
+    }
+
+    if (typeof content !== "string") {
+      return { valid: false, error: `Content at index ${i} must be a string` };
+    }
+
+    if (content.length > MAX_MESSAGE_LENGTH) {
+      return { valid: false, error: `Message at index ${i} exceeds maximum length of ${MAX_MESSAGE_LENGTH} characters` };
+    }
+
+    validatedMessages.push({ role, content });
+  }
+
+  return { valid: true, data: validatedMessages };
 }
 
 const SYSTEM_PROMPT = `You are GenBridge AI, a friendly and helpful assistant for a skill exchange marketplace in Singapore. Your role is to:
@@ -89,14 +137,35 @@ serve(async (req) => {
       });
     }
 
-    const { messages } = await req.json();
+    // Parse and validate input
+    let requestBody: unknown;
+    try {
+      requestBody = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { messages } = requestBody as { messages?: unknown };
+    const validation = validateMessages(messages);
+    
+    if (!validation.valid) {
+      console.log(`Input validation failed for user ${user.id}: ${validation.error}`);
+      return new Response(JSON.stringify({ error: validation.error }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log(`User ${user.id} - Processing chat request with ${messages.length} messages`);
+    console.log(`User ${user.id} - Processing chat request with ${validation.data!.length} messages`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -106,7 +175,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...validation.data!],
         stream: true,
       }),
     });
