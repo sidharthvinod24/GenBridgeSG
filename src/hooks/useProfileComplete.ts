@@ -18,7 +18,7 @@ export const useProfileComplete = () => {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("full_name, skills_offered, skills_wanted, q_joining_reason")
+          .select("full_name, skills_offered, skills_wanted")
           .eq("user_id", user.id)
           .maybeSingle();
 
@@ -26,13 +26,12 @@ export const useProfileComplete = () => {
           console.error("Error checking profile:", error);
           setIsComplete(false);
         } else if (data) {
-          // Profile is complete if user has name, at least one skill to teach, and one skill to learn
+          // Profile is complete if user has name and at least one skill to teach/learn
           const hasName = !!data.full_name?.trim();
           const hasSkillsOffered = (data.skills_offered?.length || 0) > 0;
           const hasSkillsWanted = (data.skills_wanted?.length || 0) > 0;
-          const hasQuestionnaire = !!data.q_joining_reason;
           
-          setIsComplete(hasName && hasSkillsOffered && hasSkillsWanted && hasQuestionnaire);
+          setIsComplete(hasName && hasSkillsOffered && hasSkillsWanted);
         } else {
           setIsComplete(false);
         }
