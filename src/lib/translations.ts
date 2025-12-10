@@ -220,6 +220,24 @@ export const translations = {
       admin: "Admin",
       tellAboutYourself: "Tell Us About Yourself",
       answerQuestions: "Answer these questions to help us find your perfect skill matches.",
+      // Credibility Score
+      credibilityScore: "Credibility Score",
+      scoreExcellent: "Excellent",
+      scoreGood: "Good",
+      scoreAverage: "Average",
+      scoreBelowAverage: "Below Average",
+      scoreNeedsImprovement: "Needs Improvement",
+      scoreBasedOn: "Score based on profile completeness",
+      completeToIncrease: "Complete your profile details and add skills to increase your score!",
+      // Profile Status
+      profileStatus: "Profile Status",
+      nameAdded: "Name added",
+      skillsToTeachStatus: "Skills to teach",
+      skillsToLearnStatus: "Skills to learn",
+      questionnaireDone: "Questionnaire done",
+      profileTip: "Complete your profile and questionnaire to find your perfect skill swap matches!",
+      tip: "Tip:",
+      browseAllSkills: "Browse All Skills",
     },
     // Questionnaire
     questionnaire: {
@@ -561,6 +579,24 @@ export const translations = {
       admin: "管理员",
       tellAboutYourself: "告诉我们关于您自己",
       answerQuestions: "回答这些问题帮助我们找到您完美的技能匹配。",
+      // Credibility Score
+      credibilityScore: "信誉评分",
+      scoreExcellent: "优秀",
+      scoreGood: "良好",
+      scoreAverage: "一般",
+      scoreBelowAverage: "低于平均",
+      scoreNeedsImprovement: "需要改进",
+      scoreBasedOn: "评分基于资料完整度",
+      completeToIncrease: "完善您的资料详情并添加技能以提高评分！",
+      // Profile Status
+      profileStatus: "资料状态",
+      nameAdded: "已添加名字",
+      skillsToTeachStatus: "可教授的技能",
+      skillsToLearnStatus: "想学习的技能",
+      questionnaireDone: "问卷已完成",
+      profileTip: "完善您的资料和问卷，找到您完美的技能交换匹配！",
+      tip: "提示：",
+      browseAllSkills: "浏览所有技能",
     },
     // Questionnaire
     questionnaire: {

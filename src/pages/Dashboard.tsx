@@ -878,31 +878,43 @@ const Dashboard = () => {
               <CardHeader className="pb-2">
                 <CardTitle className="font-display text-xl flex items-center gap-2">
                   <Shield className="w-5 h-5 text-primary" />
-                  Credibility Score
+                  {t.dashboard.credibilityScore}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <CredibilityScore score={credibilityScore} />
+                <CredibilityScore 
+                  score={credibilityScore} 
+                  translations={{
+                    credibilityScore: t.dashboard.credibilityScore,
+                    scoreExcellent: t.dashboard.scoreExcellent,
+                    scoreGood: t.dashboard.scoreGood,
+                    scoreAverage: t.dashboard.scoreAverage,
+                    scoreBelowAverage: t.dashboard.scoreBelowAverage,
+                    scoreNeedsImprovement: t.dashboard.scoreNeedsImprovement,
+                    scoreBasedOn: t.dashboard.scoreBasedOn,
+                    completeToIncrease: t.dashboard.completeToIncrease,
+                  }}
+                />
               </CardContent>
             </Card>
 
             {/* Quick Actions */}
             <Card>
               <CardHeader>
-                <CardTitle className="font-display text-xl">Quick Actions</CardTitle>
+                <CardTitle className="font-display text-xl">{t.dashboard.quickActions}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button variant="hero" className="w-full justify-start" asChild>
                   <Link to="/browse">
                     <Users className="w-5 h-5 mr-3" />
-                    Browse All Skills
+                    {t.dashboard.browseAllSkills}
                     <ArrowRight className="w-4 h-4 ml-auto" />
                   </Link>
                 </Button>
                 <Button variant="outline" className="w-full justify-start relative" asChild>
                   <Link to="/messages">
                     <MessageCircle className="w-5 h-5 mr-3" />
-                    Messages
+                    {t.nav.messages}
                     {unreadCount > 0 && (
                       <span className="absolute right-12 bg-destructive text-destructive-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                         {unreadCount > 9 ? "9+" : unreadCount}
@@ -917,30 +929,30 @@ const Dashboard = () => {
             {/* Profile Completeness */}
             <Card>
               <CardHeader>
-                <CardTitle className="font-display text-xl">Profile Status</CardTitle>
+                <CardTitle className="font-display text-xl">{t.dashboard.profileStatus}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${fullName ? "bg-green-500" : "bg-muted"}`} />
-                    <span className={fullName ? "text-foreground" : "text-muted-foreground"}>Name added</span>
+                    <span className={fullName ? "text-foreground" : "text-muted-foreground"}>{t.dashboard.nameAdded}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${skillsOffered.length > 0 ? "bg-green-500" : "bg-muted"}`} />
                     <span className={skillsOffered.length > 0 ? "text-foreground" : "text-muted-foreground"}>
-                      Skills to teach
+                      {t.dashboard.skillsToTeachStatus}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${skillsWanted.length > 0 ? "bg-green-500" : "bg-muted"}`} />
                     <span className={skillsWanted.length > 0 ? "text-foreground" : "text-muted-foreground"}>
-                      Skills to learn
+                      {t.dashboard.skillsToLearnStatus}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${isQuestionnaireComplete ? "bg-green-500" : "bg-muted"}`} />
                     <span className={isQuestionnaireComplete ? "text-foreground" : "text-muted-foreground"}>
-                      Questionnaire done
+                      {t.dashboard.questionnaireDone}
                     </span>
                   </div>
                 </div>
@@ -948,8 +960,7 @@ const Dashboard = () => {
                 {/* Tip */}
                 <div className="mt-6 p-4 rounded-lg bg-accent/10 border border-accent/20">
                   <p className="text-sm text-muted-foreground">
-                    💡 <strong>Tip:</strong> Complete your profile and questionnaire to find your perfect skill swap
-                    matches!
+                    💡 <strong>{t.dashboard.tip}</strong> {t.dashboard.profileTip}
                   </p>
                 </div>
               </CardContent>
