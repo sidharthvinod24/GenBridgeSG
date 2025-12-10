@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import SkillSelect from "@/components/SkillSelect";
 import SkillProficiencySelector, { ProficiencyLevel } from "@/components/SkillProficiencySelector";
-import CredibilityScore from "@/components/CredibilityScore";
+import CredibilityScore, { calculateCredibilityScore } from "@/components/CredibilityScore";
 import ProfileQuestionnaire from "@/components/ProfileQuestionnaire";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useAdminRole } from "@/hooks/useAdminRole";
@@ -19,7 +19,7 @@ import { validateProfile } from "@/lib/validation";
 import { 
   Heart, 
   LogOut, 
-  MapPin, 
+  Phone, 
   Edit3, 
   Save, 
   X,
@@ -39,7 +39,7 @@ interface Profile {
   user_id: string;
   full_name: string | null;
   bio: string | null;
-  location: string | null;
+  phone_number: string | null;
   avatar_url: string | null;
   skills_offered: string[];
   skills_wanted: string[];
@@ -71,7 +71,7 @@ const Dashboard = () => {
   // Form state
   const [fullName, setFullName] = useState("");
   const [bio, setBio] = useState("");
-  const [location, setLocation] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
   const [skillOffered, setSkillOffered] = useState("");
   const [skillWanted, setSkillWanted] = useState("");
@@ -132,7 +132,7 @@ const Dashboard = () => {
         setProfile(profileData);
         setFullName(data.full_name || "");
         setBio(data.bio || "");
-        setLocation(data.location || "");
+        setPhoneNumber(data.phone_number || "");
         setAgeGroup(data.age_group || "");
         setSkillsOffered(data.skills_offered || []);
         setSkillsWanted(data.skills_wanted || []);
@@ -184,12 +184,22 @@ const Dashboard = () => {
     const profileData = {
       full_name: fullName,
       bio,
-      location,
+      phone_number: phoneNumber,
       age_group: ageGroup,
       skills_offered: finalSkillsOffered,
       skills_wanted: finalSkillsWanted,
       skills_proficiency: updatedProficiency,
     };
+    
+    // Calculate credibility score based on profile completeness
+    const newCredibilityScore = calculateCredibilityScore({
+      full_name: fullName,
+      bio,
+      phone_number: phoneNumber,
+      age_group: ageGroup,
+      skills_offered: finalSkillsOffered,
+      skills_wanted: finalSkillsWanted,
+    });
     
     const validation = validateProfile(profileData);
     if (!validation.success) {
@@ -202,7 +212,7 @@ const Dashboard = () => {
     try {
       const { error } = await supabase
         .from("profiles")
-        .update(profileData)
+        .update({ ...profileData, credibility_score: newCredibilityScore })
         .eq("user_id", user.id);
 
       if (error) throw error;
@@ -534,21 +544,21 @@ const Dashboard = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="location" className="text-base font-medium flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      Location
+                    <Label htmlFor="phone" className="text-base font-medium flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      Phone Number
                     </Label>
                     {editing ? (
                       <Input
-                        id="location"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        placeholder="e.g., Tampines, Singapore"
+                        id="phone"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="e.g., +65 9123 4567"
                         className="h-12"
                       />
                     ) : (
                       <p className="text-lg text-foreground py-3">
-                        {location || "Not set"}
+                        {phoneNumber || "Not set"}
                       </p>
                     )}
                   </div>

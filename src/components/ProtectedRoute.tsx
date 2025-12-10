@@ -1,18 +1,30 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
+import { useProfileComplete } from "@/hooks/useProfileComplete";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
+  requireCompleteProfile?: boolean;
 }
 
-const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ 
+  children, 
+  requireAdmin = false,
+  requireCompleteProfile = false 
+}: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdminRole();
+  const { isComplete, loading: profileLoading } = useProfileComplete();
+  const location = useLocation();
 
   // Show loading while checking auth
-  if (loading || (requireAdmin && adminLoading)) {
+  const isLoading = loading || 
+    (requireAdmin && adminLoading) || 
+    (requireCompleteProfile && profileLoading);
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -30,6 +42,12 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
 
   // Logged in but not admin, trying to access admin route - redirect to dashboard
   if (requireAdmin && !isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Profile incomplete and trying to access routes that require complete profile
+  // Don't redirect if already on dashboard (to allow them to complete profile there)
+  if (requireCompleteProfile && !isComplete && location.pathname !== "/dashboard") {
     return <Navigate to="/dashboard" replace />;
   }
 

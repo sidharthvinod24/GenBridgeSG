@@ -12,7 +12,6 @@ import {
   Heart, 
   ArrowLeft, 
   Search, 
-  MapPin, 
   Filter,
   X,
   Sparkles,
@@ -34,7 +33,7 @@ interface Profile {
   user_id: string;
   full_name: string | null;
   bio: string | null;
-  location: string | null;
+  phone_number: string | null;
   avatar_url: string | null;
   skills_offered: string[];
   skills_wanted: string[];
@@ -71,18 +70,8 @@ const Browse = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [locationFilter, setLocationFilter] = useState("all");
   const [ageFilter, setAgeFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
-
-  // Get unique locations from profiles
-  const locations = useMemo(() => {
-    const locs = new Set<string>();
-    profiles.forEach((p) => {
-      if (p.location) locs.add(p.location);
-    });
-    return Array.from(locs).sort();
-  }, [profiles]);
 
   useEffect(() => {
     fetchProfiles();
@@ -162,11 +151,6 @@ const Browse = () => {
         }
       }
 
-      // Location filter
-      if (locationFilter !== "all" && profile.location !== locationFilter) {
-        return false;
-      }
-
       // Age filter
       if (ageFilter !== "all" && profile.age_group !== ageFilter) {
         return false;
@@ -174,7 +158,7 @@ const Browse = () => {
 
       return true;
     });
-  }, [profiles, searchQuery, categoryFilter, locationFilter, ageFilter]);
+  }, [profiles, searchQuery, categoryFilter, ageFilter]);
 
   const getInitials = (name: string | null) => {
     if (!name) return "?";
@@ -184,11 +168,10 @@ const Browse = () => {
   const clearFilters = () => {
     setSearchQuery("");
     setCategoryFilter("all");
-    setLocationFilter("all");
     setAgeFilter("all");
   };
 
-  const hasActiveFilters = searchQuery || categoryFilter !== "all" || locationFilter !== "all" || ageFilter !== "all";
+  const hasActiveFilters = searchQuery || categoryFilter !== "all" || ageFilter !== "all";
 
   const handleStartChat = async (profileUserId: string) => {
     if (!user) {
@@ -328,23 +311,6 @@ const Browse = () => {
                     </Select>
                   </div>
 
-                  {/* Location */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Location</label>
-                    <Select value={locationFilter} onValueChange={setLocationFilter}>
-                      <SelectTrigger className="h-12">
-                        <SelectValue placeholder="All Locations" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Locations</SelectItem>
-                        {locations.map((loc) => (
-                          <SelectItem key={loc} value={loc}>
-                            {loc}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
 
                   {/* Age Group */}
                   <div className="space-y-2">
@@ -427,12 +393,6 @@ const Browse = () => {
                           </div>
                         )}
                       </div>
-                      {profile.location && (
-                        <p className="text-sm text-muted-foreground flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {profile.location}
-                        </p>
-                      )}
                       {profile.age_group && (
                         <Badge variant="outline" className="mt-1 text-xs">
                           {profile.age_group}
