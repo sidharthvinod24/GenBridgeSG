@@ -199,6 +199,7 @@ const Dashboard = () => {
       age_group: ageGroup,
       skills_offered: finalSkillsOffered,
       skills_wanted: finalSkillsWanted,
+      q_joining_reason: questionnaireAnswers.q_joining_reason,
     });
     const validation = validateProfile(profileData);
     if (!validation.success) {
@@ -235,16 +236,29 @@ const Dashboard = () => {
     if (!user) return;
     setSaving(true);
     try {
+      // Calculate new credibility score including questionnaire
+      const newCredibilityScore = calculateCredibilityScore({
+        full_name: fullName,
+        bio,
+        phone_number: phoneNumber,
+        age_group: ageGroup,
+        skills_offered: skillsOffered,
+        skills_wanted: skillsWanted,
+        q_joining_reason: answers.q_joining_reason,
+      });
+      
       const { error } = await supabase
         .from("profiles")
         .update({
           q_skill_or_hobby: answers.q_skill_or_hobby,
           q_learning_style: answers.q_learning_style,
           q_joining_reason: answers.q_joining_reason,
+          credibility_score: newCredibilityScore,
         })
         .eq("user_id", user.id);
       if (error) throw error;
       setQuestionnaireAnswers(answers);
+      setCredibilityScore(newCredibilityScore);
       toast.success("Questionnaire completed!");
       setShowQuestionnaire(false);
       fetchProfile();

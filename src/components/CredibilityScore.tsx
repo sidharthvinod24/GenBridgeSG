@@ -22,26 +22,30 @@ export const calculateCredibilityScore = (profile: {
   age_group?: string | null;
   skills_offered?: string[] | null;
   skills_wanted?: string[] | null;
+  q_joining_reason?: string | null;
 }) => {
   let score = 0;
   
   // Full name: 15 points
   if (profile.full_name && profile.full_name.trim()) score += 15;
   
-  // Bio: 15 points
-  if (profile.bio && profile.bio.trim()) score += 15;
+  // Bio: 10 points
+  if (profile.bio && profile.bio.trim()) score += 10;
   
-  // Phone number: 20 points
-  if (profile.phone_number && profile.phone_number.trim()) score += 20;
+  // Phone number: 15 points
+  if (profile.phone_number && profile.phone_number.trim()) score += 15;
   
-  // Age group: 15 points
-  if (profile.age_group) score += 15;
+  // Age group: 10 points
+  if (profile.age_group) score += 10;
   
-  // Skills offered (at least 1): 17.5 points
-  if (profile.skills_offered && profile.skills_offered.length > 0) score += 17.5;
+  // Skills offered (at least 1): 15 points
+  if (profile.skills_offered && profile.skills_offered.length > 0) score += 15;
   
-  // Skills wanted (at least 1): 17.5 points
-  if (profile.skills_wanted && profile.skills_wanted.length > 0) score += 17.5;
+  // Skills wanted (at least 1): 15 points
+  if (profile.skills_wanted && profile.skills_wanted.length > 0) score += 15;
+  
+  // Questionnaire completed: 20 points
+  if (profile.q_joining_reason && profile.q_joining_reason.trim()) score += 20;
   
   return Math.round(Math.min(score, 100));
 };
