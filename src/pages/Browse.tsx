@@ -7,25 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import logo from "@/assets/logo.png";
 import CredibilityScore, { getScoreLevel } from "@/components/CredibilityScore";
-import { 
-  Heart, 
-  ArrowLeft, 
-  Search, 
-  Filter,
-  X,
-  Sparkles,
-  MessageCircle,
-  Users,
-  Shield
-} from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Heart, ArrowLeft, Search, Filter, X, Sparkles, MessageCircle, Users, Shield } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface Profile {
@@ -44,14 +29,81 @@ interface Profile {
 // Skill categories for filtering
 const SKILL_CATEGORIES = [
   { value: "all", label: "All Categories" },
-  { value: "technology", label: "Technology", keywords: ["coding", "programming", "web", "design", "computer", "software", "app", "data", "ai", "python", "javascript"] },
-  { value: "arts", label: "Arts & Crafts", keywords: ["art", "paint", "draw", "craft", "pottery", "knit", "crochet", "sew", "jewelry", "sculpture"] },
-  { value: "music", label: "Music", keywords: ["music", "piano", "guitar", "violin", "sing", "drum", "instrument", "compose", "song"] },
-  { value: "languages", label: "Languages", keywords: ["language", "english", "mandarin", "malay", "tamil", "japanese", "korean", "french", "spanish", "german"] },
-  { value: "cooking", label: "Cooking & Baking", keywords: ["cook", "bake", "cuisine", "recipe", "food", "kitchen", "pastry", "culinary"] },
-  { value: "fitness", label: "Fitness & Sports", keywords: ["fitness", "yoga", "gym", "sport", "swim", "run", "exercise", "martial", "dance", "basketball", "tennis"] },
-  { value: "business", label: "Business & Finance", keywords: ["business", "finance", "marketing", "accounting", "invest", "entrepreneur", "management", "sales"] },
-  { value: "education", label: "Education & Tutoring", keywords: ["math", "science", "tutor", "teach", "exam", "study", "academic", "history", "geography"] },
+  {
+    value: "technology",
+    label: "Technology",
+    keywords: [
+      "coding",
+      "programming",
+      "web",
+      "design",
+      "computer",
+      "software",
+      "app",
+      "data",
+      "ai",
+      "python",
+      "javascript",
+    ],
+  },
+  {
+    value: "arts",
+    label: "Arts & Crafts",
+    keywords: ["art", "paint", "draw", "craft", "pottery", "knit", "crochet", "sew", "jewelry", "sculpture"],
+  },
+  {
+    value: "music",
+    label: "Music",
+    keywords: ["music", "piano", "guitar", "violin", "sing", "drum", "instrument", "compose", "song"],
+  },
+  {
+    value: "languages",
+    label: "Languages",
+    keywords: [
+      "language",
+      "english",
+      "mandarin",
+      "malay",
+      "tamil",
+      "japanese",
+      "korean",
+      "french",
+      "spanish",
+      "german",
+    ],
+  },
+  {
+    value: "cooking",
+    label: "Cooking & Baking",
+    keywords: ["cook", "bake", "cuisine", "recipe", "food", "kitchen", "pastry", "culinary"],
+  },
+  {
+    value: "fitness",
+    label: "Fitness & Sports",
+    keywords: [
+      "fitness",
+      "yoga",
+      "gym",
+      "sport",
+      "swim",
+      "run",
+      "exercise",
+      "martial",
+      "dance",
+      "basketball",
+      "tennis",
+    ],
+  },
+  {
+    value: "business",
+    label: "Business & Finance",
+    keywords: ["business", "finance", "marketing", "accounting", "invest", "entrepreneur", "management", "sales"],
+  },
+  {
+    value: "education",
+    label: "Education & Tutoring",
+    keywords: ["math", "science", "tutor", "teach", "exam", "study", "academic", "history", "geography"],
+  },
 ];
 
 const AGE_GROUPS = [
@@ -81,35 +133,35 @@ const Browse = () => {
     try {
       // For authenticated users, use rate-limited edge function
       if (user) {
-        const { data, error } = await supabase.functions.invoke('browse-profiles', {
+        const { data, error } = await supabase.functions.invoke("browse-profiles", {
           body: null,
         });
 
         if (error) {
           // Check for rate limit error
-          if (error.message?.includes('429') || error.message?.includes('Rate limit')) {
+          if (error.message?.includes("429") || error.message?.includes("Rate limit")) {
             toast.error("Too many requests. Please wait a moment before browsing more profiles.");
             setLoading(false);
             return;
           }
           throw error;
         }
-        
+
         const profilesWithSkills = (data?.profiles || []).filter(
-          (p: Profile) => (p.skills_offered?.length > 0 || p.skills_wanted?.length > 0)
+          (p: Profile) => p.skills_offered?.length > 0 || p.skills_wanted?.length > 0,
         );
-        
+
         setProfiles(profilesWithSkills);
       } else {
         // For unauthenticated users, use direct query (public browse)
         const { data, error } = await supabase.from("profiles").select("*");
 
         if (error) throw error;
-        
+
         const profilesWithSkills = (data || []).filter(
-          (p) => (p.skills_offered?.length > 0 || p.skills_wanted?.length > 0)
+          (p) => p.skills_offered?.length > 0 || p.skills_wanted?.length > 0,
         );
-        
+
         setProfiles(profilesWithSkills);
       }
     } catch (error: any) {
@@ -126,12 +178,8 @@ const Browse = () => {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = profile.full_name?.toLowerCase().includes(query);
-        const matchesSkillsOffered = profile.skills_offered?.some((s) =>
-          s.toLowerCase().includes(query)
-        );
-        const matchesSkillsWanted = profile.skills_wanted?.some((s) =>
-          s.toLowerCase().includes(query)
-        );
+        const matchesSkillsOffered = profile.skills_offered?.some((s) => s.toLowerCase().includes(query));
+        const matchesSkillsWanted = profile.skills_wanted?.some((s) => s.toLowerCase().includes(query));
         if (!matchesName && !matchesSkillsOffered && !matchesSkillsWanted) {
           return false;
         }
@@ -143,9 +191,7 @@ const Browse = () => {
         if (category && category.keywords) {
           const allSkills = [...(profile.skills_offered || []), ...(profile.skills_wanted || [])];
           const matchesCategory = allSkills.some((skill) =>
-            category.keywords.some((keyword) =>
-              skill.toLowerCase().includes(keyword)
-            )
+            category.keywords.some((keyword) => skill.toLowerCase().includes(keyword)),
           );
           if (!matchesCategory) return false;
         }
@@ -162,7 +208,12 @@ const Browse = () => {
 
   const getInitials = (name: string | null) => {
     if (!name) return "?";
-    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   const clearFilters = () => {
@@ -185,7 +236,7 @@ const Browse = () => {
         .from("conversations")
         .select("id")
         .or(
-          `and(participant_one.eq.${user.id},participant_two.eq.${profileUserId}),and(participant_one.eq.${profileUserId},participant_two.eq.${user.id})`
+          `and(participant_one.eq.${user.id},participant_two.eq.${profileUserId}),and(participant_one.eq.${profileUserId},participant_two.eq.${user.id})`,
         )
         .maybeSingle();
 
@@ -206,7 +257,7 @@ const Browse = () => {
         .single();
 
       if (error) throw error;
-      
+
       toast.success("Conversation started!");
       window.location.href = `/messages?convo=${newConvo.id}`;
     } catch (error: any) {
@@ -238,15 +289,13 @@ const Browse = () => {
               </Link>
             </Button>
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
-                <Heart className="w-5 h-5 text-primary-foreground" />
-              </div>
+              <img src={logo} alt="GenBridgeSG Logo" className="w-10 h-10 rounded-xl object-cover" />
               <span className="font-display font-bold text-xl text-foreground">
                 Gen<span className="text-primary">Bridge</span>SG
               </span>
             </Link>
           </div>
-          
+
           {user && (
             <Button variant="outline" asChild>
               <Link to="/messages">
@@ -311,7 +360,6 @@ const Browse = () => {
                     </Select>
                   </div>
 
-
                   {/* Age Group */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Age Group</label>
@@ -358,9 +406,7 @@ const Browse = () => {
                   <Search className="w-10 h-10 text-muted-foreground" />
                 </div>
                 <h3 className="font-display font-bold text-xl mb-2">No results found</h3>
-                <p className="text-muted-foreground mb-4">
-                  Try adjusting your search or filters to find more people
-                </p>
+                <p className="text-muted-foreground mb-4">Try adjusting your search or filters to find more people</p>
                 {hasActiveFilters && (
                   <Button variant="outline" onClick={clearFilters}>
                     Clear all filters
@@ -382,12 +428,12 @@ const Browse = () => {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-display font-bold text-lg truncate">
-                          {profile.full_name || "Anonymous"}
-                        </h3>
+                        <h3 className="font-display font-bold text-lg truncate">{profile.full_name || "Anonymous"}</h3>
                         {/* Credibility Score Badge */}
                         {(profile.credibility_score ?? 0) > 0 && (
-                          <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${getScoreLevel(profile.credibility_score || 0).bg} ${getScoreLevel(profile.credibility_score || 0).color}`}>
+                          <div
+                            className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${getScoreLevel(profile.credibility_score || 0).bg} ${getScoreLevel(profile.credibility_score || 0).color}`}
+                          >
                             <Shield className="w-3 h-3" />
                             {profile.credibility_score}
                           </div>
@@ -410,11 +456,7 @@ const Browse = () => {
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {profile.skills_offered.slice(0, 4).map((skill) => (
-                          <Badge
-                            key={skill}
-                            variant="secondary"
-                            className="bg-primary-light text-primary text-xs"
-                          >
+                          <Badge key={skill} variant="secondary" className="bg-primary-light text-primary text-xs">
                             {skill}
                           </Badge>
                         ))}
@@ -436,11 +478,7 @@ const Browse = () => {
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {profile.skills_wanted.slice(0, 4).map((skill) => (
-                          <Badge
-                            key={skill}
-                            variant="secondary"
-                            className="bg-secondary-light text-secondary text-xs"
-                          >
+                          <Badge key={skill} variant="secondary" className="bg-secondary-light text-secondary text-xs">
                             {skill}
                           </Badge>
                         ))}
@@ -453,12 +491,7 @@ const Browse = () => {
                     </div>
                   )}
 
-                  <Button
-                    variant="hero"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => handleStartChat(profile.user_id)}
-                  >
+                  <Button variant="hero" size="sm" className="w-full" onClick={() => handleStartChat(profile.user_id)}>
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Start Conversation
                   </Button>
