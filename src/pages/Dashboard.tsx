@@ -18,6 +18,7 @@ import ProfileQuestionnaire, { QuestionnaireAnswers } from "@/components/Profile
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { validateProfile } from "@/lib/validation";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
   Heart,
   LogOut,
@@ -486,6 +487,7 @@ const Dashboard = () => {
           </Link>
 
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             {isAdmin && (
               <Button
                 variant="outline"
