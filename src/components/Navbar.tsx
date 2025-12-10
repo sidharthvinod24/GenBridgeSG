@@ -31,7 +31,7 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
           <Link 
-            to="/browse" 
+            to={user ? "/browse" : "/auth"} 
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Browse Skills
@@ -77,7 +77,7 @@ const Navbar = () => {
         <div className="md:hidden bg-background border-b border-border animate-slide-down">
           <div className="container py-6 flex flex-col gap-4">
             <Link 
-              to="/browse" 
+              to={user ? "/browse" : "/auth"} 
               className="text-lg font-medium text-foreground py-3 border-b border-border"
               onClick={() => setIsOpen(false)}
             >

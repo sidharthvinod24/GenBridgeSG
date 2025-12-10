@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Hero = () => {
   const { ref, isVisible } = useScrollAnimation(0.1);
+  const { user } = useAuth();
 
   return (
     <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
@@ -51,7 +53,7 @@ const Hero = () => {
               </Link>
             </Button>
             <Button variant="outline" size="xl" className="w-full sm:w-auto" asChild>
-              <Link to="/browse">
+              <Link to={user ? "/browse" : "/auth"}>
                 Browse Skills
               </Link>
             </Button>
