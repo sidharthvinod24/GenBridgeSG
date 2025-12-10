@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Heart, ArrowLeft, Mail, Lock, User, Sparkles, Phone, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
@@ -16,6 +17,7 @@ type SignupStep = "details" | "otp";
 type AuthMode = "login" | "signup" | "forgot";
 
 const Auth = () => {
+  const { t } = useLanguage();
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [signupStep, setSignupStep] = useState<SignupStep>("details");
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -191,7 +193,7 @@ const Auth = () => {
       <header className="p-6">
         <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-5 h-5" />
-          <span className="font-medium">Back to Home</span>
+          <span className="font-medium">{t.auth.backToHome}</span>
         </Link>
       </header>
 
@@ -205,7 +207,7 @@ const Auth = () => {
               Gen<span className="text-gradient-hero">Bridge</span>SG
             </h1>
             <p className="text-muted-foreground">
-              Connect. Share. Grow together.
+              {t.auth.connectShareGrow}
             </p>
           </div>
 
@@ -213,10 +215,10 @@ const Auth = () => {
           <Card className="border-0 shadow-elevated">
             <CardHeader className="text-center pb-4">
               <CardTitle className="font-display text-2xl">
-                {authMode === "forgot" ? "Reset Password" : authMode === "login" ? "Welcome Back" : signupStep === "otp" ? "Verify Your Phone" : "Join Our Community"}
+                {authMode === "forgot" ? t.auth.resetPassword : authMode === "login" ? t.auth.welcomeBack : signupStep === "otp" ? t.auth.verifyPhone : t.auth.joinCommunity}
               </CardTitle>
               <CardDescription className="text-base">
-                {authMode === "forgot" ? (resetEmailSent ? "Check your email for a reset link" : "Enter your email to receive a reset link") : authMode === "login" ? "Sign in to continue your skill-sharing journey" : signupStep === "otp" ? `Enter the 6-digit code sent to +65 ${phoneNumber}` : "Create an account to start exchanging skills"}
+                {authMode === "forgot" ? (resetEmailSent ? t.auth.checkEmailReset : t.auth.enterEmailReset) : authMode === "login" ? t.auth.signInContinue : signupStep === "otp" ? `${t.auth.enterOtpCode} +65 ${phoneNumber}` : t.auth.createAccountStart}
               </CardDescription>
             </CardHeader>
 
@@ -229,17 +231,17 @@ const Auth = () => {
                       <Mail className="w-8 h-8" />
                     </div>
                     <p className="text-muted-foreground">
-                      We've sent a password reset link to <strong>{email}</strong>
+                      {t.auth.emailSent} <strong>{email}</strong>
                     </p>
                     <Button variant="outline" className="w-full" onClick={() => switchAuthMode("login")}>
-                      Back to Sign In
+                      {t.auth.backToSignIn}
                     </Button>
                   </div>
                 ) : (
                   <form onSubmit={handleForgotPassword} className="space-y-5">
                     <div className="space-y-2">
                       <Label htmlFor="reset-email" className="text-base font-medium">
-                        Email Address
+                        {t.auth.emailAddress}
                       </Label>
                       <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -247,11 +249,11 @@ const Auth = () => {
                       </div>
                     </div>
                     <Button type="submit" variant="hero" size="xl" className="w-full" disabled={loading}>
-                      {loading ? "Sending..." : "Send Reset Link"}
+                      {loading ? t.auth.sending : t.auth.sendResetLink}
                     </Button>
                     <Button type="button" variant="ghost" className="w-full" onClick={() => switchAuthMode("login")}>
                       <ArrowLeft className="w-4 h-4 mr-2" />
-                      Back to Sign In
+                      {t.auth.backToSignIn}
                     </Button>
                   </form>
                 )
@@ -275,12 +277,12 @@ const Auth = () => {
                   </div>
 
                   <Button onClick={handleOtpVerify} variant="hero" size="xl" className="w-full" disabled={loading || otpValue.length !== 6}>
-                    {loading ? "Creating account..." : "Verify & Create Account"}
+                    {loading ? t.auth.creatingAccount : t.auth.verifyCreate}
                   </Button>
 
                   <Button type="button" variant="ghost" className="w-full" onClick={handleBackToDetails}>
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to details
+                    {t.auth.backToDetails}
                   </Button>
                 </div>
               ) : (/* Details Form */
@@ -288,17 +290,17 @@ const Auth = () => {
                   {authMode === "signup" && <>
                       <div className="space-y-2">
                         <Label htmlFor="name" className="text-base font-medium">
-                          Full Name
+                          {t.auth.fullName}
                         </Label>
                         <div className="relative">
                           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                          <Input id="name" type="text" placeholder="Enter your name" value={name} onChange={e => setName(e.target.value)} className="pl-12 h-14 text-base" required />
+                          <Input id="name" type="text" placeholder={t.auth.enterName} value={name} onChange={e => setName(e.target.value)} className="pl-12 h-14 text-base" required />
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="phone" className="text-base font-medium">
-                          Phone Number
+                          {t.auth.phoneNumber}
                         </Label>
                         <div className="relative">
                           <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -308,14 +310,14 @@ const Auth = () => {
                           <Input id="phone" type="tel" placeholder="8123 4567" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value.replace(/\D/g, "").slice(0, 8))} className="pl-24 h-14 text-base" required maxLength={8} />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Singapore mobile number (8 digits)
+                          {t.auth.sgMobileNumber}
                         </p>
                       </div>
                     </>}
 
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-base font-medium">
-                      Email Address
+                      {t.auth.emailAddress}
                     </Label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -325,7 +327,7 @@ const Auth = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="password" className="text-base font-medium">
-                      Password
+                      {t.auth.password}
                     </Label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -342,8 +344,8 @@ const Auth = () => {
                   </div>
 
                   <Button type="submit" variant="hero" size="xl" className="w-full" disabled={loading}>
-                    {loading ? "Please wait..." : <>
-                        {authMode === "login" ? "Sign In" : "Continue"}
+                    {loading ? t.auth.pleaseWait : <>
+                        {authMode === "login" ? t.auth.signIn : t.auth.continue}
                         <Sparkles className="ml-2 w-5 h-5" />
                       </>}
                   </Button>
@@ -354,7 +356,7 @@ const Auth = () => {
                       onClick={() => switchAuthMode("forgot")}
                       className="w-full text-sm text-muted-foreground hover:text-primary transition-colors"
                     >
-                      Forgot your password?
+                      {t.auth.forgotPassword}
                     </button>
                   )}
                 </form>)}
@@ -362,12 +364,12 @@ const Auth = () => {
               {/* Toggle - only show when not in OTP step */}
               {(authMode === "login" || (authMode === "signup" && signupStep === "details")) && <div className="mt-8 text-center">
                   <p className="text-muted-foreground">
-                    {authMode === "login" ? "Don't have an account?" : "Already have an account?"}
+                    {authMode === "login" ? t.auth.noAccount : t.auth.hasAccount}
                   </p>
                   <button type="button" onClick={() => {
                 switchAuthMode(authMode === "login" ? "signup" : "login");
               }} className="mt-2 font-semibold text-primary hover:text-primary-dark transition-colors">
-                    {authMode === "login" ? "Sign up for free" : "Sign in instead"}
+                    {authMode === "login" ? t.auth.signUpFree : t.auth.signInInstead}
                   </button>
                 </div>}
             </CardContent>
@@ -376,7 +378,7 @@ const Auth = () => {
           {/* Trust badges */}
           <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
-              🔒 Your data is safe with us • 🇸🇬 Made in Singapore
+              🔒 {t.auth.dataSafe} • 🇸🇬 {t.auth.madeInSg}
             </p>
           </div>
         </div>
