@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import ctaBackground from "@/assets/cta-background.jpg";
 
 const CTASection = () => {
   const { ref, isVisible } = useScrollAnimation(0.1);
@@ -11,10 +12,17 @@ const CTASection = () => {
       <div className="container">
         <div 
           ref={ref}
-          className={`relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-secondary p-8 md:p-16 transition-all duration-700 ${
+          className={`relative overflow-hidden rounded-3xl p-8 md:p-16 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
+          style={{
+            backgroundImage: `url(${ctaBackground})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
         >
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/85 via-primary/80 to-secondary/85" />
           {/* Background decoration */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary-foreground/10 rounded-full blur-2xl" />
