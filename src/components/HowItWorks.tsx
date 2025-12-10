@@ -19,7 +19,7 @@ const steps = [
     icon: MessageCircle,
     step: "3",
     title: "Connect & Arrange",
-    description: "Chat and set up a time to meet.",
+    description: "Chat and get an online meeting link generated for you.",
   },
   {
     icon: Handshake,
