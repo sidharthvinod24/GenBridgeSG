@@ -12,10 +12,12 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 
 type SignupStep = "details" | "otp";
+type AuthMode = "login" | "signup" | "forgot";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [signupStep, setSignupStep] = useState<SignupStep>("details");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -61,9 +63,30 @@ const Auth = () => {
     return !!data;
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?mode=reset`,
+      });
+      if (error) throw error;
+      setResetEmailSent(true);
+      toast.success("Password reset email sent!");
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin) {
+    if (authMode === "login") {
       // Handle login
       setLoading(true);
       try {
@@ -149,7 +172,7 @@ const Auth = () => {
       }
       toast.success("Account created successfully!");
       resetForm();
-      setIsLogin(true);
+      setAuthMode("login");
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
     } finally {
@@ -163,10 +186,15 @@ const Auth = () => {
     setPhoneNumber("");
     setOtpValue("");
     setSignupStep("details");
+    setResetEmailSent(false);
   };
   const handleBackToDetails = () => {
     setSignupStep("details");
     setOtpValue("");
+  };
+  const switchAuthMode = (mode: AuthMode) => {
+    setAuthMode(mode);
+    resetForm();
   };
   return <div className="min-h-screen bg-gradient-to-br from-primary-light via-background to-secondary-light flex flex-col">
       {/* Header */}
@@ -195,16 +223,50 @@ const Auth = () => {
           <Card className="border-0 shadow-elevated">
             <CardHeader className="text-center pb-4">
               <CardTitle className="font-display text-2xl">
-                {isLogin ? "Welcome Back" : signupStep === "otp" ? "Verify Your Phone" : "Join Our Community"}
+                {authMode === "forgot" ? "Reset Password" : authMode === "login" ? "Welcome Back" : signupStep === "otp" ? "Verify Your Phone" : "Join Our Community"}
               </CardTitle>
               <CardDescription className="text-base">
-                {isLogin ? "Sign in to continue your skill-sharing journey" : signupStep === "otp" ? `Enter the 6-digit code sent to +65 ${phoneNumber}` : "Create an account to start exchanging skills"}
+                {authMode === "forgot" ? (resetEmailSent ? "Check your email for a reset link" : "Enter your email to receive a reset link") : authMode === "login" ? "Sign in to continue your skill-sharing journey" : signupStep === "otp" ? `Enter the 6-digit code sent to +65 ${phoneNumber}` : "Create an account to start exchanging skills"}
               </CardDescription>
             </CardHeader>
 
             <CardContent>
-              {/* OTP Verification Step */}
-              {!isLogin && signupStep === "otp" ? <div className="space-y-6">
+              {/* Forgot Password Flow */}
+              {authMode === "forgot" ? (
+                resetEmailSent ? (
+                  <div className="space-y-6 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mx-auto">
+                      <Mail className="w-8 h-8" />
+                    </div>
+                    <p className="text-muted-foreground">
+                      We've sent a password reset link to <strong>{email}</strong>
+                    </p>
+                    <Button variant="outline" className="w-full" onClick={() => switchAuthMode("login")}>
+                      Back to Sign In
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleForgotPassword} className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email" className="text-base font-medium">
+                        Email Address
+                      </Label>
+                      <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        <Input id="reset-email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} className="pl-12 h-14 text-base" required />
+                      </div>
+                    </div>
+                    <Button type="submit" variant="hero" size="xl" className="w-full" disabled={loading}>
+                      {loading ? "Sending..." : "Send Reset Link"}
+                    </Button>
+                    <Button type="button" variant="ghost" className="w-full" onClick={() => switchAuthMode("login")}>
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Back to Sign In
+                    </Button>
+                  </form>
+                )
+              ) : authMode === "signup" && signupStep === "otp" ? (
+                <div className="space-y-6">
                   <div className="flex justify-center">
                     <InputOTP maxLength={6} value={otpValue} onChange={setOtpValue}>
                       <InputOTPGroup>
@@ -230,9 +292,10 @@ const Auth = () => {
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to details
                   </Button>
-                </div> : (/* Details Form */
+                </div>
+              ) : (/* Details Form */
             <form onSubmit={handleDetailsSubmit} className="space-y-5">
-                  {!isLogin && <>
+                  {authMode === "signup" && <>
                       <div className="space-y-2">
                         <Label htmlFor="name" className="text-base font-medium">
                           Full Name
@@ -285,27 +348,36 @@ const Auth = () => {
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
                     </div>
-                    {!isLogin && <PasswordStrengthIndicator password={password} />}
+                    {authMode === "signup" && <PasswordStrengthIndicator password={password} />}
                   </div>
 
                   <Button type="submit" variant="hero" size="xl" className="w-full" disabled={loading}>
                     {loading ? "Please wait..." : <>
-                        {isLogin ? "Sign In" : "Continue"}
+                        {authMode === "login" ? "Sign In" : "Continue"}
                         <Sparkles className="ml-2 w-5 h-5" />
                       </>}
                   </Button>
+
+                  {authMode === "login" && (
+                    <button
+                      type="button"
+                      onClick={() => switchAuthMode("forgot")}
+                      className="w-full text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      Forgot your password?
+                    </button>
+                  )}
                 </form>)}
 
               {/* Toggle - only show when not in OTP step */}
-              {(isLogin || signupStep === "details") && <div className="mt-8 text-center">
+              {(authMode === "login" || (authMode === "signup" && signupStep === "details")) && <div className="mt-8 text-center">
                   <p className="text-muted-foreground">
-                    {isLogin ? "Don't have an account?" : "Already have an account?"}
+                    {authMode === "login" ? "Don't have an account?" : "Already have an account?"}
                   </p>
                   <button type="button" onClick={() => {
-                setIsLogin(!isLogin);
-                resetForm();
+                switchAuthMode(authMode === "login" ? "signup" : "login");
               }} className="mt-2 font-semibold text-primary hover:text-primary-dark transition-colors">
-                    {isLogin ? "Sign up for free" : "Sign in instead"}
+                    {authMode === "login" ? "Sign up for free" : "Sign in instead"}
                   </button>
                 </div>}
             </CardContent>
