@@ -90,23 +90,39 @@ const Browse = () => {
 
   const fetchProfiles = async () => {
     try {
-      let query = supabase.from("profiles").select("*");
-      
-      // Exclude current user if logged in
+      // For authenticated users, use rate-limited edge function
       if (user) {
-        query = query.neq("user_id", user.id);
+        const { data, error } = await supabase.functions.invoke('browse-profiles', {
+          body: null,
+        });
+
+        if (error) {
+          // Check for rate limit error
+          if (error.message?.includes('429') || error.message?.includes('Rate limit')) {
+            toast.error("Too many requests. Please wait a moment before browsing more profiles.");
+            setLoading(false);
+            return;
+          }
+          throw error;
+        }
+        
+        const profilesWithSkills = (data?.profiles || []).filter(
+          (p: Profile) => (p.skills_offered?.length > 0 || p.skills_wanted?.length > 0)
+        );
+        
+        setProfiles(profilesWithSkills);
+      } else {
+        // For unauthenticated users, use direct query (public browse)
+        const { data, error } = await supabase.from("profiles").select("*");
+
+        if (error) throw error;
+        
+        const profilesWithSkills = (data || []).filter(
+          (p) => (p.skills_offered?.length > 0 || p.skills_wanted?.length > 0)
+        );
+        
+        setProfiles(profilesWithSkills);
       }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      
-      // Filter profiles that have at least one skill
-      const profilesWithSkills = (data || []).filter(
-        (p) => (p.skills_offered?.length > 0 || p.skills_wanted?.length > 0)
-      );
-      
-      setProfiles(profilesWithSkills);
     } catch (error: any) {
       console.error("Error fetching profiles:", error);
       toast.error("Failed to load skills");
