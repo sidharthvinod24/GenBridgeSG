@@ -8,12 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ArrowLeft, Send, MessageCircle, Flag, AlertTriangle, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Send, MessageCircle, Flag, AlertTriangle, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { validateMessage } from "@/lib/validation";
 import { detectScamPatterns, ScamWarning } from "@/lib/scamDetection";
 import ReportUser from "@/components/ReportUser";
 import ScamAlertBanner from "@/components/ScamAlertBanner";
+import MessageActions from "@/components/MessageActions";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import logo from "@/assets/logo.png";
 
 interface Conversation {
   id: string;
@@ -49,6 +52,7 @@ const Messages = () => {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [translatedMessages, setTranslatedMessages] = useState<Record<string, string>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -260,22 +264,23 @@ const Messages = () => {
               </Link>
             </Button>
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
-                <Heart className="w-5 h-5 text-primary-foreground" />
-              </div>
+              <img src={logo} alt="GenBridgeSG Logo" className="w-10 h-10 rounded-xl object-cover" />
               <span className="font-display font-bold text-xl text-foreground">
                 Messages
               </span>
             </Link>
           </div>
           
-          {/* Report Button */}
-          <ReportUser 
-            chatPartners={conversations.map(c => ({
-              user_id: c.otherUser?.user_id || "",
-              full_name: c.otherUser?.full_name || null
-            })).filter(p => p.user_id)}
-          />
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            {/* Report Button */}
+            <ReportUser
+              chatPartners={conversations.map(c => ({
+                user_id: c.otherUser?.user_id || "",
+                full_name: c.otherUser?.full_name || null
+              })).filter(p => p.user_id)}
+            />
+          </div>
         </div>
       </header>
 
@@ -396,19 +401,29 @@ const Messages = () => {
                           <div
                             className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                           >
-                            <div
-                              className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                                isMe
-                                  ? "bg-primary text-primary-foreground rounded-br-md"
-                                  : scamWarning.isScammy
-                                    ? "bg-amber-100 dark:bg-amber-900/50 border border-amber-300 dark:border-amber-700 rounded-bl-md"
-                                    : "bg-muted rounded-bl-md"
-                              }`}
-                            >
-                              <p className="text-sm">{message.content}</p>
-                              <p className={`text-xs mt-1 ${isMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                                {formatTime(message.created_at)}
-                              </p>
+                            <div className="flex flex-col">
+                              <div
+                                className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                                  isMe
+                                    ? "bg-primary text-primary-foreground rounded-br-md"
+                                    : scamWarning.isScammy
+                                      ? "bg-amber-100 dark:bg-amber-900/50 border border-amber-300 dark:border-amber-700 rounded-bl-md"
+                                      : "bg-muted rounded-bl-md"
+                                }`}
+                              >
+                                <p className="text-sm">
+                                  {translatedMessages[message.id] || message.content}
+                                </p>
+                                <p className={`text-xs mt-1 ${isMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                                  {formatTime(message.created_at)}
+                                </p>
+                              </div>
+                              <MessageActions
+                                content={message.content}
+                                onTranslate={(text) => 
+                                  setTranslatedMessages(prev => ({ ...prev, [message.id]: text }))
+                                }
+                              />
                             </div>
                           </div>
                           
