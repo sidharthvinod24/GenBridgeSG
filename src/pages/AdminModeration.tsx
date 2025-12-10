@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAdminRole } from "@/hooks/useAdminRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -73,7 +72,6 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
 
 const AdminModeration = () => {
   const { user } = useAuth();
-  const { isAdmin, loading: adminLoading } = useAdminRole();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -83,10 +81,8 @@ const AdminModeration = () => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isAdmin) {
-      fetchReports();
-    }
-  }, [isAdmin]);
+    fetchReports();
+  }, []);
 
   const fetchReports = async () => {
     try {
@@ -225,7 +221,7 @@ const AdminModeration = () => {
     : reports.filter(r => r.status === statusFilter);
 
   // Loading state
-  if (adminLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -234,11 +230,6 @@ const AdminModeration = () => {
         </div>
       </div>
     );
-  }
-
-  // Redirect if not admin
-  if (!isAdmin) {
-    return <Navigate to="/dashboard" replace />;
   }
 
   return (
