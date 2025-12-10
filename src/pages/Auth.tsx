@@ -143,7 +143,7 @@ const Auth = () => {
     }
     setLoading(true);
     try {
-      // Create the account
+      // Create the account with phone number in metadata
       const {
         data,
         error
@@ -153,32 +153,12 @@ const Auth = () => {
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
-            full_name: name
+            full_name: name,
+            phone_number: `+65${phoneNumber}`
           }
         }
       });
       if (error) throw error;
-
-      // Update the profile with phone number after a short delay to ensure profile is created
-      if (data.user) {
-        // Wait a moment for the trigger to create the profile
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        const {
-          error: profileError
-        } = await supabase.from("profiles").update({
-          phone_number: `+65${phoneNumber}`
-        }).eq("user_id", data.user.id);
-        
-        if (profileError) {
-          console.error("Error updating phone number:", profileError);
-          // Retry once more after another delay
-          await new Promise(resolve => setTimeout(resolve, 500));
-          await supabase.from("profiles").update({
-            phone_number: `+65${phoneNumber}`
-          }).eq("user_id", data.user.id);
-        }
-      }
       toast.success("Account created successfully!");
       resetForm();
       setAuthMode("login");
