@@ -100,6 +100,7 @@ const Dashboard = () => {
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
     age: null,
     q_skills_to_share: "",
+    q_skill_proficiency: "",
     q_digital_help_needed: [],
     q_languages_dialects: [],
     q_communication_preference: "",
@@ -172,6 +173,7 @@ const Dashboard = () => {
         setQuestionnaireAnswers({
           age: data.age || null,
           q_skills_to_share: data.q_skills_to_share || "",
+          q_skill_proficiency: (data as any).q_skill_proficiency || "",
           q_digital_help_needed: data.q_digital_help_needed || [],
           q_languages_dialects: data.q_languages_dialects || [],
           q_communication_preference: data.q_communication_preference || "",
@@ -706,6 +708,19 @@ const Dashboard = () => {
                     {questionnaireAnswers.age ? `${questionnaireAnswers.age} years old` : "Complete questionnaire"}
                   </p>
                 </div>
+
+                {/* What they want to share/teach from questionnaire */}
+                {profile?.q_skills_to_share && (
+                  <div className="space-y-2">
+                    <Label className="text-base font-medium flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-secondary" />
+                      {(questionnaireAnswers.age ?? 0) >= 40 ? "Knowledge to Share" : "Skill to Teach"}
+                    </Label>
+                    <p className="text-foreground py-3 bg-muted/50 rounded-lg px-4">
+                      {profile.q_skills_to_share}
+                    </p>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="bio" className="text-base font-medium">
