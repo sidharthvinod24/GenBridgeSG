@@ -15,6 +15,8 @@ import Messages from "./pages/Messages";
 import Browse from "./pages/Browse";
 import AdminModeration from "./pages/AdminModeration";
 import SafetyGuidelines from "./pages/SafetyGuidelines";
+import ContactUs from "./pages/ContactUs";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +58,8 @@ const App = () => (
             />
             <Route path="/browse" element={<Browse />} />
             <Route path="/safety" element={<SafetyGuidelines />} />
+            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/faq" element={<FAQ />} />
             <Route 
               path="/admin" 
               element={

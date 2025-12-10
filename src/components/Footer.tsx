@@ -47,17 +47,12 @@ const Footer = () => {
             <h4 className="font-display font-bold text-lg mb-4">{t.footer.support}</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
-                  {t.footer.helpCenter}
-                </Link>
-              </li>
-              <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
+                <Link to="/contact" className="text-background/70 hover:text-primary transition-colors">
                   {t.footer.contactUs}
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-background/70 hover:text-primary transition-colors">
+                <Link to="/faq" className="text-background/70 hover:text-primary transition-colors">
                   {t.footer.faq}
                 </Link>
               </li>
