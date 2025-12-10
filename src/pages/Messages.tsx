@@ -135,11 +135,14 @@ const Messages = () => {
             ? convo.participant_two 
             : convo.participant_one;
 
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("user_id, full_name, avatar_url")
-            .eq("user_id", otherUserId)
-            .maybeSingle();
+          const { data: profileData } = await supabase
+            .rpc("get_public_profile", { target_user_id: otherUserId });
+          
+          const profile = profileData?.[0] ? {
+            user_id: profileData[0].user_id,
+            full_name: profileData[0].full_name,
+            avatar_url: profileData[0].avatar_url
+          } : null;
 
           // Get last message
           const { data: lastMsg } = await supabase
